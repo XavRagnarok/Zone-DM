@@ -1,0 +1,5 @@
+{
+ "cmd": ["pawncc.exe", "-i includes", "$file", "-;+"],
+ "path": "D:/learning pawno/savline-rpg-main/pawno"  
+}
+
