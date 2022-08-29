@@ -24,7 +24,7 @@ REMOTE_FUNC__ stock static void:yrt_4(hi)
 
 REMOTE_FUNC__ static stock string:yrt_5(hi, const string:you[], there[], tt, &other, const len = 7)
 {
-	//printf("yrt_5 called");
+	//print("yrt_5 called");
 	#pragma unused hi, you, there, tt, len
 	new str[144];
 	str = "Hello World";
@@ -36,7 +36,7 @@ REMOTE_FUNC__ stock Float:yrt_6(hi, string:you[], there[], len);
 
 REMOTE_FUNC__ static void:yrt_7(&a, &b, c, &d)
 {
-	//printf("yrt_7 called");
+	//print("yrt_7 called");
 	a = 8;
 	b = a;
 	c += d;
@@ -145,7 +145,7 @@ TEST__ y_remote_6()
 
 TEST__ y_remote_7()
 {
-	new a, b, c = 123, d = 456;
+	new a = 1, b = 1, c = 123, d = 456;
 	yrt_7(a, b, c, d);
 	ASSERT_EQ(a, 8);
 	ASSERT_EQ(b, 8);

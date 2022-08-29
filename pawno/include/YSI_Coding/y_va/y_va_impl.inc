@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -106,10 +107,10 @@ static stock YVA2_DoPush(const skippedBytes, const pushedBytes, const pushRequir
 	// Used in reality, but copied to statics first.
 	#pragma unused pushedBytes, skippedBytes, pushRequirements
 	static
-		sReturnAddress,
-		sPushedParameters,
-		sParametersBase,
-		sTotalParameters;
+		sReturnAddress = 0,
+		sPushedParameters = 0,
+		sParametersBase = 0,
+		sTotalParameters = 0;
 	// Although "pushedBytes" is "const", we actually rewrite the value at
 	// the call site when the mode starts.  By default it is ALWAYS 0, because
 	// we have no way to determine the true value at compile time.  We must
@@ -298,11 +299,11 @@ static stock YVA2_CodeGenShiftCode(dest, src, end)
 static stock YVA2_CodeGenMainCleanup(ctx[AsmContext])
 {
 	static
-		sTemp;
+		sTemp = 0;
 	// Get the number of pushed parameters.
 	@emit POP.alt                 // 4
 	// Save the return value.
-	@emit STOR.pri     ref(sTemp) // 12
+	@emit STOR.pri     AMX_Ref(sTemp) // 12
 	// Load the stack pointer.
 	@emit LCTRL        4          // 20
 	// Remove the number of pushed parameters.
@@ -310,7 +311,7 @@ static stock YVA2_CodeGenMainCleanup(ctx[AsmContext])
 	// Store the stack pointer.
 	@emit SCTRL        4          // 32
 	// Restore the return value.
-	@emit LOAD.pri     ref(sTemp) // 40
+	@emit LOAD.pri     AMX_Ref(sTemp) // 40
 }
 
 static stock YVA2_CodeGenDeepCleanup(ctx[AsmContext], depth, returningString)
@@ -318,7 +319,7 @@ static stock YVA2_CodeGenDeepCleanup(ctx[AsmContext], depth, returningString)
 	if (returningString)
 		@emit POP.pri
 	// Remove all the temporary storage locations.
-	@emit STACK        depth * cellbytes
+	@emit STACK        (depth << __COMPILER_CELL_SHIFT)
 }
 
 static stock YVA2_CodeGenPushVariable(ctx[AsmContext], stack)
@@ -386,7 +387,7 @@ static stock YVA2_FoundCall(const m[CodeScanner])
 			new
 				dest = YSI_g_sContexts[pos][AsmContext_buffer];
 			// First, rewrite the `___` call-site to call `YVA2_DoPush` instead.
-			YVA2_CodeGenPushSite(YSI_g_sContexts[pos], hole, YSI_g_sSkips[pos], -YSI_g_sStacks[0] - pos * cellbytes), // YSI_g_sStacks[0]!!!
+			YVA2_CodeGenPushSite(YSI_g_sContexts[pos], hole, YSI_g_sSkips[pos], -YSI_g_sStacks[0] - (pos << __COMPILER_CELL_SHIFT)), // YSI_g_sStacks[0]!!!
 			// Shift the code up.
 			YVA2_CodeGenShiftCode(
 				dest + YSI_g_sContexts[pos][AsmContext_buffer_offset],
@@ -397,7 +398,7 @@ static stock YVA2_FoundCall(const m[CodeScanner])
 			YSI_g_sContexts[pos][AsmContext_buffer_offset] = (end - dest) - (YSI_g_sLength[pos] - codeLength + returningString) - 16;
 			if (len == 24)
 				YSI_g_sContexts[pos][AsmContext_buffer_offset] -= 8;
-			YVA2_CodeGenPushVariable(YSI_g_sContexts[pos], -YSI_g_sStacks[0] - pos * cellbytes);
+			YVA2_CodeGenPushVariable(YSI_g_sContexts[pos], -YSI_g_sStacks[0] - (pos << __COMPILER_CELL_SHIFT));
 			YSI_g_sContexts[pos][AsmContext_buffer_offset] += 8;
 			if (returningString == 12)
 				YSI_g_sContexts[pos][AsmContext_buffer_offset] += 8;
@@ -680,7 +681,7 @@ stock va_getstring(dest[], arg, len = sizeof (dest))
 	#emit PUSH.pri
 	// Load the address of the destination.
 	#emit LOAD.S.alt dest
-	// Blank the first cell so "strcat" behaves like "strcpy".
+	// Blank the first cell so "strcat" behaves like "StrCpy".
 	#emit ZERO.pri
 	// Store the loaded number 0 to the loaded address.
 	#emit STOR.I
@@ -694,57 +695,3 @@ stock va_getstring(dest[], arg, len = sizeof (dest))
 	#emit STACK      16
 }
 
-stock PlayerText:va_CreatePlayerTextDraw(playerid, Float:x, Float:y, const fmat[], va_args<>)
-{
-	return CreatePlayerTextDraw(playerid, x, y, va_return(fmat, va_start<4>));
-}
-
-stock Text:va_TextDrawCreate(Float:x, Float:y, const fmat[], va_args<>)
-{
-	return TextDrawCreate(x, y, va_return(fmat, va_start<3>));
-}
-
-stock va_SendClientMessage(playerid, colour, const fmat[], va_args<>)
-{
-	return SendClientMessage(playerid, colour, va_return(fmat, va_start<3>));
-}
-
-stock va_SendClientMessageToAll(colour, const fmat[], va_args<>)
-{
-	return SendClientMessageToAll(colour, va_return(fmat, va_start<2>));
-}
-
-stock va_SendPlayerMessageToPlayer(playerid, senderid, const fmat[], va_args<>)
-{
-	return SendPlayerMessageToPlayer(playerid, senderid, va_return(fmat, va_start<3>));
-}
-
-stock va_SendPlayerMessageToAll(senderid, const fmat[], va_args<>)
-{
-	return SendPlayerMessageToAll(senderid, va_return(fmat, va_start<2>));
-}
-
-stock va_GameTextForPlayer(playerid, const fmat[], time, style, va_args<>)
-{
-	return GameTextForPlayer(playerid, va_return(fmat, va_start<4>), time, style);
-}
-
-stock va_GameTextForAll(const fmat[], time, style, va_args<>)
-{
-	return GameTextForAll(va_return(fmat, va_start<3>), time, style);
-}
-
-stock va_print(const fmat[], va_args<>)
-{
-	return print(va_return(fmat, va_start<1>));
-}
-
-stock va_fprintf(File:fhnd, const fmat[], va_args<>)
-{
-	return fwrite(fhnd, va_return(fmat, va_start<2>));
-}
-
-stock va_SendRconCommand(const command[], va_args<>)
-{
-	return SendRconCommand(va_return(command, va_start<1>));
-}

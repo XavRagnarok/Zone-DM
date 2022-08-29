@@ -242,7 +242,7 @@ MyCustomHandler(...)
 }
 ```
 
-All the parameters are the parameters the user gave to `@`, i.e. the parameters for the final function to be called.  For this reason there are two magic globals: `INDIRECTION_DATA` contains a pointer to the `E_INDIRECTION` data.  `INDIRECTION_TAG` contains the index of the function's tag, the string of the tag (which includes all the specifier characters) can be retrieved with `Indirect_Tag(id, dest[32])`.
+All the parameters are the parameters the user gave to `@`, i.e. the parameters for the final function to be called.  For this reason there are two magic globals: `INDIRECTION_DATA` contains a pointer to the `E_INDIRECTION` data.  `INDIRECTION_TAG` contains the index of the function's tag, the string of the tag (which includes all the specifier characters) can be retrieved with `Indirect_Tag(id, dest[64])`.
 
 ## Testing
 
@@ -253,4 +253,25 @@ sampctl package run
 ```
 
 And connect to `localhost:7777` to test.
+
+### Metadata
+
+You can attach a single piece of metadata to a function.  This is arbitrary data that you can access via the function handle:
+
+```pawn
+Indirect_SetMeta(func, 5);
+printf("%d", Indirect_GetMeta(func)); // Prints 5
+```
+
+This allows you to associate things like handles, for example a timer handle:
+
+```
+stock SetTimerCallback(Func:func<>, time, bool:repeat)
+{
+	Indirect_Claim(func);
+	new timer = SetTimerEx("@y_inlineTimerInvoke", time, repeat, "ii", _:func, !repeat);
+	Indirect_SetMeta(func, timer);
+	return _:func;
+}
+```
 

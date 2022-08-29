@@ -23,16 +23,29 @@
 #endif
 #define SHELL_EXECUTE_INC
 
-#include "import_table"
-#include "../amx_header"
-#include "../amx_memory"
-#include "../dynamic_call"
-#include "../phys_memory"
-#include "../shellcode"
+/**
+ * <library name="amx_assembly Windows ShellExecute" summary="AMX Assembly Library: Execute arbitrary x86 assembly on Windows.">
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
+ *   <remarks>http://msdn.microsoft.com/en-us/library/windows/desktop/bb762153%28v=vs.85%29.aspx</remarks>
+ * </library>
+ */
 
-// http://msdn.microsoft.com/en-us/library/windows/desktop/bb762153%28v=vs.85%29.aspx
+/// <p/>
+
+#include "import_table"
+#include "..\amx_header"
+#include "..\amx_memory"
+#include "..\dynamic_call"
+#include "..\phys_memory"
+#include "..\shellcode"
 
 #define SW_HIDE (0)
+#define SW_NORMAL (1)
 #define SW_MAXIMIZE (3)
 #define SW_MINIMIZE (6)
 #define SW_RESTORE (9)
@@ -45,7 +58,24 @@
 #define SW_SHOWNOACTIVATE (4)
 #define SW_SHOWNORMAL (1)
 
-// NOTE: string arguments must be prepared with ToCharString() or similar function.
+// (0)                              // The operating system is out of memory or resources.
+#define ERROR_FILE_NOT_FOUND (2)    //  The specified file was not found.
+#define ERROR_PATH_NOT_FOUND (3)    // The specified path was not found.
+#define ERROR_BAD_FORMAT (11)       // The .exe file is invalid (non-Win32 .exe or error in .exe image).
+#define SE_ERR_ACCESSDENIED (5)     // The operating system denied access to the specified file.
+#define SE_ERR_ASSOCINCOMPLETE (27) // The file name association is incomplete or invalid.
+#define SE_ERR_DDEBUSY (30)         // The DDE transaction could not be completed because other DDE transactions were being processed.
+#define SE_ERR_DDEFAIL (29)         // The DDE transaction failed.
+#define SE_ERR_DDETIMEOUT (28)      // The DDE transaction could not be completed because the request timed out.
+#define SE_ERR_DLLNOTFOUND (32)     // The specified DLL was not found.
+#define SE_ERR_FNF (2)              // The specified file was not found.
+#define SE_ERR_NOASSOC (31)         // There is no application associated with the given file name extension. This error will also be returned if you attempt to print a file that is not printable.
+#define SE_ERR_OOM (8)              // There was not enough memory to complete the operation.
+#define SE_ERR_PNF (3)              // The specified path was not found.
+#define SE_ERR_SHARE (26)           // A sharing violation occurred.
+
+/// <library>amx_assembly Windows ShellExecute</library>
+/// <remarks>NOTE: string arguments must be prepared with ToCharString() or similar function.</remarks>
 stock ShellExecute(const Operation[], const File[], const Parameters[], ShowCmd) {
 	/*
 	.text:10001000 55                                push    ebp
@@ -110,3 +140,4 @@ stock ShellExecute(const Operation[], const File[], const Parameters[], ShowCmd)
 
 	return RunShellcode(refabs(asm));
 }
+

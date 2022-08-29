@@ -20,7 +20,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -117,7 +118,7 @@ Optional plugins:
  * </returns>
  *//*------------------------------------------------------------------------**/
 
-stock Sparse_TryGet(const name[], index, &dest)
+stock bool:Sparse_TryGet(const name[], index, &dest)
 {
 	new id[64];
 	SparseArray_MakeName(id, name, index);
@@ -132,18 +133,19 @@ stock Sparse_TryGet(const name[], index, &dest)
 /*-------------------------------------------------------------------------*//**
  * <param name="name">The sparse array.</param>
  * <param name="index">The index in the array.</param>
+ * <param name="def">The default value when the slot isn't found.</param>
  * <returns>
  *  The value at this index (or <c>cellmin</c>).
  * </returns>
  *//*------------------------------------------------------------------------**/
 
-stock Sparse_Get(const name[], index)
+stock Sparse_Get(const name[], index, def = cellmin)
 {
 	new id[64];
 	SparseArray_MakeName(id, name, index);
 	if (SparseArray_Exists(id, name, index))
 		return SparseArray_DoRead(id, name, index);
-	return cellmin;
+	return def;
 }
 
 /*-------------------------------------------------------------------------*//**
@@ -195,8 +197,37 @@ stock Sparse_Set(const name[], index, value)
 /*-------------------------------------------------------------------------*//**
  * <param name="name">The sparse array.</param>
  * <param name="index">The index in the array.</param>
- * <param name="value">The destination variable.</param>
- * <param name="nv">The new value.</param>
+ * <param name="oldValue">The destination variable.</param>
+ * <param name="newValue">The new value.</param>
+ * <returns>
+ *  Did the value exist?
+ * </returns>
+ * <remarks>
+ *  Get the value and replace it in the array.
+ * </remarks>
+ *//*------------------------------------------------------------------------**/
+
+stock bool:_Sparse_ExchangeNew(const name[], index, &oldValue, newValue)
+{
+	new id[64];
+	SparseArray_MakeName(id, name, index);
+	if (SparseArray_Exists(id, name, index))
+	{
+		oldValue = SparseArray_DoRead(id, name, index);
+		SparseArray_DoWrite(id, name, index, newValue);
+		return true;
+	}
+	else
+	{
+		SparseArray_DoWrite(id, name, index, newValue);
+	}
+	return false;
+}
+
+/*-------------------------------------------------------------------------*//**
+ * <param name="name">The sparse array.</param>
+ * <param name="index">The index in the array.</param>
+ * <param name="oldValue">The destination variable.</param>
  * <returns>
  *  Did the value exist?
  * </returns>
@@ -205,23 +236,22 @@ stock Sparse_Set(const name[], index, value)
  * </remarks>
  *//*------------------------------------------------------------------------**/
 
-stock bool:Sparse_Exchange(const name[], index, &value, nv = cellmin)
+stock bool:_Sparse_Exchange(const name[], index, &oldValue)
 {
 	new id[64];
 	SparseArray_MakeName(id, name, index);
 	if (SparseArray_Exists(id, name, index))
 	{
-		value = SparseArray_DoRead(id, name, index);
-		if (nv == cellmin)
-			SparseArray_DoDelete(id, name, index);
-		else
-			SparseArray_DoWrite(id, name, index, nv);
+		oldValue = SparseArray_DoRead(id, name, index);
+		SparseArray_DoDelete(id, name, index);
 		return true;
 	}
-	else if (nv != cellmin)
-		SparseArray_DoWrite(id, name, index, nv);
 	return false;
 }
+
+// Make the last parameter fully optional (not just with a default).
+#define Sparse_Exchange(%0) _Sparse_Exchange(%0)PP_DOLLAR$
+#define _Sparse_Exchange(%0,%1,%2,%3)%9$ _Sparse_ExchangeNew(%0,%1,%2,%3)%9$
 
 #if defined YSI_TESTS
 	#include "..\y_iterate"

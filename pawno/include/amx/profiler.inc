@@ -23,10 +23,25 @@
 #endif
 #define PROFILER_INC
 
+/**
+ * <library name="amx_assembly profiler" summary="AMX Assembly Library: Performance profiler.">
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
+ * </library>
+ */
+
+/// <p/>
+
 #include <file>
 #include <time>
 #include <string>
-#tryinclude <console>
+#if !defined _samp_included
+	#tryinclude <console>
+#endif
 
 #include "amx_base"
 #include "amx_header"
@@ -42,6 +57,9 @@
 	#define PROF_MAX_PUBLICS 1000
 #endif
 
+/// <p/>
+
+/// <library>amx_assembly profiler</library>
 enum ProfEntryCode {
 	Opcode:pec_push_c0,
 	pec_push_address,
@@ -53,26 +71,51 @@ enum ProfEntryCode {
 	pec_call_enter
 }
 
-static stock g_pecs[PROF_MAX_PUBLICS][ProfEntryCode];
-static stock g_num_pecs;
+/// <library>amx_assembly profiler</library>
+const ProfEntryCode:ProfEntryCode__ = ProfEntryCode;
 
+/// <library>amx_assembly profiler</library>
+static stock g_pecs[PROF_MAX_PUBLICS][ProfEntryCode];
+
+/// <library>amx_assembly profiler</library>
+static stock g_num_pecs = 0;
+
+/// <p/>
+
+/// <library>amx_assembly profiler</library>
 enum ProfCallInfo {
 	pci_index,
 	pci_start_time
 }
 
+/// <library>amx_assembly profiler</library>
+const ProfCallInfo:ProfCallInfo__ = ProfCallInfo;
+
+/// <p/>
+
+/// <library>amx_assembly profiler</library>
 enum ProfPublicInfo {
 	ppi_child_time,
 	ppi_total_time,
 	ppi_num_calls
 }
 
+/// <library>amx_assembly profiler</library>
+const ProfPublicInfo:ProfPublicInfo__ = ProfPublicInfo;
+
+/// <library>amx_assembly profiler</library>
 static stock g_publics[PROF_MAX_PUBLICS][ProfPublicInfo];
-static stock g_num_publics;
 
+/// <library>amx_assembly profiler</library>
+static stock g_num_publics = 0;
+
+/// <library>amx_assembly profiler</library>
 static stock g_call_stack[PROF_MAX_CALL_STACK][ProfCallInfo];
-static stock g_call_depth;
 
+/// <library>amx_assembly profiler</library>
+static stock g_call_depth = 0;
+
+/// <library>amx_assembly profiler</library>
 static stock exit_public() {
 	if (--g_call_depth < sizeof(g_call_stack)) {
 		new index = g_call_stack[g_call_depth][pci_index];
@@ -101,7 +144,7 @@ static stock exit_public() {
 			g_publics[index][ppi_num_calls]++;
 		}
 		//{
-		//	new public_name[32];
+		//	new public_name[64];
 		//	GetPublicNameByIndex(index, public_name);
 		//	printf("Leaving %s", public_name);
 		//}
@@ -111,9 +154,10 @@ static stock exit_public() {
 	return 0; // make compiler happy
 }
 
+/// <library>amx_assembly profiler</library>
 static stock enter_public(index, address) {
 	//{
-	//	new public_name[32];
+	//	new public_name[64];
 	//	GetPublicNameByIndex(index, public_name);
 	//	printf("Entering %s", public_name);
 	//}
@@ -145,6 +189,7 @@ static stock enter_public(index, address) {
 	return 0; // make compiler happy
 }
 
+/// <library>amx_assembly profiler</library>
 static stock new_pec(index, address, code_start) {
 	if (g_num_pecs < sizeof(g_pecs)) {
 		new pec[ProfEntryCode];
@@ -158,7 +203,7 @@ static stock new_pec(index, address, code_start) {
 		pec[pec_push_c2] = RelocateOpcode(OP_PUSH_C);
 		pec[pec_push_8] = 8;
 
-		new enter_proc;
+		new enter_proc = 0;
 		#emit const.pri enter_public
 		#emit stor.s.pri enter_proc
 		pec[pec_call] = RelocateOpcode(OP_CALL);
@@ -171,6 +216,7 @@ static stock new_pec(index, address, code_start) {
 	return -1;
 }
 
+/// <library>amx_assembly profiler</library>
 stock ProfilerInit() {
 	new hdr[AMX_HDR];
 	GetAmxHeader(hdr);
@@ -183,7 +229,7 @@ stock ProfilerInit() {
 
 	// Redirect all public calls to ProfileHook().
 	for (new i = 0, cur = publics; i < num_publics; cur += defsize, i++) {
-		new address;
+		new address = 0;
 		#emit lref.s.pri cur
 		#emit stor.s.pri address
 
@@ -194,7 +240,7 @@ stock ProfilerInit() {
 		}
 
 		// Get start address of the g_pecs sub-array at pec_index.
-		new pec_start;
+		new pec_start = 0;
 		#emit const.alt g_pecs
 		#emit load.s.pri pec_index
 		#emit idxaddr
@@ -213,6 +259,7 @@ stock ProfilerInit() {
 	}
 }
 
+/// <library>amx_assembly profiler</library>
 stock bool:ProfilerWriteData(const filename[]) {
 	new File:file = fopen(filename, io_write);
 	new buffer[100];
@@ -226,7 +273,7 @@ stock bool:ProfilerWriteData(const filename[]) {
 	fwrite(file, "+----------------------------------+----------------+----------------+----------------+\n");
 
 	for (new i = 0; i < g_num_publics; i++) {
-			new name[32];
+			new name[64];
 			GetPublicNameFromIndex(i, name);
 		#if defined strformat
 			strformat(buffer, sizeof(buffer), false, "| %32s |%15d |%15d |%15d |\n",
@@ -255,3 +302,4 @@ stock bool:ProfilerWriteData(const filename[]) {
 	fclose(file);
 	return true;
 }
+

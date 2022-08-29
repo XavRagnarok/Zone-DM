@@ -23,6 +23,19 @@
 #endif
 #define OPCODE_INC
 
+/**
+ * <library name="amx_assembly opcode" summary="AMX Assembly Library: Information on all PAWN opcodes.">
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
+ * </library>
+ */
+
+/// <p/>
+
 #if __Pawn >= 0x30A
 	// Disable the recursion warning in the Russian compiler.
 	#pragma warning push
@@ -36,6 +49,9 @@
 
 #define OPCODE_MAX_INSN_NAME 15
 
+/// <p/>
+
+/// <library>amx_assembly opcode</library>
 enum Opcode {
   OP_NONE,         OP_LOAD_PRI,     OP_LOAD_ALT,
   OP_LOAD_S_PRI,   OP_LOAD_S_ALT,   OP_LREF_PRI,
@@ -86,157 +102,68 @@ enum Opcode {
   OP_LAST_
 };
 
-enum OpcodeInsnInfo {
-	OpcodeInsnInfo_name[OPCODE_MAX_INSN_NAME],
-	OpcodeInsnInfo_num_opers,
-	bool:OpcodeInsnInfo_needs_reloc
-}
+/// <library>amx_assembly opcode</library>
+const Opcode:Opcode__ = Opcode;
 
-static stock const insn_table[][OpcodeInsnInfo] = {
-	{ "none",        0, false },
-	{ "load.pri",    1, false },
-	{ "load.alt",    1, false },
-	{ "load.s.pri",  1, false },
-	{ "load.s.alt",  1, false },
-	{ "lref.pri",    1, false },
-	{ "lref.alt",    1, false },
-	{ "lref.s.pri",  1, false },
-	{ "lref.s.alt",  1, false },
-	{ "load.i",      0, false },
-	{ "lodb.i",      1, false },
-	{ "const.pri",   1, false },
-	{ "const.alt",   1, false },
-	{ "addr.pri",    1, false },
-	{ "addr.alt",    1, false },
-	{ "stor.pri",    1, false },
-	{ "stor.alt",    1, false },
-	{ "stor.s.pri",  1, false },
-	{ "stor.s.alt",  1, false },
-	{ "sref.pri",    1, false },
-	{ "sref.alt",    1, false },
-	{ "sref.s.pri",  1, false },
-	{ "sref.s.alt",  1, false },
-	{ "stor.i",      0, false },
-	{ "strb.i",      1, false },
-	{ "lidx",        0, false },
-	{ "lidx.b",      1, false },
-	{ "idxaddr",     0, false },
-	{ "idxaddr.b",   1, false },
-	{ "align.pri",   1, false },
-	{ "align.alt",   1, false },
-	{ "lctrl",       1, false },
-	{ "sctrl",       1, false },
-	{ "move.pri",    0, false },
-	{ "move.alt",    0, false },
-	{ "xchg",        0, false },
-	{ "push.pri",    0, false },
-	{ "push.alt",    0, false },
-	{ "push.r",      1, false },
-	{ "push.c",      1, false },
-	{ "push",        1, false },
-	{ "push.s",      1, false },
-	{ "pop.pri",     0, false },
-	{ "pop.alt",     0, false },
-	{ "stack",       1, false },
-	{ "heap",        1, false },
-	{ "proc",        0, false },
-	{ "ret",         0, false },
-	{ "retn",        0, false },
-	{ "call",        1, true  },
-	{ "call.pri",    0, false },
-	{ "jump",        1, true  },
-	{ "jrel",        1, false },
-	{ "jzer",        1, true  },
-	{ "jnz",         1, true  },
-	{ "jeq",         1, true  },
-	{ "jneq",        1, true  },
-	{ "jless",       1, true  },
-	{ "jleq",        1, true  },
-	{ "jgrtr",       1, true  },
-	{ "jgeq",        1, true  },
-	{ "jsless",      1, true  },
-	{ "jsleq",       1, true  },
-	{ "jsgrtr",      1, true  },
-	{ "jsgeq",       1, true  },
-	{ "shl",         0, false },
-	{ "shr",         0, false },
-	{ "sshr",        0, false },
-	{ "shl.c.pri",   1, false },
-	{ "shl.c.alt",   1, false },
-	{ "shr.c.pri",   1, false },
-	{ "shr.c.alt",   1, false },
-	{ "smul",        0, false },
-	{ "sdiv",        0, false },
-	{ "sdiv.alt",    0, false },
-	{ "umul",        0, false },
-	{ "udiv",        0, false },
-	{ "udiv.alt",    0, false },
-	{ "add",         0, false },
-	{ "sub",         0, false },
-	{ "sub.alt",     0, false },
-	{ "and",         0, false },
-	{ "or",          0, false },
-	{ "xort",        0, false },
-	{ "not",         0, false },
-	{ "neg",         0, false },
-	{ "invert",      0, false },
-	{ "add.c",       1, false },
-	{ "smul.c",      1, false },
-	{ "zero.pri",    0, false },
-	{ "zero.alt",    0, false },
-	{ "zero",        1, false },
-	{ "zero.s",      1, false },
-	{ "sign.pri",    0, false },
-	{ "sign.alt",    0, false },
-	{ "eq",          0, false },
-	{ "neq",         0, false },
-	{ "less",        0, false },
-	{ "leq",         0, false },
-	{ "grtr",        0, false },
-	{ "geq",         0, false },
-	{ "sless",       0, false },
-	{ "sleq",        0, false },
-	{ "sgrtr",       0, false },
-	{ "sgeq",        0, false },
-	{ "eq.c.pri",    1, false },
-	{ "eq.c.alt",    1, false },
-	{ "inc.pri",     0, false },
-	{ "inc.alt",     0, false },
-	{ "inc",         1, false },
-	{ "inc.s",       1, false },
-	{ "inc.i",       0, false },
-	{ "dec.pri",     0, false },
-	{ "dec.alt",     0, false },
-	{ "dec",         1, false },
-	{ "dec.s",       1, false },
-	{ "dec.i",       0, false },
-	{ "movs",        1, false },
-	{ "cmps",        1, false },
-	{ "fill",        1, false },
-	{ "halt",        1, false },
-	{ "bounds",      1, false },
-	{ "sysreq.pri",  0, false },
-	{ "sysreq.c",    1, false },
-	{ "file",       -1, false }, // obsolete
-	{ "line",       -1, false }, // obsolete
-	{ "symbol",     -1, false }, // obsolete
-	{ "srange",     -1, false }, // obsolete
-	{ "jump.pri",    0, false },
-	{ "switch",      1, true },
-	{ "casetbl",    -1, true },
-	{ "swap.pri",    0, false },
-	{ "swap.alt",    0, false },
-	{ "push.adr",    1, false },
-	{ "nop",         0, false },
-	{ "sysreq.d",    1, false },
-	{ "symtag",      1, false }, // obsolete
-	{ "break",       0, false }
+/// <library>amx_assembly opcode</library>
+stock const gAMXOpcodeParameterCounts[] = {
+	0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1,
+	1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,
+	0, 1, 1, 0, 0, 1, 0, 1, 1, 0
 };
 
+/// <library>amx_assembly opcode</library>
+stock const gAMXOpcodeNeedsReloc[] = {
+	false, false, false, false, false, false, false, false, false, false, false, false, false,
+	false, false, false, false, false, false, false, false, false, false, false, false, false,
+	false, false, false, false, false, false, false, false, false, false, false, false, false,
+	false, false, false, false, false, false, false, false, false, false, true , false, true ,
+	false, true , true , true , true , true , true , true , true , true , true , true , true ,
+	false, false, false, false, false, false, false, false, false, false, false, false, false,
+	false, false, false, false, false, false, false, false, false, false, false, false, false,
+	false, false, false, false, false, false, false, false, false, false, false, false, false,
+	false, false, false, false, false, false, false, false, false, false, false, false, false,
+	false, false, false, false, false, false, false, false, false, false, false, false, true ,
+	true , false, false, false, false, false, false, false
+};
+
+/// <library>amx_assembly opcode</library>
+stock const gAMXOpcodeNames[][OPCODE_MAX_INSN_NAME] = {
+	"none", "load.pri", "load.alt", "load.s.pri", "load.s.alt", "lref.pri", "lref.alt",
+	"lref.s.pri", "lref.s.alt", "load.i", "lodb.i", "const.pri", "const.alt", "addr.pri",
+	"addr.alt", "stor.pri", "stor.alt", "stor.s.pri", "stor.s.alt", "sref.pri", "sref.alt",
+	"sref.s.pri", "sref.s.alt", "stor.i", "strb.i", "lidx", "lidx.b", "idxaddr", "idxaddr.b",
+	"align.pri", "align.alt", "lctrl", "sctrl", "move.pri", "move.alt", "xchg", "push.pri",
+	"push.alt", "push.r", "push.c", "push", "push.s", "pop.pri", "pop.alt", "stack", "heap", "proc",
+	"ret", "retn", "call", "call.pri", "jump", "jrel", "jzer", "jnz", "jeq", "jneq", "jless",
+	"jleq", "jgrtr", "jgeq", "jsless", "jsleq", "jsgrtr", "jsgeq", "shl", "shr", "sshr",
+	"shl.c.pri", "shl.c.alt", "shr.c.pri", "shr.c.alt", "smul", "sdiv", "sdiv.alt", "umul", "udiv",
+	"udiv.alt", "add", "sub", "sub.alt", "and", "or", "xort", "not", "neg", "invert", "add.c",
+	"smul.c", "zero.pri", "zero.alt", "zero", "zero.s", "sign.pri", "sign.alt", "eq", "neq", "less",
+	"leq", "grtr", "geq", "sless", "sleq", "sgrtr", "sgeq", "eq.c.pri", "eq.c.alt", "inc.pri",
+	"inc.alt", "inc", "inc.s", "inc.i", "dec.pri", "dec.alt", "dec", "dec.s", "dec.i", "movs",
+	"cmps", "fill", "halt", "bounds", "sysreq.pri", "sysreq.c", "file", "line", "symbol", "srange",
+	"jump.pri", "switch", "casetbl", "swap.pri", "swap.alt", "push.adr", "nop", "sysreq.d",
+	"symtag", "break"
+};
+
+/// <library>amx_assembly opcode</library>
+stock const gAMXOpcodeBaseSizes[] = {
+	4, 8, 8, 8, 8, 8, 8, 8, 8, 4, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 4, 8, 4, 8, 4, 8, 8, 8, 8,
+	8, 4, 4, 4, 4, 4, 8, 8, 8, 8, 4, 4, 8, 8, 4, 4, 4, 8, 4, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
+	8, 4, 4, 4, 8, 8, 8, 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 8, 8, 4, 4, 8, 8, 4, 4, 4,
+	4, 4, 4, 4, 4, 4, 4, 4, 4, 8, 8, 4, 4, 8, 8, 4, 4, 4, 8, 8, 4, 8, 8, 8, 8, 8, 4, 8, 8, 8, 8, 8,
+	4, 8, 8, 4, 4, 8, 4, 8, 8, 4
+};
+
+/// <library>amx_assembly opcode</library>
 const NUM_OPCODES = _:OP_LAST_;
 
+/// <library>amx_assembly opcode</library>
 static stock Opcode:ReadOpcodeNearThis(offset = 0) {
-	new ret_addr;
+	new ret_addr = 0;
 
 	// Get return address + COD - DAT + offset.
 	#emit load.s.alt 4
@@ -258,11 +185,15 @@ static stock Opcode:ReadOpcodeNearThis(offset = 0) {
 	return OP_NONE; // make compiler happy
 }
 
+/// <library>amx_assembly opcode</library>
 static stock bool:HaveToRelocateOpcodes() {
 	return ReadOpcodeNearThis(-8) != OP_CALL;
 }
 
-// Based on this idea: http://forum.sa-mp.com/showthread.php?t=358084
+/// <library>amx_assembly opcode</library>
+/// <remarks>
+///   Based on this idea: http://forum.sa-mp.com/showthread.php?t=358084
+/// </remarks>
 stock Opcode:RelocateOpcodeNow(Opcode:opcode) {
 	if (!HaveToRelocateOpcodes()) {
 		return opcode;
@@ -751,9 +682,17 @@ stock Opcode:RelocateOpcodeNow(Opcode:opcode) {
 			#else
 				if (T) return ReadOpcodeNearThis(8);
 			#endif
+			#if ((__Pawn & 0x0F) >= 0x0A) || ((__Pawn & 0xF0) >= 0xA0)
+				// Disable `switch control expression is constant`.
+				#pragma warning push
+				#pragma warning disable 243
+			#endif
 			switch (0) {
 				case 0: {}
 			}
+			#if ((__Pawn & 0x0F) >= 0x0A) || ((__Pawn & 0xF0) >= 0xA0)
+				#pragma warning pop
+			#endif
 		}
 		case OP_CASETBL: {
 			new x = 0;
@@ -778,7 +717,7 @@ stock Opcode:RelocateOpcodeNow(Opcode:opcode) {
 		case OP_SYSREQ_D: {
 			// Since there's no way to #emit sysreq.d we have to compute its
 			// address using a relative offset to another opcode, e.g. nop.
-			new bool:is_crashdetect;
+			new bool:is_crashdetect = false;
 			#emit zero.pri
 			#emit lctrl 0xFF
 			#emit stor.s.pri is_crashdetect
@@ -799,13 +738,18 @@ stock Opcode:RelocateOpcodeNow(Opcode:opcode) {
 	return opcode;
 }
 
+/// <library>amx_assembly opcode</library>
 static stock Opcode:opcode_table[NUM_OPCODES];
+
+/// <library>amx_assembly opcode</library>
 static stock bool:opcode_table_is_ready = false;
 
+/// <library>amx_assembly opcode</library>
 stock bool:IsOpcodeValid(Opcode:opcode) {
 	return (OP_NONE <= opcode < Opcode:NUM_OPCODES);
 }
 
+/// <library>amx_assembly opcode</library>
 static stock InitOpcodeTable() {
 	for (new i = 0; i < NUM_OPCODES; i++) {
 		opcode_table[i] = RelocateOpcodeNow(Opcode:i);
@@ -813,6 +757,7 @@ static stock InitOpcodeTable() {
 	opcode_table_is_ready = true;
 }
 
+/// <library>amx_assembly opcode</library>
 stock Opcode:RelocateOpcode(Opcode:opcode) {
 	if (!opcode_table_is_ready) {
 		InitOpcodeTable();
@@ -820,6 +765,12 @@ stock Opcode:RelocateOpcode(Opcode:opcode) {
 	return opcode_table[_:opcode];
 }
 
+/// <library>amx_assembly opcode</library>
+stock bool:IsOpcodeRelocationRequired() {
+	return RelocateOpcode(OP_LOAD_PRI) != OP_LOAD_PRI;
+}
+
+/// <library>amx_assembly opcode</library>
 stock Opcode:UnrelocateOpcode(Opcode:opcode) {
 	if (!opcode_table_is_ready) {
 		InitOpcodeTable();
@@ -835,44 +786,27 @@ stock Opcode:UnrelocateOpcode(Opcode:opcode) {
 	return opcode;
 }
 
-stock GetOpcodeInstructionInformation(Opcode:opcode) {
-	if (OP_NONE < opcode < Opcode:NUM_OPCODES) {
-		return insn_table[_:opcode];
-	}
-	return insn_table[0];
-}
-
+/// <library>amx_assembly opcode</library>
 stock GetOpcodeInstructionName(Opcode:opcode) {
 	static const ret[OPCODE_MAX_INSN_NAME] = "none";
 	if (OP_NONE < opcode < Opcode:NUM_OPCODES) {
-		// This doesn't work.
-		//return insn_table[_:opcode][OpcodeInsnInfo_name];
-		// Fake it without requiring `strcpy`.
-		#emit CONST.alt    insn_table
-		#emit LOAD.S.pri   opcode
-		#emit IDXADDR
-		#emit MOVE.alt
-		#emit LOAD.I
-		#emit ADD
-		#emit LOAD.S.alt   16
-		#emit MOVS         60 // 15 * 4
-		#emit RETN
-		// Check that the code is correct for the size of "OPCODE_MAX_INSN_NAME".
-		#assert OPCODE_MAX_INSN_NAME == 15
+		return gAMXOpcodeNames[_:opcode];
 	}
 	return ret;
 }
 
+/// <library>amx_assembly opcode</library>
 stock GetOpcodeInstructionParameters(Opcode:opcode) {
 	if (OP_NONE < opcode < Opcode:NUM_OPCODES) {
-		return insn_table[_:opcode][OpcodeInsnInfo_num_opers];
+		return gAMXOpcodeParameterCounts[_:opcode];
 	}
 	return 0;
 }
 
+/// <library>amx_assembly opcode</library>
 stock bool:GetOpcodeInstructionRelocatable(Opcode:opcode) {
 	if (OP_NONE < opcode < Opcode:NUM_OPCODES) {
-		return insn_table[_:opcode][OpcodeInsnInfo_needs_reloc];
+		return gAMXOpcodeNeedsReloc[_:opcode];
 	}
 	return false;
 }

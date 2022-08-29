@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -183,8 +184,20 @@ Optional plugins:
 
 stock
 	BitArray:YSI_gGroupPlayers[MAX_PLAYERS]<_MAX_GROUPS_G>,
-	BitArray:YSI_gTempGroups<_MAX_GROUPS_G>;
-
+	BitArray:YSI_gTempAllowed_<_MAX_GROUPS_G>,
+	BitArray:YSI_gTempDenied_<_MAX_GROUPS_G>;
+	
 stock const
 	BitArray:YSI_g_cEmptyGroups<_MAX_GROUPS_G>;
+
+enum E_GROUP_SET
+{
+	DENY  = 0x80000000,
+	UNDEF = 0,
+	UNDEFINED = 0,
+	ALLOW = 1,
+}
+
+// An internal rewrite to avoid excessively long names.
+#define YCMD_SetPlayer Command_SetPlayer
 

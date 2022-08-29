@@ -23,11 +23,27 @@
 #endif
 #define HEAP_ALLOC_INC
 
+/**
+ * <library name="amx_assembly heap_alloc" summary="AMX Assembly Library: Allocate space in the heap.">
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
+ * </library>
+ */
+
+/// <p/>
+
 #define HeapAlloc HeapAllocCells
 
-// Allocates a block of (uninitialized) memory on the heap.
+/// <library>amx_assembly heap_alloc</library>
+/// <summary>
+///   Allocates a block of (uninitialized) memory on the heap.
+/// </summary>
 stock HeapAllocBytes(nbytes) {
-	new address;
+	new address = 0;
 	#emit lctrl 2
 	#emit stor.s.pri address
 	#emit load.s.alt nbytes
@@ -36,14 +52,21 @@ stock HeapAllocBytes(nbytes) {
 	return address;
 }
 
-// Same as HeapAllocBytes() but operates on cells.
+/// <library>amx_assembly heap_alloc</library>
+/// <summary>
+///   Same as HeapAllocBytes() but operates on cells.
+/// </summary>
 stock HeapAllocCells(ncells) {
 	return HeapAllocBytes(ncells * 4);
 }
 
-// Releases memory allocated with HeapAlloc().
+/// <library>amx_assembly heap_alloc</library>
+/// <summary>
+///   Releases memory allocated with HeapAlloc().
+/// </summary>
 stock HeapRelease(address) {
 	#emit load.s.pri address
 	#emit sctrl 2
 	return address;
 }
+

@@ -4,15 +4,18 @@
 #define _INC_y_profiling
 
 /**
- * <library name="y_profiling">
- * <section>
- *  Description
- * </section>
- *  Runs any functions named as profilings when the Profiling_Run function is called.
- * <section>
- *  Version
- * </section>
- *  1.0
+ * <library
+ *   name="y_profiling"
+ *   version="1.0"
+ *   license="(c) 2022 YSI contibutors, licensed under MPL 1.1"
+ *   summary="Runs any functions named as profilings when the Profiling_Run function is called."
+ * >
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
  * </library>
  *//** *//*
 Legal:
@@ -31,7 +34,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -58,6 +61,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -125,15 +129,30 @@ CHAIN_HOOK(Profiling)
 
 #if defined RUN_PROFILINGS
 	#define PROFILE_INIT__%0(%1) @yP_%0();@yP_%0()
-	#define PROFILE__%0(%1) __TZ:@y_P%0();__TZ:@y_P%0(%1)RUN_TIMING(#%0)y_P@%0();static y_P@%0()
+	#define PROFILE__ u@(u[_:__TZ:__TB:__TC:u@$
 	#define PROFILE_CLOSE__%0(%1) @P_y%0();@P_y%0()
-	#define __TZ:%0[%2](%1);%0[%2](%1)RUN_TIMING(%3)%4[%5](%6);%9[%5](%6) %0(%1);%0(%1)RUN_TIMING(%3,%2)%4(%6);static %4(%6)
+
+	// With explicit count.
+	#define __TZ:__TB:%8$%0[%2](%1) %8$%0(%1);@y_P%0();@y_P%0()RUN_TIMING(#%0,%2)%0();%0(%1)
+
+	// Without explicit count.
+	#define __TB:%8$%0(%1) %8$%0(%1);@y_P%0();@y_P%0()RUN_TIMING(#%0)%0();%0(%1)
+
+	// Strip tags.
+	#define __TC:%8$%1:%3();%9:%0();%9:%0()RUN_TIMING(#%9:%2)%9: %8$%1:%3();@y_P%0();@y_P%0()RUN_TIMING(#%2)
+
+//	// Strip `stock` and `static`.
+//	#define @y_Pstock%0()%9()RUN_TIMING(#%9stock%2)%9stock @y_P%0();@y_P%0()RUN_TIMING(#%2)
+//	#define @y_Pstatic%0()%9()RUN_TIMING(#%9static%2)%9static @y_P%0();@y_P%0()RUN_TIMING(#%2)
+//	#define @y_Pconst%0()%9()RUN_TIMING(#%9const%2)%9const @y_P%0();@y_P%0()RUN_TIMING(#%2)
+
 #else
 	#define PROFILE_INIT__%0(%1) static stock yP_@%0()
-	#define PROFILE__%0(%1) static stock __TZ:y_P@%0()
+	#define PROFILE__ u@(u[_:__TZ:u@$
 	#define PROFILE_CLOSE__%0(%1) static stock P_y@%0()
-	#define __TZ:%0[%2](%1) __TZ:%0_%2(%1)
+	#define __TZ:%8$%0[%2](%1) %8$%0(%1)
 #endif
+
 
 #if YSI_KEYWORD(ProfileInit)
 	#define ProfileInit:%1() PROFILE_INIT__ %1()
@@ -145,12 +164,24 @@ CHAIN_HOOK(Profiling)
 	#define ProfileClose:%1() PROFILE_CLOSE__ %1()
 #endif
 
-#define @yP_%0\32; @yP_
 #define @y_P%0\32; @y_P
-#define @P_y%0\32; @P_y
-#define yP_@%0\32; yP_@
+#define @yP_%0\32; @yP_
+#define @Py_%0\32; @Py_
 #define y_P@%0\32; y_P@
+#define yP_@%0\32; yP_@
+#define Py_@%0\32; Py_@
+
+#define @P_y%0\32; @P_y
+#define @_Py%0\32; @_Py
+#define @_yP%0\32; @_yP
 #define P_y@%0\32; P_y@
+#define _Py@%0\32; _Py@
+#define _yP@%0\32; _yP@
+
+#define y@P_%0\32; y@P_
+#define y@_P%0\32; y@_P
+#define P@_y%0\32; P@_y
+#define P@y_%0\32; P@y_
 
 // These all need to come AFTER the types are defined in case the have profilings.
 #include "y_utils"
@@ -184,22 +215,22 @@ stock bool:Profiling_Run(&profilings)
 #if defined RUN_PROFILINGS
 	P:2("Profiling_Run() called");
 	new
-		idx,
-		buffer[32];
+		idx = 0,
+		buffer[FUNCTION_LENGTH];
 	while ((idx = AMX_GetPublicNamePrefix(idx, buffer, Y_PROFILING_PROFILE_SEARCH)))
 	{
 		buffer[0] = Y_PROFILING_INIT,
-		CallLocalFunction(buffer, ""),
+		CallLocalFunction(buffer, YSI_EMPTY),
 		// Call the test.
 		buffer[0] = Y_PROFILING_PROFILE;
-		P:5("Profiling_Run(): Calling %s", unpack(buffer[1]));
+		P:5("Profiling_Run(): Calling %s", Unpack(buffer[1]));
 		YSI_g_sInProfile = true,
-		CallLocalFunction(buffer, ""),
+		CallLocalFunction(buffer, YSI_EMPTY),
 		YSI_g_sInProfile = false,
 		buffer[0] = Y_PROFILING_CLOSE,
-		CallLocalFunction(buffer, ""),
+		CallLocalFunction(buffer, YSI_EMPTY),
 		++profilings;
-		PROFILE_REPORT(" ");
+		PROFILE_REPORT(YSI_SPACE);
 	}
 #else
 	#pragma unused profilings
@@ -245,30 +276,50 @@ stock Profiling_RunAll()
 {
 	// Disable error messages (as we're likely to generate them).
 	new
-		startTime,
-		endTime,
-		profilings;
+		startTime = 0,
+		endTime = 0,
+		profilings = 0;
 	// The timing will be inaccurate since it will include many prints, but it
 	// isn't that important to be accurate.
 	startTime = GetTickCount();
-	PROFILE_REPORT(" ");
-	PROFILE_REPORT("  ||========================||  ");
-	PROFILE_REPORT("  || STARTING PROFILINGS... ||  ");
-	PROFILE_REPORT("  ||========================||  ");
-	PROFILE_REPORT(" ");
+	#if !defined LIGHT_PROFILE_REPORT
+		Server_PrintIntroMessage("        STARTING PROFILINGS..."),
+		Server_FinishIntroMessage();
+	#endif
 	Profiling_Run(profilings);
 	printf("*** Profilings: %d", profilings);
-	PROFILE_REPORT(" ");
-	PROFILE_REPORT("  ||======================||  ");
-	PROFILE_REPORT("  || PROFILINGS COMPLETE! ||  ");
-	PROFILE_REPORT("  ||======================||  ");
-	PROFILE_REPORT(" ");
+	#if !defined LIGHT_PROFILE_REPORT
+		Server_PrintIntroMessage("         PROFILINGS COMPLETE!"),
+		Server_FinishIntroMessage();
+	#endif
 	endTime = GetTickCount();
 	printf("*** Time: %dms", endTime - startTime);
-	PROFILE_REPORT(" ");
+	PROFILE_REPORT(YSI_SPACE);
 	CallLocalFunction("OnProfilingsComplete", "i", profilings);
 	#if defined PROFILE_AUTO_EXIT
 		SendRconCommand("exit");
 	#endif
 }
+
+stock __PA(const name[])
+{
+	return printf("Timing \"%s\"...", name);
+}
+
+stock __PB(const name[], results[], iters, size = sizeof (results))
+{
+	#if defined PROFILINGS_FILE
+		DumpProfilingTime(PROFILINGS_FILE(name), results, iters);
+	#else
+		#pragma unused name
+	#endif
+		printf("\t  Mean = %s\n\t  Mode = %s\n\tMedian = %s\n\t Range = %s",
+			BeautifyProfilingTime(Mean(results, size), iters),
+			BeautifyProfilingTime(Mode(results, size), iters),
+			BeautifyProfilingTime(Median(results, size), iters),
+			BeautifyProfilingTime(Range(results, size), iters)
+		);
+}
+
+#define __PA(%0,%9);__TC;__PB(%0,%9,%1,%2) __PA(%0);__TC;__PB(%0,%1,%2)
 

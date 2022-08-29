@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -107,10 +108,10 @@ Optional plugins:
 stock Iter_Random_Internal(count, const array[], start, ...)
 {
 	new
-		numArgs,
-		rewrite,
-		first,
-		last;
+		numArgs = 0,
+		rewrite = 0,
+		first = 0,
+		last = 0;
 	// y_hooks can mangle callback parameter counts, thus it redefines `numargs`
 	// to account for this and traverse the stack until it finds a valid value.
 	// However, because this internal function is never called directly from a
@@ -128,7 +129,7 @@ stock Iter_Random_Internal(count, const array[], start, ...)
 	// Short-circuit the common-case where there are no exclusions.
 	if (numArgs)
 	{
-		for (new value, excluded = rewrite = first; excluded != last; excluded += 4)
+		for (new value = 0, excluded = rewrite = first; excluded != last; excluded += 4)
 		{
 			#emit LREF.S.pri   excluded
 			#emit LOAD.I
@@ -140,7 +141,7 @@ stock Iter_Random_Internal(count, const array[], start, ...)
 				// It is.  Optimise for the inner loop.  Do this by compressing
 				// valid values to the start of the list and sorting the
 				// dereferenced versions instead of the addresses.
-				for (new i2 = first, v2; i2 != rewrite; i2 += 4)
+				for (new i2 = first, v2 = 0; i2 != rewrite; i2 += 4)
 				{
 					#emit LREF.S.pri   i2
 					#emit STOR.S.pri   v2
@@ -292,10 +293,10 @@ stock Iter_RandomFree_InternalC(count, const array[], start, ...)
 {
 	count = start - count;
 	new
-		numArgs,
-		rewrite,
-		first,
-		last;
+		numArgs = 0,
+		rewrite = 0,
+		first = 0,
+		last = 0;
 	// y_hooks can mangle callback parameter counts, thus it redefines `numargs`
 	// to account for this and traverse the stack until it finds a valid value.
 	// However, because this internal function is never called directly from a
@@ -313,7 +314,7 @@ stock Iter_RandomFree_InternalC(count, const array[], start, ...)
 	// Short-circuit the common-case where there are no exclusions.
 	if (numArgs)
 	{
-		for (new value, excluded = rewrite = first; excluded != last; excluded += 4)
+		for (new value = 0, excluded = rewrite = first; excluded != last; excluded += 4)
 		{
 			#emit LREF.S.pri   excluded
 			#emit LOAD.I
@@ -325,7 +326,7 @@ stock Iter_RandomFree_InternalC(count, const array[], start, ...)
 				// It is.  Optimise for the inner loop.  Do this by compressing
 				// valid values to the start of the list and sorting the
 				// dereferenced versions instead of the addresses.
-				for (new i2 = first, v2; i2 != rewrite; i2 += 4)
+				for (new i2 = first, v2 = 0; i2 != rewrite; i2 += 4)
 				{
 					#emit LREF.S.pri   i2
 					#emit STOR.S.pri   v2
@@ -660,7 +661,6 @@ stock Iter_Remove_InternalD(&count, array[], start, size, value)
 
 stock Iter_SafeRemove_InternalC(&count, array[], size, value, &last)
 {
-	last = size;
 	if (0 <= value < size++ && array[value] > value)
 	{
 		// This version has reverse iterators, which need maintaining, and can
@@ -669,10 +669,18 @@ stock Iter_SafeRemove_InternalC(&count, array[], size, value, &last)
 			--count,
 			last = (array[(value - 1) % size] - 1) % size,
 			array[last] = array[value],
-			array[value] = value,
-			array[(array[last] - 1) % size] = (last + 1) % size;
+			// Set the current value.
+			array[value] = -123456789,
+			// Set the reverse pointer.  The one before the next is NEVER in the
+			// iterator at this point, because we just removed its previous.
+			array[(array[last] - 1) % size] = (last + 1) % size - size - size;
 	}
-	return INVALID_ITERATOR_SLOT;
+	else
+	{
+		return
+			last = size,
+			INVALID_ITERATOR_SLOT;
+	}
 }
 
 stock Iter_SafeRemove_InternalD(&count, array[], start, size, value, &last)
@@ -689,7 +697,7 @@ stock Iter_SafeRemove_InternalD(&count, array[], start, size, value, &last)
 				return
 					--count,
 					array[last] = array[value],
-					array[value] = value;
+					array[value] = -123456789;
 			}
 			last = start;
 		}

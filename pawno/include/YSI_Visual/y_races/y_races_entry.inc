@@ -20,7 +20,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -117,7 +118,7 @@ stock _YSI_HAS_y_races(_do_not_call_me_ever_, _like_never_)
 	return 0;
 }
 
-forward Race_Create(laps = 0, entry = 0, countdown = 3, bool:arial = false, bool:fixedPrize = true, exitTime = 0, interior = 0, world = 0, bool:restart = false);
+forward Race_Create(laps = 0, entryCost = 0, countdown = 3, bool:arial = false, bool:fixedPrize = true, exitTime = 0, interior = 0, world = 0, bool:restart = false);
 forward Race_Destroy(slot, bool:refund = false);
 FOREIGN__ Race_AddCheckpoint(raceid, Float:x, Float:y, Float:z);
 FOREIGN__ Race_AddStart(raceid, Float:x, Float:y, Float:z, Float:a);

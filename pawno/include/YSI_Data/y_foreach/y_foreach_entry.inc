@@ -1,4 +1,4 @@
-/*                                                                                              *
+/*                                                                                             *
  *                                                                                             *
  *     _____ ______ ______   ____  ______ _      ______          __  ______ ____  _____        *
  *    / ____|  ____|  ____| |  _ \|  ____| |    / __ \ \        / / |  ____/ __ \|  __ \       *
@@ -34,7 +34,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -61,6 +61,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -171,7 +172,7 @@ Optional plugins:
 			#define _Y_ITERATE_FOUND
 			#endinput
 		#endif
-	#elseif defined foreach && __COMPILER_FIRST_PASS
+	#elseif defined foreach && __COMPILER_1ST_PASS
 		// I made this a warning on compilers that supported them, but that's a
 		// silly idea!
 		#error The old <foreach> include is no longer compatible with YSI.
@@ -299,6 +300,22 @@ Optional plugins:
 // 
 
 #define _FOREACH_CHARACTERS (_FOREACH_BOTS || _FOREACH_PLAYERS)
+
+// 
+// _FOREACH_STREAMED
+// 
+// Include `Streamed...[playerid]` versions of all the iterators otherwise
+// included.
+// 
+
+#define _FOREACH_STREAMED 0
+
+#if defined IsPlayerStreamedIn
+	#if !defined FOREACH_NO_STREAMED
+		#undef _FOREACH_STREAMED
+		#define _FOREACH_STREAMED 1
+	#endif
+#endif
 
 #if !defined BOTSYNC_IS_BOT
 	forward Iter_OPDCInternal(playerid);

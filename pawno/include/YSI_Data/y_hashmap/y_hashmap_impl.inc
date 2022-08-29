@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -137,7 +138,7 @@ stock _HashMap_Init(HashMap:m<>, &target, size1, size2, &t2)
 		HashMap:sInit<> = {0, ...};
 	m = sInit;
 	new
-		ptr;
+		ptr = 0;
 	// Save the pointer.
 	#emit LOAD.S.pri target
 	#emit STOR.S.pri ptr
@@ -267,13 +268,13 @@ stock bool:HashMap_AddWithHash(HashMap:m<>, const str[], hash, value, bool:ignor
 		// pointers as 0...  I don't think there is a nice way to do this.
 		// if (AMX_Read(ptr + 4) || AMX_Read(ptr + 8)) return false;
 		static
-			ptr,
-			res;
+			ptr = 0,
+			res = 0;
 		// Add this entry to the correct binary tree.
 		P:5("HashMap_Add: mask = %d", hash & 0xFF);
 		new
-			prev = ref(m[hash & 0xFF]),
-			next;
+			prev = AMX_Ref(m[hash & 0xFF]),
+			next = 0;
 		for ( ; ; )
 		{
 			#emit LREF.S.pri  prev
@@ -326,7 +327,7 @@ stock bool:HashMap_AddWithHash(HashMap:m<>, const str[], hash, value, bool:ignor
 		AMX_Write(prev, ptr),
 		// Get the hashed string destination size, and copy the string.
 		next = m[HASH_MAP_SIZE_3],
-		rawMemcpy(ptr - next, ref(str), next);
+		RawMemCpy(ptr - next, AMX_Ref(str[0]), next);
 		return true;
 	}
 	return false;
@@ -347,6 +348,33 @@ stock bool:HashMap_AddWithHash(HashMap:m<>, const str[], hash, value, bool:ignor
 stock bool:HashMap_Add(HashMap:m<>, const str[], value, bool:ignorecase = false)
 {
 	return HashMap_AddWithHash(m, str, YHash(str, .sensitive = !ignorecase), value, ignorecase);
+}
+
+/*-------------------------------------------------------------------------*//**
+ * <param name="m">The hash map to search.</param>
+ * <param name="str">The key to find.</param>
+ * <returns>
+ *  Does this hash map contain the given value?
+ * </returns>
+ *//*------------------------------------------------------------------------**/
+
+stock bool:HashMap_Has(HashMap:m<>, const str[], bool:ignorecase = false)
+{
+	return HashMap_GetWithHash(m, str, YHash(str, .sensitive = !ignorecase), ignorecase) != -1;
+}
+
+/*-------------------------------------------------------------------------*//**
+ * <param name="m">The hash map to search.</param>
+ * <param name="str">The key to find.</param>
+ * <param name="hash">The hashed key.</param>
+ * <returns>
+ *  Does this hash map contain the given value?
+ * </returns>
+ *//*------------------------------------------------------------------------**/
+
+stock bool:HashMap_HasWithHash(HashMap:m<>, const str[], hash, bool:ignorecase = false)
+{
+	return HashMap_GetWithHash(m, str, hash, ignorecase) != -1;
 }
 
 /*-------------------------------------------------------------------------*//**
@@ -375,10 +403,10 @@ stock HashMap_GetWithHash(HashMap:m<>, const str[], hash, bool:ignorecase = fals
 {
 	P:3("HashMap_Get called: mask = %d (%d)", hash, hash & 0xFF);
 	new
-		prev = ref(m[hash & 0xFF]),
-		next;
+		prev = AMX_Ref(m[hash & 0xFF]),
+		next = 0;
 	static
-		res;
+		res = 0;
 	for ( ; ; )
 	{
 		#emit LREF.S.pri  prev
@@ -435,10 +463,10 @@ stock bool:HashMap_RemoveKeyWithHash(HashMap:m<>, const str[], hash, bool:ignore
 {
 	// First, find the key and it's parent.
 	new
-		prev = ref(m[hash & 0xFF]),
-		next;
+		prev = AMX_Ref(m[hash & 0xFF]),
+		next = 0;
 	static
-		res;
+		res = 0;
 	// First, find this key in the hashmap.
 	for ( ; ; )
 	{
@@ -512,26 +540,27 @@ stock bool:HashMap_RemoveKeyWithHash(HashMap:m<>, const str[], hash, bool:ignore
 			// no branch is empty, then this branch MUST be at least two nodes
 			// high, and so MUST have a parent.
 			AMX_Write(prev, rVal),
-			AMX_Write(rParent + HASH_MAP_DIR_LEFT, AMX_Read(rVal + HASH_MAP_DIR_RIGHT)),
+			rHeight = AMX_Read(rVal + HASH_MAP_DIR_RIGHT),
+			AMX_Write(rParent + HASH_MAP_DIR_LEFT, rHeight),
 			AMX_Write(rVal + HASH_MAP_DIR_RIGHT, right),
 			AMX_Write(rVal + HASH_MAP_DIR_LEFT, left);
 		}
-		else
+		else if (lParent)
 		{
 			// Reduce the left (larger) branch.  This branch MAY NOT have a
 			// parent, if both branches are equal at one node high.
-			AMX_Write(prev, lVal);
-			if (lParent)
-			{
-				AMX_Write(lParent + HASH_MAP_DIR_RIGHT, AMX_Read(lVal + HASH_MAP_DIR_LEFT)),
-				AMX_Write(lVal + HASH_MAP_DIR_RIGHT, right),
-				AMX_Write(lVal + HASH_MAP_DIR_LEFT, left);
-			}
-			else
-			{
-				AMX_Write(lVal + HASH_MAP_DIR_RIGHT, right),
-				AMX_Write(lVal + HASH_MAP_DIR_LEFT, 0);
-			}
+			AMX_Write(prev, lVal),
+			lHeight = AMX_Read(lVal + HASH_MAP_DIR_LEFT),
+			AMX_Write(lParent + HASH_MAP_DIR_RIGHT, lHeight),
+			AMX_Write(lVal + HASH_MAP_DIR_RIGHT, right),
+			AMX_Write(lVal + HASH_MAP_DIR_LEFT, left);
+		}
+		else
+		{
+			// This branch doesn't have a parent, if both branches are equal at
+			// one node high.
+			AMX_Write(prev, lVal),
+			AMX_Write(lVal + HASH_MAP_DIR_RIGHT, right);
 		}
 	}
 	// Clear the removed node's pointers and string.
@@ -549,13 +578,8 @@ stock bool:HashMap_RemoveKey(HashMap:m<>, const str[], bool:ignorecase = false)
 static stock HashMap_GetBranchEnd(cur, &height, &parent, dir)
 {
 	// Find the node as close in (hash) value to the current node as possible.
-	static
-		next;
-	while ((next = AMX_Read(cur + dir)))
+	for (new next = 0; (next = AMX_Read(cur + dir)); ++height, parent = cur, cur = next)
 	{
-		++height,
-		parent = cur,
-		cur = next;
 	}
 	return cur;
 }
@@ -577,7 +601,7 @@ stock bool:HashMap_RemoveValue(HashMap:m<>, value)
 			sString[128 char];
 		new
 			size = m[HASH_MAP_SIZE_3];
-		rawMemcpy(ref(sString), m[HASH_MAP_PTR] + value * m[HASH_MAP_SIZE_2] - size, min(size, sizeof (sString) * 4));
+		RawMemCpy(AMX_Ref(sString[0]), m[HASH_MAP_PTR] + value * m[HASH_MAP_SIZE_2] - size, min(size, sizeof (sString) * 4));
 		return HashMap_RemoveKey(m, sString);
 	}
 	return false;
@@ -596,9 +620,11 @@ stock bool:HashMap_RemoveValue(HashMap:m<>, value)
 
 stock HashMap_Set(HashMap:m<>, const str[], const value)
 {
+	new
+		hash = YHash(str, .sensitive = true);
 	return
-		HashMap_RemoveKey(m, str),
+		HashMap_RemoveKeyWithHash(m, str, hash),
 		HashMap_RemoveValue(m, value),
-		HashMap_Add(m, str, value);
+		HashMap_AddWithHash(m, str, hash, value);
 }
 

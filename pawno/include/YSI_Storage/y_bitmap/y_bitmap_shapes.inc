@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -91,7 +92,7 @@ Optional plugins:
 // End the input above because all this code is being written with no testing
 // or compiling until I am home again.  So in the interests of leaving the code
 // stable, this is all ignored.
-stock Bitmap_DrawRectangle(Bitmap:ctx, const minX, const minY, const maxX, const maxY, fillColour, lineColour = 0, linePattern[] = "SOLID", fillPattern[] = "SOLID")
+stock Bitmap_DrawRectangle(Bitmap:ctx, const minX, const minY, const maxX, const maxY, fillColour, lineColour = 0, const linePattern[] = "SOLID", const fillPattern[] = "SOLID")
 {
 	if (fillColour)
 	{
@@ -106,15 +107,15 @@ stock Bitmap_DrawRectangle(Bitmap:ctx, const minX, const minY, const maxX, const
 				border = _Bitmap_Param(linePattern, "border");
 			if (border == cellmin) border = 8;
 			//printf("border = %d", border);
-			//printf("1");
+			//print("1");
 			_Bitmap_DoRectangle(ctx, minX - border, minY - border, maxX + border, minY, lineColour, linePattern),
-			//printf("1");
+			//print("1");
 			_Bitmap_DoRectangle(ctx, minX - border, minY, minX, maxY, lineColour, linePattern),
-			//printf("1");
+			//print("1");
 			_Bitmap_DoRectangle(ctx, minX - border, maxY, maxX + border, maxY + border, lineColour, linePattern),
-			//printf("1");
+			//print("1");
 			_Bitmap_DoRectangle(ctx, maxX, minY, maxX + border, maxY, lineColour, linePattern);
-			//printf("1");
+			//print("1");
 		}
 		else
 		{
@@ -132,7 +133,7 @@ stock Bitmap_DrawRectangle(Bitmap:ctx, const minX, const minY, const maxX, const
 	}
 }
 
-static stock _Bitmap_DoRectangle(Bitmap:ctx, minX, minY, maxX, maxY, colour, pattern[])
+static stock _Bitmap_DoRectangle(Bitmap:ctx, minX, minY, maxX, maxY, colour, const pattern[])
 {
 	new
 		width = Bitmap_Width(ctx);
@@ -142,15 +143,15 @@ static stock _Bitmap_DoRectangle(Bitmap:ctx, minX, minY, maxX, maxY, colour, pat
 	maxX = min(maxX, width),
 	_Bitmap_MakePattern(pattern, minX, minY, 0, 0);
 	new
-		ya,
-		read,
+		ya = 0,
+		read = 0,
 		a = (colour & 0xFF) + 1,
-		na,
-		suba,
+		na = 0,
+		suba = 0,
 		r = ((colour & 0xFF000000) >>> 16),
 		g = ((colour & 0x00FF0000) >>> 16),
 		b = ((colour & 0x0000FF00) >>>  8),
-		orig;
+		orig = 0;
 	for (new y = minY; y != maxY; ++y)
 	{
 		read = Bitmap_IndexInt(ctx, minX, width, y),
@@ -204,7 +205,7 @@ static stock _Bitmap_RectangleRecopy(n, BitArray:pattern<PATTERN_MASK_X>)
  * </remarks>
  *//*------------------------------------------------------------------------**/
 
-stock Bitmap_DrawCircle(Bitmap:ctx, const x, const y, const Float:radius, fillColour, lineColour = 0, linePattern[] = "SOLID", fillPattern[] = "SOLID")
+stock Bitmap_DrawCircle(Bitmap:ctx, const x, const y, const Float:radius, fillColour, lineColour = 0, const linePattern[] = "SOLID", const fillPattern[] = "SOLID")
 {
 	P:3("Bitmap_DrawCircle called: %d, %d, %d, %.2f, 0x%04x%04x, 0x%04x%04x, \"%s\", \"%s\"", _:ctx, x, y, radius, fillColour >>> 16, fillColour & 0xFFFF, lineColour >>> 16, lineColour & 0xFFFF, linePattern, fillPattern);
 	Bitmap_DrawRing(ctx, x, y, 0.0, radius, fillColour, fillPattern);
@@ -226,7 +227,7 @@ stock Bitmap_DrawCircle(Bitmap:ctx, const x, const y, const Float:radius, fillCo
  * </remarks>
  *//*------------------------------------------------------------------------**/
 
-stock Bitmap_DrawRing(Bitmap:ctx, x, y, Float:inner, Float:outer, colour, pattern[] = "SOLID")
+stock Bitmap_DrawRing(Bitmap:ctx, x, y, Float:inner, Float:outer, colour, const pattern[] = "SOLID")
 {
 	P:3("Bitmap_DrawRing called: %d, %d, %d, %.2f, %.2f, 0x%04x%04x, \"%s\"", _:ctx, x, y, inner, outer, colour >>> 16, colour & 0xFFFF, pattern);
 	new
@@ -246,7 +247,7 @@ stock Bitmap_DrawRing(Bitmap:ctx, x, y, Float:inner, Float:outer, colour, patter
 		Float:outerMin = rootMax * rootMax,
 		Float:innerMax = inner + 1.0,
 		Float:rootMin = inner - 1.0,
-		Float:innerMin;
+		Float:innerMin = 0.0;
 	outerMax *= outerMax,
 	innerMax *= innerMax;
 	if (inner <= 0.0)
@@ -260,21 +261,21 @@ stock Bitmap_DrawRing(Bitmap:ctx, x, y, Float:inner, Float:outer, colour, patter
 	//	Float:innerDiff = innerMax - innerMin;
 	_Bitmap_MakePattern(pattern, minX, minY, 0, 0);
 	new
-		ya,
+		ya = 0,
 		// Get the float co-ordinates for ease of calculation.
 		Float:fX = float(-rad), // Converted back from the integer version to.
-		Float:fXX,
+		Float:fXX = 0.0,
 		Float:fY = float(-rad), // Make up for rounding errors.
-		Float:fYY,
-		Float:pos,
-		read,
+		Float:fYY = 0.0,
+		Float:pos = 0.0,
+		read = 0,
 		a = (colour & 0xFF) + 1,
-		na,
-		suba,
+		na = 0,
+		suba = 0,
 		r = ((colour & 0xFF000000) >>> 16),
 		g = ((colour & 0x00FF0000) >>> 16),
 		b = ((colour & 0x0000FF00) >>>  8),
-		orig;
+		orig = 0;
 	P:5("Bitmap_DrawRing: minX = %d, minY = %d, width = %d, height = %d", minX, minY, width, Bitmap_Height(ctx));
 	for (y = minY; y != maxY; ++y, ++fY)
 	{
@@ -336,3 +337,32 @@ stock Bitmap_DrawRing(Bitmap:ctx, x, y, Float:inner, Float:outer, colour, patter
 		}
 	}
 }
+
+// Interesting simple circle algorithm:
+static stock Bitmap_Bresenham(x, y, radius, colour)
+{
+	// I know people don't like me documenting things with references, but tough:
+	//
+	//   https://possiblywrong.wordpress.com/2022/02/14/bresenhams-circles-are-always-optimal/
+	//
+	// It is way more in-depth than I can do here.  However I don't actually use
+	// this code, it was just interesting to port.
+	#define BITMAP_BRESENHAM_PLOT(%0,%1,%2) YSI_gMallocMemory[Bitmap_IndexInt(ctx, (%0), width, (%1))] = (%2)
+	for (new error = 3 - 2 * radius, h = radius, v = 0; h >= v; error += 4 * (++v) + 2)
+	{
+		BITMAP_BRESENHAM_PLOT(x + h, y + v, colour),
+		BITMAP_BRESENHAM_PLOT(x + h, y - v, colour),
+		BITMAP_BRESENHAM_PLOT(x - h, y + v, colour),
+		BITMAP_BRESENHAM_PLOT(x - h, y - v, colour),
+		BITMAP_BRESENHAM_PLOT(x + v, y + h, colour),
+		BITMAP_BRESENHAM_PLOT(x + v, y - h, colour),
+		BITMAP_BRESENHAM_PLOT(x - v, y + h, colour),
+		BITMAP_BRESENHAM_PLOT(x - v, y - h, colour);
+		if (error > 0)
+		{
+			error -= 4 * (--h);
+		}
+	}
+	#undef BITMAP_BRESENHAM_PLOT
+}
+

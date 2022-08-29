@@ -20,7 +20,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -88,7 +89,7 @@ YCMD:language(playerid, params[], help)
 	else
 	{
 		new
-			lang;
+			lang = 0;
 		if (sscanf(params, "i", lang))
 		{
 			new
@@ -98,8 +99,8 @@ YCMD:language(playerid, params[], help)
 			{
 				new
 					code[3];
-				strcpy(code, Langs_GetCode(i));
-				if (!isnull(code))
+				StrCpy(code, Langs_GetCode(i));
+				if (!IsNull(code))
 				{
 					// They may not be in order.
 					Text_Send(playerid, $YSI_LANGS_DISP, _:i, Langs_GetName(i), code);

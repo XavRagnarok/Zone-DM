@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -91,7 +92,7 @@ TEST__ y_svar_Enum()
 	ASSERT_EQ(y_svar_TestEnum[y_svar_E_TEST_B], 55.44);
 	y_svar_TestEnum[y_svar_E_TEST_B] = 55.44;
 	ASSERT(!strcmp(y_svar_TestEnum[y_svar_E_TEST_C], "SOME STORED DATA") && y_svar_TestEnum[y_svar_E_TEST_C][0]);
-	strcpy(y_svar_TestEnum[y_svar_E_TEST_C], "SOME STORED DATA", 24);
+	StrCpy(y_svar_TestEnum[y_svar_E_TEST_C], "SOME STORED DATA", 24);
 }
 
 TEST__ y_svar_1D()
@@ -135,7 +136,7 @@ TEST__ y_svar_2DEnum()
 		if (!(y_svar_Test2DEnum[i][y_svar_E_TEST_B] == 55.44 + i)) ++fails;
 		y_svar_Test2DEnum[i][y_svar_E_TEST_B] = 55.44 + i;
 		if (strcmp(y_svar_Test2DEnum[i][y_svar_E_TEST_C], "SOME STORED DATA") || !y_svar_Test2DEnum[i][y_svar_E_TEST_C][0]) ++fails;
-		strcpy(y_svar_Test2DEnum[i][y_svar_E_TEST_C], "SOME STORED DATA", 24);
+		StrCpy(y_svar_Test2DEnum[i][y_svar_E_TEST_C], "SOME STORED DATA", 24);
 	}
 	ASSERT_ZE(fails);
 }

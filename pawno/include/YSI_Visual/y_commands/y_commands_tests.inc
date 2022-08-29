@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -69,6 +70,13 @@ Optional plugins:
 	Incognito - Streamer.
 	Me - sscanf2, fixes2, Whirlpool.
 */
+
+TEST__ y_commands_Simple()
+{
+	new
+		id = Command_Find("y_commands_1");
+	ASSERT_NE(id, -1);
+}
 
 TEST__ y_commands_Syntax()
 {
@@ -283,8 +291,8 @@ TEST__ y_commands_Hashing()
 	new
 		dst0[32],
 		dst1[32],
-		hash0,
-		hash1;
+		hash0 = 0,
+		hash1 = 0;
 	// CASE INSENSITIVE.
 	// V1.
 	Puny_Encode(dst0, "hello\x102;you", .delimiter = '@');
@@ -309,7 +317,7 @@ TEST__ y_commands_Hashing()
 }
 
 static
-	gSomeVar;
+	gSomeVar = 0;
 
 YCMD:y_commands_1(playerid, cmdtext[], help)
 {
@@ -353,34 +361,48 @@ TEST__ y_commands_3()
 
 YCMD:y_commands_4(playerid, cmdtext[], help)
 {
+	//printf("y_commands_4 %d %s %d", playerid, cmdtext, help);
 	gSomeVar = playerid + strval(cmdtext);
 	return 1;
 }
 
-YCMD:y_commands_5(playerid, cmdtext[], help) = y_commands_4;
+YCMD:y_commands_6(playerid, cmdtext[], help) = y_commands_4;
+YCMD:y_commands_8(playerid, cmdtext[], help) = y_commands_6;
+
+// TODO: Make this line an error.
+YCMD:y_commands_12(playerid, cmdtext[], help) = y_commands_10;
 
 TEST__ y_commands_4()
 {
 	call OnPlayerConnect(80);
 	gSomeVar = 42;
+	//printf("gSomeVar: %d", gSomeVar);
 	call OnPlayerCommandText(80, "/y_commands_4 40");
+	//printf("gSomeVar: %d", gSomeVar);
 	ASSERT_EQ(gSomeVar, 120);
-	call OnPlayerCommandText(80, "/y_commands_5 50");
+	call OnPlayerCommandText(80, "/y_commands_6 50");
+	//printf("gSomeVar: %d", gSomeVar);
 	ASSERT_EQ(gSomeVar, 130);
+	call OnPlayerCommandText(80, "/y_commands_8 70");
+	//printf("gSomeVar: %d", gSomeVar);
+	ASSERT_EQ(gSomeVar, 150);
 	ASSERT_NE(YCMD:y_commands_4, COMMAND_NOT_FOUND);
-	ASSERT_NE(YCMD:y_commands_5, COMMAND_NOT_FOUND);
+	ASSERT_NE(YCMD:y_commands_6, COMMAND_NOT_FOUND);
+	ASSERT_NE(YCMD:y_commands_8, COMMAND_NOT_FOUND);
+	ASSERT_EQ(YCMD:y_commands_10, COMMAND_NOT_FOUND);
+	ASSERT_EQ(YCMD:y_commands_12, COMMAND_NOT_FOUND);
 }
 
 static stock
-	YSI_gsPlayerid,
+	YSI_gsPlayerid = 0,
 	YSI_gsParams[32],
-	YSI_gsHelp;
+	YSI_gsHelp = 0;
 
 YCMD:y_commands_reprocess(playerid, params[], help)
 {
 	//printf("%d %x %d", playerid, params[0], help);
 	YSI_gsPlayerid = playerid;
-	strcpy(YSI_gsParams, params);
+	StrCpy(YSI_gsParams, params);
 	YSI_gsHelp = help;
 	return 1;
 }
@@ -534,7 +556,7 @@ YCMD:y_commands_t111111(playerid, params[], help)
 TEST__ y_commands_iterator0()
 {
 	new
-		found,
+		found = 0,
 		total = 0;
 	FOREACH__ (new c : Command())
 	{
@@ -555,7 +577,7 @@ TEST__ y_commands_iterator0()
 TEST__ y_commands_iterator1()
 {
 	new
-		found,
+		found = 0,
 		total = 0;
 	FOREACH__ (new c : Command)
 	{

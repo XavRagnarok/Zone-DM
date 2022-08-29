@@ -4,16 +4,18 @@
 #define _INC_y_cgen
 
 /*+
- * <library name="y_cgen">
- * <section>
- *  Description
- * </section>
- *  Large chunks of code that isn't used, so that the space can be reclaimed and
- *  reused by other code generating functions.
- * <section>
- *  Version
- * </section>
- *  1.0
+ * <library
+ *   name="y_cgen"
+ *   version="1.0"
+ *   license="(c) 2022 YSI contibutors, licensed under MPL 1.1"
+ *   summary="Large chunks of code that isn't used, so that the space can be reclaimed and reused by other code generating functions."
+ * >
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
  * </library>
  *//** *//*
 Legal:
@@ -32,7 +34,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -59,6 +61,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -94,7 +97,11 @@ CHAIN_HOOK(CGen)
 #define CHAIN_ORDER CHAIN_NEXT(CGen)
 
 #if !defined CGEN_MEMORY
-	#define CGEN_MEMORY (10000)
+	#if defined YSI_TESTS
+		#define CGEN_MEMORY (50000)
+	#else
+		#define CGEN_MEMORY (10000)
+	#endif
 #endif
 
 static stock
@@ -121,7 +128,6 @@ public _@_y_cgen_@_0()
 	//   bytes_per_call = 630
 	//   bytes_per_line = bytes_per_call * 16
 	//   bytes_per_line = 10080 (~10KiB)
-	//   N = 16.25
 	//   
 	#if CGEN_MEMORY >= 10000
 		CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();
@@ -150,7 +156,34 @@ public _@_y_cgen_@_0()
 	#if CGEN_MEMORY >= 90000
 		CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();
 	#endif
-	#if CGEN_MEMORY >= 100000
+	#if CGEN_MEMORY >= 110000
+		CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();
+	#endif
+	#if CGEN_MEMORY >= 120000
+		CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();
+	#endif
+	#if CGEN_MEMORY >= 130000
+		CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();
+	#endif
+	#if CGEN_MEMORY >= 140000
+		CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();
+	#endif
+	#if CGEN_MEMORY >= 150000
+		CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();
+	#endif
+	#if CGEN_MEMORY >= 160000
+		CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();
+	#endif
+	#if CGEN_MEMORY >= 170000
+		CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();
+	#endif
+	#if CGEN_MEMORY >= 180000
+		CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();
+	#endif
+	#if CGEN_MEMORY >= 190000
+		CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();CGEN();
+	#endif
+	#if CGEN_MEMORY >= 200000
 		#error Too much codespace requested, please edit YSI_Coding\y_cgen\y_cgen
 	#endif
 }
@@ -227,19 +260,22 @@ public CGen_OOM(ctx[AsmContext])
 	}
 	case ASM_ERROR_SPACE:
 	{
-		static excess = 0;
-		// This is just an estimate of how much more space is required, assuming that each opcode
-		// has (on average) half a parameter.
-		excess += 6;
-		P:F("Out of code generation (CGen) space.  The current value of `CGEN_MEMORY` is `%d`, please recompile with a higher value (approximately %d).", CGEN_MEMORY, CGEN_MEMORY + excess);
+		// Just jump straight to the next CGEN step in the error.
+		P:F("Out of code generation (CGen) space.  The current value of `CGEN_MEMORY` is `%d`, please recompile with a higher value (approximately %d).", CGEN_MEMORY, ((CGEN_MEMORY / 10000) + 1) * CGEN_MEMORY);
+		P:I("    Note: This is perfectly safe and the recommended correct way to resolve this issue.");
 	}
 	case ASM_ERROR_LABEL_OVERFLOW:
 	{
 		P:F("Out of label space.  The current value of `ASM_MAX_LABELS` is `%d`, please recompile with a higher value.", ASM_MAX_LABELS);
+		P:I("    Note: This is perfectly safe and the recommended correct way to resolve this issue.");
 	}
 	case ASM_ERROR_LABEL_DUPLICATE:
 	{
 		P:F("Duplicate label in code generation.");
+	}
+	case ASM_ERROR_NONE:
+	{
+		// Do nothing, just for warning 244.
 	}
 	}
 	AsmClearError(ctx);

@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -131,7 +132,7 @@ P:D(Bit_Mask(value));
  *//*------------------------------------------------------------------------**/
 
 P:D(bool:Bit_GetBit(BitArray:array<>,slot));
-#define Bit_GetBit(%1,%2) (%1[(%2)>>>CELLSHIFT]&Bit:(1<<((%2)&cellbits-1)))
+#define Bit_GetBit(%1,%2) (%1[(%2)>>>CELLSHIFT]>>>Bit:((%2)&cellbits-1)&Bit:1)
 
 /*-------------------------------------------------------------------------*//**
  * <param name="array">Array of bits.</param>
@@ -149,7 +150,7 @@ P:D(bool:Bit_GetBit(BitArray:array<>,slot));
  *//*------------------------------------------------------------------------**/
 
 P:D(bool:Bit_Get(BitArray:array<>,slot));
-#define Bit_Get(%1,%2) bool:Bit_GetBit(Bit:%1,_:%2)
+#define Bit_Get(%1,%2) bool:Bit_GetBit(%1,_:%2)
 
 /*-------------------------------------------------------------------------*//**
  * <param name="array">Array of bits.</param>
@@ -160,7 +161,7 @@ P:D(bool:Bit_Get(BitArray:array<>,slot));
  *//*------------------------------------------------------------------------**/
 
 P:D(Bit_Let(BitArray:array<>,slot));
-#define Bit_Let(%1,%2) %1[(%2)>>>CELLSHIFT]|=Bit:(1<<((%2)&cellbits-1))
+#define Bit_Let(%1,%2) (%1[(%2)>>>CELLSHIFT]|=Bit:(1<<((%2)&cellbits-1)))
 
 /*-------------------------------------------------------------------------*//**
  * <param name="array">Array of bits.</param>
@@ -171,7 +172,18 @@ P:D(Bit_Let(BitArray:array<>,slot));
  *//*------------------------------------------------------------------------**/
 
 P:D(Bit_Vet(BitArray:array<>,slot));
-#define Bit_Vet(%1,%2) %1[(%2)>>>CELLSHIFT]&=Bit:~(1<<((%2)&cellbits-1))
+#define Bit_Vet(%1,%2) (%1[(%2)>>>CELLSHIFT]&=Bit:~(1<<((%2)&cellbits-1)))
+
+/*-------------------------------------------------------------------------*//**
+ * <param name="array">Array of bits.</param>
+ * <param name="slot">Bit slot.</param>
+ * <remarks>
+ *  Swaps the bit value.
+ * </remarks>
+ *//*------------------------------------------------------------------------**/
+
+P:D(Bit_Toggle(BitArray:array<>,slot));
+#define Bit_Toggle(%1,%2) (%1[(%2)>>>CELLSHIFT]^=Bit:(1<<((%2)&cellbits-1)))
 
 /*-------------------------------------------------------------------------*//**
  * <param name="array">Array of bits.</param>
@@ -211,7 +223,7 @@ P:D(Bit_FastSet(BitArray:array<>,slot,bool:set,size = sizeof (array)));
 
 stock Bit_SetAll(BitArray:array<>, bool:set, size = sizeof (array))
 {
-	memset(_:array, set ? 0xFFFFFFFF : 0, size);
+	MemSet(_:array, set ? 0xFFFFFFFF : 0, size);
 }
 
 /*-------------------------------------------------------------------------*//**
@@ -233,7 +245,7 @@ stock Bit_SetAll(BitArray:array<>, bool:set, size = sizeof (array))
 stock Bit_GetCount(const BitArray:array<>, size = sizeof (array))
 {
 	new
-		count;
+		count = 0;
 	for (new i = 0; i != size; ++i)
 	{
 		count += Cell_CountBits(array[i]);
@@ -245,11 +257,11 @@ stock Bit_Display(const BitArray:array<>, size = sizeof (array))
 {
 	new
 		ret[YSI_MAX_STRING],
-		val;
+		val = 0;
 	while (size--)
 	{
-		val = Cell_ReverseBits(array[size]);
-		format(ret, sizeof (ret), "%016b%016b%s", val >>> 16, val & 0xFFFF, ret);
+		val = _:array[size];
+		format(ret, sizeof (ret), "%s%016b%016b", ret, val >>> 16, val & 0xFFFF);
 	}
 	//P:7("Bit_Display called: %s, %i", ret, size);
 	return ret;
@@ -261,7 +273,7 @@ stock Iter_Func@Bits(start, const BitArray:data<>, size = sizeof (data))
 {
 	P:3("Iter_Func@Bits called: %s, %i", Bit_Display(data, size), start);
 	new
-		cur,
+		cur = 0,
 		i = Bit_Slot(++start);
 	if (i == size)
 	{
@@ -290,7 +302,7 @@ stock Iter_Func@Blanks(start, const BitArray:data<>, size = sizeof (data))
 {
 	P:3("Iter_Func@Blanks called: %s, %i", Bit_Display(data, size), start);
 	new
-		cur,
+		cur = 0,
 		i = Bit_Slot(++start);
 	if (i == size)
 	{

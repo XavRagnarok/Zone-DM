@@ -1,21 +1,24 @@
 /*+
- * <library name="y_shortfunc">
- * <section>
- *  Description
- * </section>
- *  Defines new names for native functions.
- * <section>
- *  Version
- * </section>
- *  0.2
- * <section>
- *  Natives
- * </section><ul>
- *  <symbol name="W@">Renaming of <symbolref name="__CallRemoteFunction" /> for size reasons.</symbol>
- *  <symbol name="V@">Renaming of <symbolref name="getproperty" /> for size reasons.</symbol>
- *  <symbol name="S@">Renaming of <symbolref name="setproperty" /> for size reasons.</symbol>
- *  <symbol name="P@">Renaming of <symbolref name="__CallLocalFunction" /> for size reasons.</symbol>
- * </ul>
+ * <library
+ *   name="y_shortfunc"
+ *   version="0.2"
+ *   license="(c) 2022 YSI contibutors, licensed under MPL 1.1"
+ *   summary="Defines new names for native functions."
+ * >
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
+ *   <section>
+ *     Natives
+ *   </section><ul>
+ *     <symbol name="W@">Renaming of <symbolref name="__CallRemoteFunction" /> for size reasons.</symbol>
+ *     <symbol name="V@">Renaming of <symbolref name="getproperty" /> for size reasons.</symbol>
+ *     <symbol name="S@">Renaming of <symbolref name="setproperty" /> for size reasons.</symbol>
+ *     <symbol name="R@">Renaming of <symbolref name="__CallLocalFunction" /> for size reasons.</symbol>
+ *   </ul>
  * </library>
  *//** *//*
 Legal:
@@ -34,7 +37,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -61,6 +64,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -92,7 +96,7 @@ Optional plugins:
 // 
 // A@ - PARSER_DROP()
 // B@ - Fix "On"
-// C@ - CallRemoteFunction string return wrapper
+// C@ - New `C:`.
 // D@ - CallRemoteFunction wrapper
 // E@ - Set caller / LENGTH_REQUIRED{}
 // F@ - Also get string return without caller / PARSER_NO:
@@ -100,14 +104,14 @@ Optional plugins:
 // H@ - Ignore parameters / PARSER_ID:
 // I@ - Temp var
 // J@ - Temp var
-// K@ - SetTimer
+// K@ - CallRemoteFunction string return wrapper
 // L@ - Return storage / PARSER_WANT:
 // M@ - y_svar callback
 // N@ - y_uvar callback
 // O@ - SetTimerEx
-// P@ - CallLocalFunction
+// P@ - New `P:`.
 // Q@ - Temp string
-// R@ - Set string return
+// R@ - CallLocalFunction
 // S@ - Get string return
 // T@ - String return storage
 // U@ - setproperty
@@ -128,7 +132,7 @@ Optional plugins:
 
 static stock
 	YSI_g_sPropVarArg[3] = YSIM_VARARG,
-	YSI_g_sCallData;
+	YSI_g_sCallData = 0;
 
 static stock const
 	YSI_g_sPropCaller[] = YSIM_CALLER,
@@ -138,9 +142,9 @@ static stock const
 	YSI_g_sYSI_MAX_STRING = YSI_MAX_STRING;
 
 // CallRemoteFunction wrapper that handles references and string returns.
-stock C@(const function[], const fmat[], GLOBAL_TAG_TYPES:...)
+stock K@(const function[], const fmat[], GLOBAL_TAG_TYPES:...)
 {
-	P:5("C@ called: %s, %s", function, fmat);
+	P:5("K@ called: %s, %s", function, fmat);
 
 	#pragma unused function, fmat
 	// New implementation of "CallRemoteFunction".  Wraps the old function
@@ -209,6 +213,7 @@ stock C@(const function[], const fmat[], GLOBAL_TAG_TYPES:...)
 	// backing them up on the heap (saved extra work now sorting out which saved
 	// parameter went where).
 	#emit SYSREQ.C     setproperty
+	
 	if (YSI_g_sCallData)
 	{
 		// Get the return value.  Already have most of the parameters pushed,
@@ -234,11 +239,11 @@ stock C@(const function[], const fmat[], GLOBAL_TAG_TYPES:...)
 		#emit SYSREQ.C     strunpack
 		
 		// Get all the varargs (without using our corrupted stack).
-		static i, j, ch;
+		static i = 0, j = 0, ch = 0;
 		for (i = j = 0; (ch = fmat[i]); ++i) if (ch == 'd')
 		{
-			YSI_g_sPropVarArg[1] = '@' + ++j,
-			P:7("C@: Write back: %d %d %d %s %d", i, j, ch, YSI_g_sPropVarArg, getproperty(8, YSI_g_sPropVarArg));
+			YSI_g_sPropVarArg[1] = '@' + ++j;
+			P:7("K@: Write back: %d %d %d %s %d", i, j, ch, YSI_g_sPropVarArg, getproperty(8, YSI_g_sPropVarArg));
 			setarg(i + 2, 0, getproperty(8, YSI_g_sPropVarArg));
 		}
 	}
@@ -349,10 +354,10 @@ stock D@(const function[], const fmat[], GLOBAL_TAG_TYPES:...)
 		#emit STOR.pri     YSI_g_sCallData
 		
 		// Get all the varargs (without using our corrupted stack).
-		static i, j, ch;
+		static i = 0, j = 0, ch = 0;
 		for (i = j = 0; (ch = fmat[i]); ++i) if (ch == 'd')
 		{
-			YSI_g_sPropVarArg[1] = '@' + ++j,
+			YSI_g_sPropVarArg[1] = '@' + ++j;
 			P:7("D@: Write back: %d %d %d %s %d", i, j, ch, YSI_g_sPropVarArg, getproperty(8, YSI_g_sPropVarArg));
 			setarg(i + 2, 0, getproperty(8, YSI_g_sPropVarArg));
 		}
@@ -424,51 +429,11 @@ stock T@(const string:ret[YSI_MAX_STRING], GLOBAL_TAG_TYPES:...)
 	return 1;
 }
 
-// Used by y_master and y_remote.  Re-evaluate after rewrites.
-native U@(id=0, const name[]="", value=cellmin, const string[]="") = setproperty;
-native V@(GLOBAL_TAG_TYPES:id=0, const name[]="", value=cellmin, string[]="") = getproperty;
-
-// Define this command with basically every strong tag in existence to avoid
-// tag mismatch warnings with remote functions with strong tag parameters.
-native W@(const function[], const format[], GLOBAL_TAG_TYPES:...) = CallRemoteFunction;
-native O@(const function[], time, repeat, const format[] = "", GLOBAL_TAG_TYPES:...) = SetTimerEx;
-
-stock S@(GLOBAL_TAG_TYPES:v = -1)
-{
-	P:4("S@ called");
-	return
-		getproperty(8, "", YSIM_STRING, Q@),
-		strunpack(Q@, Q@),
-		setproperty(8, YSIM_CALLER, v);
-}
-
 stock X@(GLOBAL_TAG_TYPES:n)
 {
 	// THIS MUST REMAIN FOREVER!  Detected by fixes.inc.
 	P:4("X@ called: %i", n);
-	setproperty(8, YSIM_RETURN, n);
-}
-
-stock E@()
-{
-	P:4("E@ called");
-	// Already returns the previous value.
-	return setproperty(8, YSIM_CALLER, Master_ID());
-}
-
-stock Z@(GLOBAL_TAG_TYPES:v = -1)
-{
-	P:4("Z@ called");
-	return
-		setproperty(8, YSIM_CALLER, v),
-		getproperty(8, YSIM_RETURN);
-}
-
-stock R@(const buffer[])
-{
-	// To remove on completion of y_remote upgrade.
-	P:4("R@ called: \"%s\"", buffer);
-	return setproperty(8, "", YSIM_STRING, buffer);
+	setproperty(8, YSI_g_sPropReturn, n);
 }
 
 stock H@(GLOBAL_TAG_TYPES:...)
@@ -480,6 +445,10 @@ stock H@(GLOBAL_TAG_TYPES:...)
 #define _UNUSED(%0) H@(_:_H@0:_H@1:%0)
 #define _H@0:_H@1:%0&%1) _H@0:_H@1:%0%1)
 #define _H@1:%0[%9]%1) _H@1:%0%1)
+
+#if _YSI_SAFE_STARTUP
+	#define OnChaosTimer(%0,%1) YSI_JOIN(,r%0_On,r%0Timer)(%1)
+#endif
 
 // Correctly stringise "On" callbacks without ALS interferring.
 #define B@:#On%0) "On"#%0)

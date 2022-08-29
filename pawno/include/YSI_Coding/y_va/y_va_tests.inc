@@ -1,5 +1,5 @@
 static
-	YSI_g_sVariable;
+	YSI_g_sVariable = 0;
 
 static stock y_va_CallRemoteFunction(va_args<>)
 {
@@ -50,6 +50,7 @@ public y_va_PublicTestFunction(vara, varb)
 	}
 	// Just use them so they can't be optimised out.
 	vara = clamp(varb, varc, vard);
+	#pragma unused vara
 }
 
 forward y_va_PublicRecurseFunction(const func[], vara);
@@ -57,7 +58,7 @@ forward y_va_PublicRecurseFunction(const func[], vara);
 public y_va_PublicRecurseFunction(const func[], vara)
 {
 	// "" Passed to "CallLocalFunction" crashes it.
-	ASSERT_EQ(123, y_va_CallLocalFunction_X(func, "\1", vara));
+	ASSERT_EQ(y_va_CallLocalFunction_X(func, "\1", vara), 123);
 }
 
 forward y_va_PublicCallFunction(const func[], vara);
@@ -134,6 +135,13 @@ TEST__ y_va_CallLocalFunction()
 	ASSERT_EQ(YSI_g_sVariable, 45);
 }
 
+forward y_va_SetTimerExPublic(a, b, c);
+
+public y_va_SetTimerExPublic(a, b, c)
+{
+	#pragma unused a, b, c
+}
+
 static stock y_va_SetTimerEx(va_args<>)
 {
 	return va_SetTimerEx("y_va_SetTimerExPublic", 1000, false, "iii", va_start<0>);
@@ -159,7 +167,7 @@ TEST__ y_va_format()
 
 static stock y_va_return(dest[], size, const fmat[], va_args<>)
 {
-	strcpy(dest, va_return(fmat, va_start<3>), size);
+	StrCpy(dest, va_return(fmat, va_start<3>), size);
 }
 
 TEST__ y_va_return()
@@ -284,6 +292,12 @@ TEST__ y_va2_format()
 {
 	new
 		str[64];
+	// Use `H` and `h` in open.mp for upper- and lower-case HEX.
+	y_va2_format(str, sizeof (str), "Hello %d %04H %s", 99, 0x1F, "woop");
+	ASSERT_SAME(str, "Hello 99 001F woop");
+	y_va2_format(str, sizeof (str), "Hello %d %04h %s", 99, 0x1f, "woop");
+	ASSERT_SAME(str, "Hello 99 001f woop");
+	// Keep `x` as upper-case for backwards compatibility.
 	y_va2_format(str, sizeof (str), "Hello %d %04x %s", 99, 0x1F, "woop");
 	ASSERT_SAME(str, "Hello 99 001F woop");
 }
@@ -475,7 +489,7 @@ static stock va_return_Pass(const message[], va_args<>)
 	new
 		str[64];
 	format(str, sizeof (str), "<prefix> %s", va_return(message, va_start<1>));
-	return str;
+	__COMPILER_STRING_RETURN(str);
 }
 
 TEST__ va_return_PassParameters()

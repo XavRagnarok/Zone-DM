@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -71,7 +72,7 @@ Optional plugins:
 */
 
 static
-	gZone;
+	gZone = 0;
 
 // Test pulsing 1.
 PTEST_INIT__ GangZonePulse1(playerid)
@@ -255,7 +256,7 @@ PTEST_INIT__ GangZoneStopPulse2(playerid)
 PTEST__ GangZoneStopPulse2(playerid)
 {
 	GangZonePulseForPlayer(playerid, gZone, 0xFF0000AA, 0x00FF00AA, 1000);
-	SetTimerEx("GangZoneStopPulse2", 4000, 0, "i", playerid);
+	YSI_SetTimerEx("GangZoneStopPulse2", 4000, false, "i", playerid);
 	ASK("Does the pulsing stop after four seconds?");
 }
 

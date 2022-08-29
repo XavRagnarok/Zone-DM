@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -95,7 +96,7 @@ static stock
 	YSI_g_sClasses[MAX_CLASSES][E_CLASS],
 	YSI_g_sPlayerClass[MAX_PLAYERS],
 	YSI_g_sInternalClass[MAX_PLAYERS],
-	YSI_g_sClassCount,
+	YSI_g_sClassCount = 0,
 	YSI_g_sLastRefuse[MAX_PLAYERS];
 
 stock Class_ResolveGroups(class, Group:forgroup, bool:cp) <YSI_has_groups : n>
@@ -177,10 +178,10 @@ P:D(Class_Skin(classid));
  * <transition keep="true" target="_YCM : y"/>
  *//*------------------------------------------------------------------------**/
 
-HOOK__ OnScriptInit()
+HOOK__ OnYSIInit()
 {
 	#if !_YSIM_IS_CLIENT
-		if (!YSI_FILTERSCRIPT)
+		if (!Script_IsFilterscript())
 		{
 			// This code placement is not generic.
 			new
@@ -191,27 +192,35 @@ HOOK__ OnScriptInit()
 			{
 				P:E("y_classes assumptions failed.  Do you have \"AddPlayerClass\" in your modes?");
 			}
-			//printf("==========================");
-			P:4("Class_OnScriptInit: classes = %d %d %d", classLeft, classMiddle, classRight);
-			//printf("==========================");
+			//print("==========================");
+			P:4("Class_OnYSIInit: classes = %d %d %d", classLeft, classMiddle, classRight);
+			//print("==========================");
 			#if !defined YSI_NO_MASTER
-				if (_Master_Get(#_YCM, true))
+				switch (_Master_Get(#_YCM, true))
 				{
-					// Nothing changed, or we took it without force.
-					state _YCM:y;
-					_YCM@ = _E_YCM@y;
-				}
-				else
-				{
-					// Something changed, tell other scripts.
-					state _YCM:u;
-					_YCM@ = _E_YCM@u;
-					// Determine the next unique name.
-					CallRemoteFunction(#_YCM, "");
-					// There is a note in y_master about this being safe
-					// because servers always get the data.  This is the server
-					// code, but may be in use by cloud systems.  This, however,
-					// is still not a problem because we never fully pass off.
+					case e_YSIM_GET_TYPE_NO_CONTEST:
+					{
+						// Nothing changed, or we took it without force.
+						P:2("Got master " #_YCM);
+						state _YCM:y;
+						_YCM@ = _E_YCM@y;
+					}
+					case e_YSIM_GET_TYPE_STOLE:
+					{
+						// Something changed, tell other scripts.
+						state _YCM:u;
+						_YCM@ = _E_YCM@u;
+						// Determine the next unique name.
+						CallRemoteFunction(#_YCM, YSI_EMPTY);
+						// There is a note in y_master about this being safe
+						// because servers always get the data.  This is the server
+						// code, but may be in use by cloud systems.  This, however,
+						// is still not a problem because we never fully pass off.
+					}
+					case e_YSIM_GET_TYPE_NOT_GOT:
+					{
+						P:E("`E_YSIM_GET_TYPE_NOT_GOT` with `force = true`");
+					}
 				}
 			#endif
 		}
@@ -342,7 +351,7 @@ MASTER_HOOK__ OnPlayerSpawn(playerid)
 	P:2("Class_OnPlayerSpawn called: %d", playerid);
 	new
 		playerclass = YSI_g_sPlayerClass[playerid],
-		weapon;
+		weapon = 0;
 	for (new i = 0; i != MAX_CLASS_SPAWN_WEAPONS; ++i)
 	{
 		weapon = YSI_g_sClasses[playerclass][E_CLASS_WEAPONS][i];
@@ -430,9 +439,9 @@ stock Class_Add(skin, Float:x, Float:y, Float:z, Float:a, ...)
 	new
 		n = numargs(),
 		w = 5,
-		s,
+		s = 0,
 		weapons[MAX_CLASS_SPAWN_WEAPONS + 1],
-		cw;
+		cw = 0;
 	_CLASS_WEAPON_CODE
 	return Class_AddClass(skin, x, y, z, a, weapons, MAX_CLASS_SPAWN_WEAPONS + 1, Group:-1, Group:-1);
 }
@@ -458,9 +467,9 @@ stock Class_AddEx(Group:forgroup, Group:setgroup, skin, Float:x, Float:y, Float:
 	new
 		n = numargs(),
 		w = 7,
-		s,
+		s = 0,
 		weapons[MAX_CLASS_SPAWN_WEAPONS + 1],
-		cw;
+		cw = 0;
 	_CLASS_WEAPON_CODE
 	return Class_AddClass(skin, x, y, z, a, weapons, MAX_CLASS_SPAWN_WEAPONS + 1, forgroup, setgroup);
 }
@@ -484,9 +493,9 @@ stock Class_AddForGroup(Group:group, skin, Float:x, Float:y, Float:z, Float:a, .
 	new
 		n = numargs(),
 		w = 6,
-		s,
+		s = 0,
 		weapons[MAX_CLASS_SPAWN_WEAPONS + 1],
-		cw;
+		cw = 0;
 	_CLASS_WEAPON_CODE
 	return Class_AddClass(skin, x, y, z, a, weapons, MAX_CLASS_SPAWN_WEAPONS + 1, group, Group:-1);
 }
@@ -510,9 +519,9 @@ stock Class_AddWithGroupSet(Group:group, skin, Float:x, Float:y, Float:z, Float:
 	new
 		n = numargs(),
 		w = 6,
-		s,
+		s = 0,
 		weapons[MAX_CLASS_SPAWN_WEAPONS + 1],
-		cw;
+		cw = 0;
 	_CLASS_WEAPON_CODE
 	return Class_AddClass(skin, x, y, z, a, weapons, MAX_CLASS_SPAWN_WEAPONS + 1, Group:-1, group);
 }
@@ -541,7 +550,7 @@ GLOBAL__ Class_AddClass(s,Float:x,Float:y,Float:z,Float:a,const w[],c,Group:f,Gr
 	#pragma unused c
 	P:2("Class_AddClass called: %i, %f, %f, %f, %f, %s, %i, %i, %i", s, x, y, z, a, Debug_PrintArray(w, c), c, _:f, _:g);
 	new
-		i;
+		i = 0;
 	while (i != MAX_CLASSES && _Class_IsActive(i)) ++i;
 	if (i == MAX_CLASSES) return -1;
 	YSI_g_sClasses[i][E_CLASS_FLAGS] = e_CLASS_FLAGS_ACTIVE | e_CLASS_FLAGS_ENABLED | e_CLASS_FLAGS:s,

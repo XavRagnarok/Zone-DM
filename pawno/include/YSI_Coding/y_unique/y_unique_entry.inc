@@ -1,13 +1,16 @@
 /*+
- * <library name="y_unique">
- * <section>
- *  Description
- * </section>
- *  Defines a symbol differently every time it is included.
- * <section>
- *  Version
- * </section>
- *  1.0
+ * <library
+ *   name="y_unique"
+ *   version="1.0"
+ *   license="(c) 2022 YSI contibutors, licensed under MPL 1.1"
+ *   summary="Defines a symbol differently every time it is included."
+ * >
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
  * </library>
  *//** *//*
 Legal:
@@ -26,7 +29,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -53,6 +56,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -127,14 +131,32 @@ Optional plugins:
 		static stock const UNIQUE_SYMBOL_LESS_THAN_900 = UNIQUE_SYMBOL;
 		#include "y_unique__800_to_899"
 	#else
-		static stock const UNIQUE_SYMBOL_OTHER_VALUE;
+		static stock const UNIQUE_SYMBOL_OTHER_VALUE = cellmin;
 		#include "y_unique__900_to_999"
 	#endif
-#else
-	static stock const UNIQUE_SYMBOL_DOESNT_EXIST;
-	#define UNIQUE_SYMBOL (0)
-	#define UNIQUE_FUNCTION<%0...%1> %0000%1
+	
+	#endinput
 #endif
+// The non-repeating header.
+/**
+ * <library
+ *   name="y_unique"
+ *   version="1.0"
+ *   license="(c) 2022 YSI contibutors, licensed under MPL 1.1"
+ *   summary="Defines a symbol differently every time it is included."
+ * >
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
+ * </library>
+ *//** */
+
+static stock const UNIQUE_SYMBOL_DOESNT_EXIST = cellmin;
+#define UNIQUE_SYMBOL (0)
+#define UNIQUE_FUNCTION<%0...%1> %0000%1
 
 #if !defined Y_UNIQUE_LOCK_CONTRIBUTION
 	#define Y_UNIQUE_LOCK_CONTRIBUTION 0
@@ -142,9 +164,9 @@ Optional plugins:
 
 #if defined YSI_LOCK_MODE
 	#if Y_UNIQUE_LOCK_CONTRIBUTION < 2
-		forward UNIQUE_FUNCTION<@yH_OnScriptInit@...>();
+		forward UNIQUE_FUNCTION<@yH_OnYSIInit@...>();
 
-		public UNIQUE_FUNCTION<@yH_OnScriptInit@...>()
+		public UNIQUE_FUNCTION<@yH_OnYSIInit@...>()
 		{
 			#if Y_UNIQUE_LOCK_CONTRIBUTION == 0
 				#undef Y_UNIQUE_LOCK_CONTRIBUTION

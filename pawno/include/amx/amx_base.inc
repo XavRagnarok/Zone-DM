@@ -23,13 +23,30 @@
 #endif
 #define AMX_BASE_INC
 
+/**
+ * <library name="amx_assembly amx_base" summary="AMX Assembly Library: Script load address determination.">
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
+ * </library>
+ */
+
+/// <p/>
+
+/// <library>amx_assembly amx_base</library>
 static stock GetAmxBaseAddress_helper() {
 	return 0;
 }
 
-// Returns the AMX base address i.e. amx->base.
+/// <library>amx_assembly amx_base</library>
+/// <summary>
+///   Returns the AMX base address i.e. <c>amx-&gt;base</c>.
+/// </summary>
 stock GetAmxBaseAddressNow() {
-	new cod, dat;
+	new cod = 0, dat = 0;
 	#emit lctrl 0
 	#emit stor.s.pri cod
 	#emit lctrl 1
@@ -39,12 +56,12 @@ stock GetAmxBaseAddressNow() {
 	new code_start = cod - dat;
 
 	// Get address of GetAmxBaseAddress_helper().
-	new fn_addr;
+	new fn_addr = 0;
 	#emit const.pri GetAmxBaseAddress_helper
 	#emit stor.s.pri fn_addr
 
 	// Get absolute address from the CALL instruction.
-	new fn_addr_reloc, call_addr;
+	new fn_addr_reloc = 0, call_addr = 0;
 	GetAmxBaseAddress_helper();
 	#emit lctrl 6
 	#emit stor.s.pri call_addr
@@ -55,6 +72,7 @@ stock GetAmxBaseAddressNow() {
 	return fn_addr_reloc - fn_addr - cod;
 }
 
+/// <library>amx_assembly amx_base</library>
 stock GetAmxBaseAddress() {
 	static amx_base = 0;
 	if (amx_base == 0) {
@@ -62,3 +80,4 @@ stock GetAmxBaseAddress() {
 	}
 	return amx_base;
 }
+

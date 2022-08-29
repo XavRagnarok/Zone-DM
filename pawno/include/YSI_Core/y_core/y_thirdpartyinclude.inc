@@ -4,15 +4,18 @@
 #define _INC_y_thirdpartyinclude
 
 /*+
- * <library name="y_thirdpartyinclude">
- * <section>
- *  Description
- * </section>
- *  Try and include all YSI dependencies, looking in as many places as needed.
- * <section>
- *  Version
- * </section>
- *  1.0
+ * <library
+ *   name="y_thirdpartyinclude"
+ *   version="1.0"
+ *   license="(c) 2022 YSI contibutors, licensed under MPL 1.1"
+ *   summary="Try and include all YSI dependencies, looking in as many places as needed."
+ * >
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
  * </library>
  *//** *//*
 Legal:
@@ -31,7 +34,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -58,6 +61,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -318,22 +322,26 @@ Optional plugins:
 
 #if defined AMX_INCLUDING_FAILED
 	#error Could not include "https://github.com/Zeex/amx_assembly" - ensure its files are in "include\amx_assembly\"
-#elseif !defined CodeScanRunFast
+#elseif !defined IsOpcodeRelocationRequired
 	#error Please update "https://github.com/Zeex/amx_assembly" to the latest version.
 #endif
 
-#tryinclude "..\..\md-sort\md-sort"
-#tryinclude <md-sort\md-sort>
-#tryinclude "..\..\md-sort-master\md-sort"
-#tryinclude <md-sort-master\md-sort>
-#tryinclude "md-sort"
-#tryinclude <md-sort>
-#if !defined _INC_md_sort
-	#error Could not include "https://github.com/oscar-broman/md-sort" - ensure its files are in "include\md-sort\"
-#elseif !defined ResetDeepArray_Entry
-	#error Please update "https://github.com/oscar-broman/md-sort" to the latest version.
-#endif
+//#tryinclude "..\..\md-sort\md-sort"
+//#tryinclude <md-sort\md-sort>
+//#tryinclude "..\..\md-sort-master\md-sort"
+//#tryinclude <md-sort-master\md-sort>
+//#tryinclude "md-sort"
+//#tryinclude <md-sort>
+//#if !defined _INC_md_sort
+//	#error Could not include "https://github.com/oscar-broman/md-sort" - ensure its files are in "include\md-sort\"
+//#elseif !defined ResetDeepArray_Entry
+//	#error Please update "https://github.com/oscar-broman/md-sort" to the latest version.
+//#endif
 
+// Manually fix earlier versions.
+#if !defined _INC_code_parse_inc
+	#undef u@
+#endif
 #tryinclude "..\..\code-parse\code-parse"
 #tryinclude <code-parse\code-parse>
 #tryinclude "..\..\code-parse.inc\code-parse"
@@ -342,9 +350,14 @@ Optional plugins:
 #tryinclude <code-parse.inc-master\code-parse>
 #tryinclude "code-parse"
 #tryinclude <code-parse>
-#if !defined _INC_code_parse_inc
+#if defined _INC_code_parse_inc
+	#undef u@
+#else
 	#error Could not include "https://github.com/Y-Less/code-parse.inc" - ensure its files are in "include\code-parse\"
+//#elseif !defined __code_parse_u@_1
+//	#error Please update "https://github.com/Y-Less/code-parse.inc" to the latest version.
 #endif
+#define u@$ 1]);
 
 #tryinclude "..\..\indirection\indirection"
 #tryinclude <indirection\indirection>
@@ -354,7 +367,7 @@ Optional plugins:
 #tryinclude <indirection>
 #if !defined _INC_indirection
 	#error Could not include "https://github.com/Y-Less/indirection" - ensure its files are in "include\indirection\"
-#elseif !defined Indirect_Init
+#elseif !defined Indirect_Init || defined TAGOF@ || defined __TAGOF
 	#error Please update "https://github.com/Y-Less/indirection" to the latest version.
 #endif
 
@@ -381,4 +394,7 @@ public OnCodeInit()
 #if __COMPILER_WARNING_SUPPRESSION
 	#pragma warning pop
 #endif
+
+#include "y_codeparse"
+#include "y_dumpamx"
 

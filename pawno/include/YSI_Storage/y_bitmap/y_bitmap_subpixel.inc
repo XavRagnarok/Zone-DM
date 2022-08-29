@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -70,6 +71,55 @@ Optional plugins:
 	Me - sscanf2, fixes2, Whirlpool.
 */
 
-stock Bitmap_StraightLine(sX, sY, eX, eY, width, pattern[] = "SOLID")
+stock Bitmap_StraightLine(Bitmap:ctx, sX, sY, eX, eY, Float:lineWidth, colour, const pattern[] = "SOLID")
 {
+	P:3("Bitmap_DrawRing called: %d, %d, %d, %.2f, %.2f, 0x%04x%04x, \"%s\"", _:ctx, x, y, inner, outer, colour >>> 16, colour & 0xFFFF, pattern);
+	new
+		imageWidth = Bitmap_Width(ctx),
+		minY = 0, // = max(0, min(sY, eY)),
+		maxY = Bitmap_Height(ctx), // = min(max(sY, eY), Bitmap_Height(ctx)),
+		minX = 0, // = max(0, min(sX, eX)),
+		maxX = Bitmap_Width(ctx), // = min(max(sX, eX), imageWidth),
+		Float:angle = 0.0,
+		read = 0,
+		a = (colour & 0xFF) + 1,
+		na = 0,
+		suba = 0,
+		r = ((colour & 0xFF000000) >>> 16),
+		g = ((colour & 0x00FF0000) >>> 16),
+		b = ((colour & 0x0000FF00) >>>  8),
+		orig = 0;
+	_Bitmap_MakePattern(pattern, minX, minY, 0, 0);
+
+	// Sort out the line angle, in degrees, to get the corners.
+	if (sX > eX)
+	{
+		// Swap the direction.
+		sX ^= eX;
+		eX ^= sX;
+		sX ^= eX;
+		sY ^= eY;
+		eY ^= sY;
+		sY ^= eY;
+	}
+	angle = (sX == eX) ? 0.0 : atan((eY - sY) / (eX - sX));
+
+	// Now we find the box to draw in by the corners, not the centre line.
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
 }
+

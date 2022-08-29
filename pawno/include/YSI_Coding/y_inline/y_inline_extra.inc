@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -70,111 +71,59 @@ Optional plugins:
 	Me - sscanf2, fixes2, Whirlpool.
 */
 
-stock MySQL_PQueryInline(MySQL:handle, Func:cb<>, const query[], GLOBAL_TAG_TYPES:...)
-{
-	new ret = mysql_format(handle, YSI_UNSAFE_HUGE_STRING, YSI_UNSAFE_HUGE_LENGTH, query, ___(3));
-	if (ret)
-	{
-		ret = mysql_pquery(handle, YSI_UNSAFE_HUGE_STRING, "Indirect_FromCallback", "ii", _:cb, true);
-		if (ret)
-		{
-			Indirect_Claim(cb);
-		}
-	}
-	return ret;
-}
-
-stock MySQL_TQueryInline(MySQL:handle, Func:cb<>, const query[], GLOBAL_TAG_TYPES:...)
-{
-	new ret = mysql_format(handle, YSI_UNSAFE_HUGE_STRING, YSI_UNSAFE_HUGE_LENGTH, query, ___(3));
-	if (ret)
-	{
-		ret = mysql_tquery(handle, YSI_UNSAFE_HUGE_STRING, "Indirect_FromCallback", "ii", _:cb, true);
-		if (ret)
-		{
-			Indirect_Claim(cb);
-		}
-	}
-	return ret;
-}
-
-stock ORM_SelectInline(ORM:id, Func:cb<>)
-{
-	new ret = orm_select(id, "Indirect_FromCallback", "ii", _:cb, true);
-	if (ret)
-	{
-		Indirect_Claim(cb);
-	}
-	return ret;
-}
-
-stock ORM_UpdateInline(ORM:id, Func:cb<>)
-{
-	new ret = orm_update(id, "Indirect_FromCallback", "ii", _:cb, true);
-	if (ret)
-	{
-		Indirect_Claim(cb);
-	}
-	return ret;
-}
-
-stock ORM_InsertInline(ORM:id, Func:cb<>)
-{
-	new ret = orm_insert(id, "Indirect_FromCallback", "ii", _:cb, true);
-	if (ret)
-	{
-		Indirect_Claim(cb);
-	}
-	return ret;
-}
-
-stock ORM_DeleteInline(ORM:id, Func:cb<>)
-{
-	new ret = orm_delete(id, "Indirect_FromCallback", "ii", _:cb, true);
-	if (ret)
-	{
-		Indirect_Claim(cb);
-	}
-	return ret;
-}
-
-stock ORM_LoadInline(ORM:id, Func:cb<>)
-{
-	new ret = orm_load(id, "Indirect_FromCallback", "ii", _:cb, true);
-	if (ret)
-	{
-		Indirect_Claim(cb);
-	}
-	return ret;
-}
-
-stock ORM_SaveInline(ORM:id, Func:cb<>)
-{
-	new ret = orm_save(id, "Indirect_FromCallback", "ii", _:cb, true);
-	if (ret)
-	{
-		Indirect_Claim(cb);
-	}
-	return ret;
-}
-
-stock BCrypt_CheckInline(text[], hash[], Func:cb<>)
-{
-	new ret = bcrypt_check(text, hash, "Indirect_FromCallback", "ii", _:cb, true);
-	if (ret)
-	{
-		Indirect_Claim(cb);
-	}
-	return ret;
-}
-
-stock BCrypt_HashInline(text[], cost, Func:cb<>)
-{
-	new ret = bcrypt_hash(text, cost, "Indirect_FromCallback", "ii", _:cb, true);
-	if (ret)
-	{
-		Indirect_Claim(cb);
-	}
-	return ret;
-}
+//
+// These forward, but don't declare the "extra" functions.  The reason for this is simple - they
+// used to be defined in here, but that's incredibly inefficient if these functions aren't actually
+// used.  Not these functions themselves, the compiler is good at getting rid of them, but the
+// public functions they called to process the results - the interim implementation details.  The
+// reason why is simple - publics are ALWAYS included in the final mode, they can't be ommitted
+// based on what other functions you might be calling.
+//
+// If you get one of the following errors, hopefully this text will direct you here (I doubt it -
+// people don't even bother to read the error messages themselves, let alone search further, but
+// there we go):
+//
+//     error 004: function "Timer_CreateCallback" is not implemented
+//     error 004: function "SetCallbackTimer" is not implemented
+//     error 004: function "Timer_KillCallback" is not implemented
+//     error 004: function "KillCallbackTimer" is not implemented
+//     error 004: function "RequestCallback" is not implemented
+//     error 004: function "RequestJSONCallback" is not implemented
+//     error 004: function "MySQL_PQueryInline" is not implemented
+//     error 004: function "MySQL_TQueryInline" is not implemented
+//     error 004: function "ORM_SelectInline" is not implemented
+//     error 004: function "ORM_UpdateInline" is not implemented
+//     error 004: function "ORM_InsertInline" is not implemented
+//     error 004: function "ORM_DeleteInline" is not implemented
+//     error 004: function "ORM_LoadInline" is not implemented
+//     error 004: function "ORM_SaveInline" is not implemented
+//     error 004: function "BCrypt_CheckInline" is not implemented
+//     error 004: function "BCrypt_HashInline" is not implemented
+//
+// These functions have now moved to `YSI_Extra`.  So to use them, you need to explicitly include
+// them:
+//
+//     #include <YSI_Extra\y_inline_mysql>
+//     #include <YSI_Extra\y_inline_bcrypt>
+//     #include <YSI_Extra\y_inline_requests>
+//     #include <YSI_Extra\y_inline_timers>
+//
+// Obviously, pick-and-choose which you want.
+//
+forward Timer_CreateCallback(Func:func<>, initialOrTime, timeOrCount = 0, count = -1);
+forward SetCallbackTimer(Func:func<>, initialOrTime, timeOrCount = 0, count = -1);
+forward Timer_KillCallback(func);
+forward KillCallbackTimer(func);
+forward Request:RequestCallback(RequestsClient:id, const path[], E_HTTP_METHOD:method, Func:callback<iisi>, body[] = "", Headers:headers = Headers:-1);
+forward Request:RequestJSONCallback(RequestsClient:id, const path[], E_HTTP_METHOD:method, Func:callback<iii>, Node:json = Node:-1, Headers:headers = Headers:-1);
+forward MySQL_PQueryInline(MySQL:handle, Func:cb<>, const query[], GLOBAL_TAG_TYPES:...);
+forward MySQL_TQueryInline(MySQL:handle, Func:cb<>, const query[], GLOBAL_TAG_TYPES:...);
+forward ORM_SelectInline(ORM:id, Func:cb<>);
+forward ORM_UpdateInline(ORM:id, Func:cb<>);
+forward ORM_InsertInline(ORM:id, Func:cb<>);
+forward ORM_DeleteInline(ORM:id, Func:cb<>);
+forward ORM_LoadInline(ORM:id, Func:cb<>);
+forward ORM_SaveInline(ORM:id, Func:cb<>);
+forward bool:BCrypt_CheckInline(const password[], const hash[], Func:cb<i>);
+forward BCrypt_HashInline(const password[], cost = 12, {F@_@s, F@_@si}:cb); // Func:cb<s> | Func:cb<si>
 

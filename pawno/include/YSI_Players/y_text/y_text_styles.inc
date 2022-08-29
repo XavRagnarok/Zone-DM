@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -138,8 +139,8 @@ static stock
 	//YSI_g_s3DBlankData[E_3D_DATA],
 	YSI_g_sStyleBlankData[E_STYLE_DATA] = {e_STYLE_TYPE_CLIENT | e_STYLE_TYPE:0x0FF0000A, -1},
 	XML:YSI_g_sXMLRules = NO_XML_FILE,
-	YSI_g_sCurFile[32] = "\1\0",
-	YSI_g_sCur3D;
+	YSI_g_sCurFile[FUNCTION_LENGTH] = "\1\0",
+	YSI_g_sCur3D = 0;
 
 stock _Style_Init(id)
 {
@@ -179,10 +180,10 @@ public Styles_EntryTag()
 		name[MAX_XML_ENTRY_NAME],
 		val[MAX_XML_ENTRY_TEXT],
 		e_STYLE_TYPE:type = e_STYLE_TYPE_OTHER,
-		data,
-		colour,
-		id,
-		time;
+		data = 0,
+		colour = 0,
+		id = 0,
+		time = 0;
 	if (!XML_GetParentValue("name", val))
 	{
 		return 0;
@@ -326,12 +327,12 @@ public Styles_3DTag()
 		name[MAX_XML_ENTRY_NAME],
 		val[MAX_XML_ENTRY_TEXT],
 		#if !defined _inc_sscanf2 && !defined unformat
-			tmp,
+			tmp = 0,
 		#endif
-		Float:x,
-		Float:y,
-		Float:z,
-		e_3D_FLAGS:flags;
+		Float:x = 0.0,
+		Float:y = 0.0,
+		Float:z = 0.0,
+		e_3D_FLAGS:flags = e_3D_FLAGS:0;
 	if (YSI_g_sCur3D == MAX_3D_STYLES)
 	{
 		return -1;
@@ -407,7 +408,7 @@ public Styles_3DTag()
  * </remarks>
  *//*------------------------------------------------------------------------**/
 
-//hook OnScriptInit()
+//hook OnYSIInit()
 public _Styles_SpecialInit()
 {
 	if (YSI_g_sXMLRules == NO_XML_FILE)
@@ -430,9 +431,9 @@ public _Styles_SpecialInit()
 	YSI_g_sCur3D = 0;
 	new
 		idx = 0,
-		buffer[32],
-		b2[32],
-		pos;
+		buffer[FUNCTION_LENGTH],
+		b2[FUNCTION_LENGTH],
+		pos = 0;
 	// Load the data for ALL the files this script uses (to get textdraw data).
 	while ((idx = AMX_GetPublicNameSuffix(idx, buffer, _A<@yX_>)))
 	{
@@ -481,5 +482,5 @@ public _Styles_SpecialInit()
 
 stock Styles_Reload()
 {
-	CallRemoteFunction("_Styles_SpecialInit", "");
+	CallRemoteFunction("_Styles_SpecialInit", YSI_EMPTY);
 }

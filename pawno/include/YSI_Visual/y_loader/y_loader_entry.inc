@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -78,8 +79,8 @@ static stock
 	#if defined _YSI_VISUAL_OBJECTS
 		YSI_g_sRaceObjects[ceildiv(MAX_DYN_OBJECTS, 4)] = {-1, ...},
 	#endif
-	YSI_g_sCurRace,
-	YSI_g_sCurWorld;
+	YSI_g_sCurRace = 0,
+	YSI_g_sCurWorld = 0;
 
 forward Loader_Spawn();
 forward Loader_Check();
@@ -109,7 +110,7 @@ Loader_Loader()
 /*-------------------------------------------------------------------------*//**
  * <param name="filename">File to parse as an XML race file.</param>
  * <param name="laps">Number of laps to race for.</param>
- * <param name="entry">Cost of entry.</param>
+ * <param name="entryCost">Cost of entry.</param>
  * <param name="countdown">Time to count down from for start.</param>
  * <param name="arial">Use arial checkpoints instead.</param>
  * <param name="fixedPrize">Set prize amounts manually.</param>
@@ -123,11 +124,11 @@ Loader_Loader()
  * </remarks>
  *//*------------------------------------------------------------------------**/
 
-stock Loader_Parse(filename[], laps = 0, entry = 0, countdown = 3, bool:arial = false, bool:fixedPrize = true, exitTime = 0, interior = 0, world = 0, bool:restart = false)
+stock Loader_Parse(filename[], laps = 0, entryCost = 0, countdown = 3, bool:arial = false, bool:fixedPrize = true, exitTime = 0, interior = 0, world = 0, bool:restart = false)
 {
 	if (!fexist(filename)) return NO_RACE;
 	new
-		race = Race_Create(laps, entry, countdown, arial, fixedPrize, exitTime, interior, world, restart);
+		race = Race_Create(laps, entryCost, countdown, arial, fixedPrize, exitTime, interior, world, restart);
 	if (race != NO_RACE)
 	{
 		YSI_g_sCurRace = race;
@@ -230,19 +231,19 @@ public Loader_Obj()
 			name[MAX_XML_ENTRY_NAME],
 			val[MAX_XML_ENTRY_TEXT];
 		new
-			Float:x,
-			Float:y,
-			Float:z,
-			Float:rx,
-			Float:ry,
-			Float:rz,
-			model;
+			Float:x = 0.0,
+			Float:y = 0.0,
+			Float:z = 0.0,
+			Float:rx = 0.0,
+			Float:ry = 0.0,
+			Float:rz = 0.0,
+			model = 0;
 		while (XML_GetKeyValue(name, val))
 		{
 			if (!strcmp(name, "position", true))
 			{
 				new
-					pos;
+					pos = 0;
 				x = floatstr(val);
 				pos = chrfind(' ', val, pos);
 				y = floatstr(val[++pos]);
@@ -252,7 +253,7 @@ public Loader_Obj()
 			else if (!strcmp(name, "rotation", true))
 			{
 				new
-					pos;
+					pos = 0;
 				rz = floatstr(val);
 				pos = chrfind(' ', val, pos);
 				ry = floatstr(val[++pos]);
@@ -301,15 +302,15 @@ public Loader_Check()
 			name[MAX_XML_ENTRY_NAME],
 			val[MAX_XML_ENTRY_TEXT];
 		new
-			Float:x,
-			Float:y,
-			Float:z;
+			Float:x = 0.0,
+			Float:y = 0.0,
+			Float:z = 0.0;
 		while (XML_GetKeyValue(name, val))
 		{
 			if (!strcmp(name, "position", true))
 			{
 				new
-					pos;
+					pos = 0;
 				x = floatstr(val);
 				pos = chrfind(' ', val, pos);
 				y = floatstr(val[++pos]);
@@ -338,16 +339,16 @@ public Loader_Spawn()
 			name[MAX_XML_ENTRY_NAME],
 			val[MAX_XML_ENTRY_TEXT];
 		new
-			Float:x,
-			Float:y,
-			Float:z,
-			Float:rz;
+			Float:x = 0.0,
+			Float:y = 0.0,
+			Float:z = 0.0,
+			Float:rz = 0.0;
 		while (XML_GetKeyValue(name, val))
 		{
 			if (!strcmp(name, "position", true))
 			{
 				new
-					pos;
+					pos = 0;
 				x = floatstr(val);
 				pos = chrfind(' ', val, pos);
 				y = floatstr(val[++pos]);

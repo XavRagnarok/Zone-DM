@@ -20,7 +20,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -111,7 +112,7 @@ forward _PHP_Ignore(index, response, data[]);
 
 stock PHP_SendString(string:name[], string:value[], bool:priority = false)
 {
-	if (isnull(value))
+	if (IsNull(value))
 	{
 		return _PHP_Send(name, NULL, priority, e_PHP_SEND_TYPE_STRING);
 	}
@@ -224,7 +225,7 @@ MASTER_TASK__ _PHP_ForceSend[5000]()
 	if (YSI_g_sIndex > PHP_HEADER_LENGTH)
 	{
 		// Send the data.
-		HTTP(0, HTTP_POST, PHP_SEND, YSI_g_sBuffer, "_PHP_Ignore");
+		YSI_HTTP(0, HTTP_POST, PHP_SEND, YSI_g_sBuffer, "_PHP_Ignore");
 		YSI_g_sIndex = PHP_HEADER_LENGTH;
 		// I don't think this is actually REQUIRED, but does no harm.
 		YSI_g_sBuffer[PHP_HEADER_LENGTH] = '\0';
@@ -261,7 +262,7 @@ MASTER_HOOK__ OnScriptInit()
 	//YSI_g_sLen = strlen(PHP_RECEIVE) + 4;
 	//SetTimer("_PHP_FireOne", 50, 0);
 	// Send '0' only once at server start to reset PHP.
-	HTTP(0, HTTP_HEAD, PHP_RECEIVE "?ID=0", "", "_PHP_Result");
+	YSI_HTTP(0, HTTP_HEAD, PHP_RECEIVE "?ID=0", YSI_EMPTY, "_PHP_Result");
 	//new TODO;
 	DEFER__ _PHP_FireOne[500](0, 0);
 	DEFER__ _PHP_FireOne[5500](0, 0);
@@ -282,7 +283,7 @@ timer _PHP_FireOne[10](res, to)
 	//valstr(sAddr[YSI_g_sLen], YSI_g_sID);
 	format(sAddr, sizeof (sAddr), PHP_RECEIVE "?ID=%d&RE=%d&TO=%d", YSI_g_sID, res, to);
 	P:1("_PHP_FireOne request: %s: ", sAddr);
-	HTTP(YSI_g_sID, HTTP_GET, sAddr, "", "_PHP_Result");
+	YSI_HTTP(YSI_g_sID, HTTP_GET, sAddr, YSI_EMPTY, "_PHP_Result");
 }
 
 static stock PHP_GetNum32(const str[])
@@ -329,7 +330,7 @@ public _PHP_Result(index, response, data[])
 					//P:I("PHP: Got response.");
 					// Now parse the data.
 					static
-						sFunc[32],
+						sFunc[FUNCTION_LENGTH],
 						bool:sTrue = true,
 						bool:sFalse = false;
 					for (new i = 1, len = strlen(data); i < len; )

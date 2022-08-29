@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -97,7 +98,7 @@ enum E_USER_PRELOAD
 }
 
 static stock
-	YSI_g_sPlayerIndexFile,
+	YSI_g_sPlayerIndexFile = 0,
 	INI:YSI_g_sPlayerWriteFile = INI_NO_FILE,
 	YSI_g_sPlayerYID[MAX_PLAYERS] = {-2, ...},
 	YSI_g_sPreloadData[MAX_PLAYERS][E_USER_PRELOAD];
@@ -160,14 +161,14 @@ stock Player_Preload(string:name[], ret[E_USER_PRELOAD])
 	// password is to be loaded.
 	P:4("Player_Preload called: %s", name);
 	ret[E_USER_PRELOAD_YID] = -2;
-	memset(ret[E_USER_PRELOAD_PASS], 0, MAX_PASSWORD_LENGTH);
+	MemSet(ret[E_USER_PRELOAD_PASS], 0, MAX_PASSWORD_LENGTH);
 	ret[E_USER_PRELOAD_LANG] = NO_LANGUAGE;
 	ret[E_USER_PRELOAD_BITS] = 0;
 	ret[E_USER_PRELOAD_DATE] = 0;
 	new
 		namelen = strlen(name),
 		filename[] = USER_FILE_PATH "ind_X.YSI",
-		File:fIndex;
+		File:fIndex = File:0;
 	Player_GetIndexFile(filename, name[0]);
 	fIndex = fopen(filename, io_read);
 	if (fIndex)
@@ -175,7 +176,7 @@ stock Player_Preload(string:name[], ret[E_USER_PRELOAD])
 		P:5("Player_Preload: fIndex OK");
 		new
 			line[INDEX_DATA_LINE_LENGTH],
-			len;
+			len = 0;
 		while ((len = fread(fIndex, line)))
 		{
 			P:6("Player_Preload: while");
@@ -272,7 +273,7 @@ stock Player_IsRegistered(playerid)
 
 */
 
-HOOK__ OnScriptInit()
+HOOK__ OnYSIInit()
 {
 	switch (ftouch(USER_FILE_PATH "index.YSI"))
 	{
@@ -305,55 +306,15 @@ HOOK__ OnScriptInit()
 	}
 }
 
-public OnGameModeInit()
+public OnScriptInit()
 {
-	if (YSI_FILTERSCRIPT)
-	{
-		#if defined Users_OnGameModeInit
-			Users_OnGameModeInit();
-		#endif
-	}
-	else
-	{
-		#if defined Users_OnGameModeInit
-			Users_OnGameModeInit();
-		#endif
-		Users_DoUpgrade0();
-		Users_DoUpgrade1();
-	}
-	return 1;
-}
-
-#if defined _ALS_OnGameModeInit
-	#undef OnGameModeInit
-#else
-	#define _ALS_OnGameModeInit
-#endif
-#if defined Users_OnGameModeInit
-	forward Users_OnGameModeInit();
-#endif
-#define OnGameModeInit(%0) Users_OnGameModeInit(%0)
-
-public OnFilterScriptInit()
-{
-	// DO ALL (MOST) OTHER INITS FIRST.  ENSURE WE COME LATER.
-	#if defined Users_OnFilterScriptInit
-		Users_OnFilterScriptInit();
+	#if defined Users_OnScriptInit
+		Users_OnScriptInit();
 	#endif
 	Users_DoUpgrade0();
 	Users_DoUpgrade1();
 	return 1;
 }
-
-#if defined _ALS_OnFilterScriptInit
-	#undef OnFilterScriptInit
-#else
-	#define _ALS_OnFilterScriptInit
-#endif
-#if defined Users_OnFilterScriptInit
-	forward Users_OnFilterScriptInit();
-#endif
-#define OnFilterScriptInit(%0) Users_OnFilterScriptInit(%0)
 
 HOOK__ OnPlayerConnect(playerid)
 {
@@ -475,7 +436,7 @@ GLOBAL__ Player_TryLogin(playerid, string:password[])
 			if (YSI_g_sPreloadData[playerid][E_USER_PRELOAD_PASS][0] && !strcmp(YSI_g_sPreloadData[playerid][E_USER_PRELOAD_PASS], hash, false, MAX_PASSWORD_LENGTH))
 			{
 				// Wipe the password from memory.
-				memset(YSI_g_sPreloadData[playerid][E_USER_PRELOAD_PASS], 0, MAX_PASSWORD_LENGTH);
+				MemSet(YSI_g_sPreloadData[playerid][E_USER_PRELOAD_PASS], 0, MAX_PASSWORD_LENGTH);
 				// Extract the uid and call in to the login code.
 				Langs_SetPlayerLanguage(playerid, YSI_g_sPreloadData[playerid][E_USER_PRELOAD_LANG]);
 				broadcastfunc Player_DoLogin(playerid, YSI_g_sPreloadData[playerid][E_USER_PRELOAD_YID]);
@@ -521,7 +482,7 @@ GLOBAL__ Player_ForceLogin(playerid)
 		{
 			// Extract the uid and call in to the login code.
 			//YSI_g_sPreloadData[playerid][E_USER_PRELOAD_PASS] = '\0';
-			memset(YSI_g_sPreloadData[playerid][E_USER_PRELOAD_PASS], 0, MAX_PASSWORD_LENGTH);
+			MemSet(YSI_g_sPreloadData[playerid][E_USER_PRELOAD_PASS], 0, MAX_PASSWORD_LENGTH);
 			Langs_SetPlayerLanguage(playerid, YSI_g_sPreloadData[playerid][E_USER_PRELOAD_LANG]);
 			broadcastfunc Player_DoLogin(playerid, YSI_g_sPreloadData[playerid][E_USER_PRELOAD_YID]);
 			Text_Send(playerid, $YSI_LOGIN_LOGIN);
@@ -704,7 +665,7 @@ static stock Player_HashPass(pass[], target[])
 		new
 			s1 = 1,
 			s2 = 0,
-			i,
+			i = 0,
 			You_REALLY_shouldnt_use_Adler32;
 		while (pass[i])
 		{
@@ -715,7 +676,7 @@ static stock Player_HashPass(pass[], target[])
 	#elseif defined PP_MD5 && defined MD5_Hash
 		new
 			You_REALLY_shouldnt_use_MD5;
-		strcpy(target, MD5_Hash(pass, strlen(pass)));
+		StrCpy(target, MD5_Hash(pass, strlen(pass)));
 	#elseif defined PP_SHA1
 		#error SHA1 unsupported.
 	#elseif defined PP_YSI
@@ -723,12 +684,11 @@ static stock Player_HashPass(pass[], target[])
 			charset[] = "A,UbRgdnS#|rT_%5+ZvEK¬NF<9¦IH[(C)2O07 Y-Less]$Qw^?/om4;@'8k£Pp.c{&l\\3zay>DfxV:WXjuG6*!1\"i~=Mh`JB}qt",
 			css = 99;
 		new
-			j,
-			sum = j,
+			j = strlen(pass),
+			sum = 0,
 			tmp = 0,
-			i,
-			mod;
-		j = strlen(pass);
+			i = 0,
+			mod = 0;
 		for (i = 0; i < MAX_PASSWORD_LENGTH || i < j; i++)
 		{
 			mod = i % MAX_PASSWORD_LENGTH;
@@ -827,7 +787,7 @@ GLOBAL__ Player_TryRegister(playerid, string:password[])
 			{
 				// Extract the uid and call in to the login code.
 				//YSI_g_sPreloadData[playerid][E_USER_PRELOAD_PASS] = '\0';
-				memset(YSI_g_sPreloadData[playerid][E_USER_PRELOAD_PASS], 0, MAX_PASSWORD_LENGTH);
+				MemSet(YSI_g_sPreloadData[playerid][E_USER_PRELOAD_PASS], 0, MAX_PASSWORD_LENGTH);
 				Langs_SetPlayerLanguage(playerid, YSI_g_sPreloadData[playerid][E_USER_PRELOAD_LANG]);
 				broadcastfunc Player_DoLogin(playerid, YSI_g_sPreloadData[playerid][E_USER_PRELOAD_YID]);
 				Text_Send(playerid, $YSI_LOGIN_LOGIN);
@@ -847,7 +807,7 @@ GLOBAL__ Player_TryRegister(playerid, string:password[])
 	//format(name, sizeof (name), "%" #MAX_PLAYER_NAME "s", name);
 	new
 		filename[64] = USER_FILE_PATH "ind_X.YSI",
-		File:fIndex;//,
+		File:fIndex = File:0;//,
 		//hash[MAX_PASSWORD_LENGTH + 1];
 	//Player_HashPass(password, hash);
 	Player_GetIndexFile(filename, name[0]);
@@ -918,7 +878,7 @@ GLOBAL__ Player_ChangePassword(playerid, string:password[])
 	// Save it.
 	Player_RewritePreload(playerid);
 	// Wipe it.
-	memset(YSI_g_sPreloadData[playerid][E_USER_PRELOAD_PASS], 0, MAX_PASSWORD_LENGTH);
+	MemSet(YSI_g_sPreloadData[playerid][E_USER_PRELOAD_PASS], 0, MAX_PASSWORD_LENGTH);
 	return 1;
 }
 
@@ -970,7 +930,7 @@ static stock Player_RewritePreload(playerid)
 		new
 			namelen = strlen(name),
 			filename[] = USER_FILE_PATH "ind_X.YSI",
-			File:fIndex;
+			File:fIndex = File:0;
 		Player_GetIndexFile(filename, name[0]);
 		fIndex = fopen(filename, io_readwrite);
 		if (fIndex)
@@ -978,7 +938,7 @@ static stock Player_RewritePreload(playerid)
 			P:5("Player_RewritePreload: fIndex OK");
 			new
 				line[INDEX_DATA_LINE_LENGTH],
-				len;
+				len = 0;
 			while ((len = fread(fIndex, line)))
 			{
 				P:6("Player_RewritePreload: while");
@@ -1253,7 +1213,7 @@ static stock Player_GetNewID()
 	if (fHnd)
 	{
 		fread(fHnd, num);
-		num[strfind(num, " ")] = '\0';
+		num[strfind(num, YSI_SPACE)] = '\0';
 		uid = strval(num) + 1;
 		valstr(num, uid);
 		fseek(fHnd, 0, seek_start);
@@ -1311,14 +1271,14 @@ static stock Users_DoUpgrade0()
 				// little while, but needs doing).
 				P:I("Please wait, upgrading user files.");
 				new
-					ch,
+					ch = 0,
 					filename[] = USER_FILE_PATH "ind_X.YSI",
-					File:f,
-					File:g,
+					File:f = File:0,
+					File:g = File:0,
 					line[INDEX_DATA_LINE_LENGTH],
 					//Language:def = Langs_GetLanguageAt(0),
 					code[3];
-				strcpy(code, Langs_GetCode(Langs_GetLanguageAt(0)));
+				StrCpy(code, Langs_GetCode(Langs_GetLanguageAt(0)));
 				for (new i = -2; i != 26; ++i)
 				{
 					if (i == -2)
@@ -1386,22 +1346,11 @@ static stock Users_DoUpgrade0()
 							}
 						}
 					}
-					fseek(g);
 					fclose(f);
-					fremove(filename);
-					f = fopen(filename, io_write);
-					if (!f)
+					if (!Files_DoCopy(g, filename))
 					{
-						fclose(g);
 						P:E("Upgrade %c failed.", filename[USER_FILE_LENGTH + 4]);
-						continue;
 					}
-					while (fread(g, line))
-					{
-						fwrite(f, line);
-					}
-					fclose(f);
-					fclose(g);
 				}
 				f = fopen(USER_FILE_PATH "index.YSI", io_append);
 				if (f)
@@ -1439,15 +1388,15 @@ static stock Users_DoUpgrade1()
 				// little while, but needs doing).
 				P:I("Please wait, upgrading user files.");
 				new
-					ch,
+					ch = 0,
 					hash[MAX_PASSWORD_LENGTH + MAX_INDEX_LENGTH + 1],
 					filename[] = USER_FILE_PATH "ind_X.YSI",
-					File:f,
-					File:g,
+					File:f = File:0,
+					File:g = File:0,
 					line[INDEX_DATA_LINE_LENGTH],
 					//Language:def = Langs_GetLanguageAt(0),
 					code[3];
-				strcpy(code, Langs_GetCode(Langs_GetLanguageAt(0)));
+				StrCpy(code, Langs_GetCode(Langs_GetLanguageAt(0)));
 				for (new i = -2; i != 26; ++i)
 				{
 					if (i == -2)
@@ -1485,7 +1434,7 @@ static stock Users_DoUpgrade1()
 						if (ch > 3)
 						{
 							// Get the current hash.
-							strcpy(hash, line[MAX_INDEX_LENGTH + 1 + MAX_PLAYER_NAME + 1], MAX_PASSWORD_LENGTH + 1);
+							StrCpy(hash, line[MAX_INDEX_LENGTH + 1 + MAX_PLAYER_NAME + 1], MAX_PASSWORD_LENGTH + 1);
 							//hash[MAX_PASSWORD_LENGTH] = '\0';
 							// Append their ID (not QUITE their join time, but
 							// best we can do retrospectively).
@@ -1510,22 +1459,11 @@ static stock Users_DoUpgrade1()
 							fwrite(g, line);
 						}
 					}
-					fseek(g);
 					fclose(f);
-					fremove(filename);
-					f = fopen(filename, io_write);
-					if (!f)
+					if (!Files_DoCopy(g, filename))
 					{
-						fclose(g);
 						P:E("Upgrade %c failed.", filename[USER_FILE_LENGTH + 4]);
-						continue;
 					}
-					while (fread(g, line))
-					{
-						fwrite(f, line);
-					}
-					fclose(f);
-					fclose(g);
 				}
 				f = fopen(USER_FILE_PATH "index.YSI", io_append);
 				if (f)

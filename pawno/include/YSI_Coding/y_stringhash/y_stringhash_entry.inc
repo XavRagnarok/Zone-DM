@@ -20,7 +20,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -89,8 +90,8 @@ Optional plugins:
 #define _H@b (_:_H_1:_H_0
 #define _I@b (_:_H_3:_H_2
 // Old.
-#define _H_0(%0) HASH@bernstein(%0))
-#define _H_2(%0) HASHi@bernstein(%0))
+#define _H_0(%0) HASH@bernstein(%0)5381)
+#define _H_2(%0) HASHi@bernstein(%0)5381)
 // New.
 #define _H_1:_H_0<%0> HASh@bernstein(%0))
 #define _H_3:_H_2<%0> HAShi@bernstein(%0))
@@ -99,8 +100,8 @@ Optional plugins:
 #define _H@f (_:_H0@f:_H1@f
 #define _I@f (_:_H2@f:_H3@f
 // Old.
-#define _H1@f(%0) HASH@fnv1(%0))
-#define _H3@f(%0) HASHi@fnv1(%0))
+#define _H1@f(%0) HASH@fnv1(%0)2166136261)
+#define _H3@f(%0) HASHi@fnv1(%0)2166136261)
 // New.
 #define _H0@f:_H1@f<%0> HASh@fnv1(%0))
 #define _H2@f:_H3@f<%0> HAShi@fnv1(%0))
@@ -109,8 +110,8 @@ Optional plugins:
 #define _H@a (_:_H0@a:_H1@a
 #define _I@a (_:_H2@a:_H3@a
 // Old.
-#define _H1@a(%0) HASH@fnv1a(%0))
-#define _H3@a(%0) HASHi@fnv1a(%0))
+#define _H1@a(%0) HASH@fnv1a(%0)2166136261)
+#define _H3@a(%0) HASHi@fnv1a(%0)2166136261)
 // New.
 #define _H0@a:_H1@a<%0> HASh@fnv1a(%0))
 #define _H2@a:_H3@a<%0> HAShi@fnv1a(%0))
@@ -126,16 +127,16 @@ Optional plugins:
 #define _H_6:_H_7:%0<%1> HAShi@%0(%1))
 
 // Empty strings.
-#define HASH_:%0(,@,@) 2166136261
+#define HASH_:%0(,@,@)%1) %1)
 
 #define _Y_HASH_H(%0,%1)(%9) @B%0:@A0:@A1:@A2:@A3:@A4:@A5:@A6:@A7:@A8:@A9:@Aa:@Ab:@Ac:@Ad:@Ae:@Af:@Ag:@Ah:@Ai:@Aj:@Ak:@Al:@Am:@An:@Ao:@Ap:@Aq:@Ar:@As:@At:@Au:@Av:@Aw:@Ax:@Ay:@Az:@AA:@AB:@AC:@AD:@AE:@AF:@AG:@AH:@AI:@AJ:@AK:@AL:@AM:@AN:@AO:@AP:@AQ:@AR:@AS:@AT:@AU:@AV:@AW:@AX:@AY:@AZ:@A_:@A@:@B_:@B%1$(%9)$
 #define _Y_HASH_I(%0,%1)(%9) @B%0:@A0:@A1:@A2:@A3:@A4:@A5:@A6:@A7:@A8:@A9:@Aa:@Ab:@Ac:@Ad:@Ae:@Af:@Ag:@Ah:@Ai:@Aj:@Ak:@Al:@Am:@An:@Ao:@Ap:@Aq:@Ar:@As:@At:@Au:@Av:@Aw:@Ax:@Ay:@Az:@Ba:@Bb:@Bc:@Bd:@Be:@Bf:@Bg:@Bh:@Bi:@Bj:@Bk:@Bl:@Bm:@Bn:@Bo:@Bp:@Bq:@Br:@Bs:@Bt:@Bu:@Bv:@Bw:@Bx:@By:@Bz:@A_:@A@:@B_:@B%1$(%9)$
 
 // Bernstein
-#define @B0:%9$()$ -1
+#define @B0:%9$()$ 5381
 #define @B1$(<%0>%1) @B2:%0@B3:<>%1
-#define @B2:%9<%0>%1) %9(@B2:%0)*33+%1)
-#define @B3:(%0)*%1$ -%1
+#define @B2:%9<%0>%1) %9(@B2:%0)*33^%1)
+#define @B3:(%0)*%1$ 5381*%1
 
 // FNV1
 #define @B4:%9$()$ 2166136261
@@ -315,8 +316,8 @@ stock YHash(const str[], bool:sensitive = true, e_HASH_TYPE:type = hash_bernstei
 			return 2166136261;
 		case hash_fnv1a:
 			return 2166136261;
-		default:
-			return -1;
+		case hash_bernstein:
+			return 5381;
 		}
 	}
 	P:3("YHash called: \"%s\", %i, %i, %i, %i", str, _:sensitive, _:type, len, pack);
@@ -330,12 +331,12 @@ stock YHash(const str[], bool:sensitive = true, e_HASH_TYPE:type = hash_bernstei
 			case hash_bernstein:
 			{
 				new
-					hash = -1;
+					hash = 5381;
 				if (sensitive)
 				{
 					while (i != len)
 					{
-						hash = hash * 33 + str{i++};
+						hash = hash * 33 ^ str{i++};
 					}
 				}
 				else
@@ -343,7 +344,7 @@ stock YHash(const str[], bool:sensitive = true, e_HASH_TYPE:type = hash_bernstei
 					while (i != len)
 					{
 						pack = str{i++},
-						hash = hash * 33 + (IS_IN_RANGE(pack, 'A', 'Z' + 1) ? pack | 0x20 : pack);
+						hash = hash * 33 ^ (IS_IN_RANGE(pack, 'A', 'Z' + 1) ? pack | 0x20 : pack);
 					}
 				}
 				return hash;
@@ -399,12 +400,12 @@ stock YHash(const str[], bool:sensitive = true, e_HASH_TYPE:type = hash_bernstei
 			case hash_bernstein:
 			{
 				new
-					hash = -1;
+					hash = 5381;
 				if (sensitive)
 				{
 					while (i != len)
 					{
-						hash = hash * 33 + str[i++];
+						hash = hash * 33 ^ str[i++];
 					}
 				}
 				else
@@ -412,7 +413,7 @@ stock YHash(const str[], bool:sensitive = true, e_HASH_TYPE:type = hash_bernstei
 					while (i != len)
 					{
 						pack = str[i++],
-						hash = hash * 33 + (IS_IN_RANGE(pack, 'A', 'Z' + 1) ? pack | 0x20 : pack);
+						hash = hash * 33 ^ (IS_IN_RANGE(pack, 'A', 'Z' + 1) ? pack | 0x20 : pack);
 					}
 				}
 				return hash;

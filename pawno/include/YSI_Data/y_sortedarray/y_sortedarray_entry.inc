@@ -20,7 +20,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -98,7 +99,7 @@ stock bool:_Sorted_Contains(arr[], last, value)
 {
 	new
 		first = 0,
-		mid;
+		mid = 0;
 	while (first < last)
 	{
 		mid = (first + last - 1) / 2;
@@ -132,7 +133,7 @@ stock _Sorted_FindInsert(arr[], last, value)
 {
 	new
 		first = 0,
-		mid;
+		mid = 0;
 	while (first < last)
 	{
 		mid = (first + last - 1) / 2;
@@ -166,7 +167,7 @@ stock _Sorted_Find(arr[], last, value)
 {
 	new
 		first = 0,
-		mid;
+		mid = 0;
 	while (first < last)
 	{
 		mid = (first + last - 1) / 2;
@@ -214,13 +215,13 @@ stock bool:_Sorted_Add(arr[], &size, value, max = sizeof (arr))
 	else if (arr[0] >= value)
 	{
 		// New smallest value.
-		memcpy(arr[1], arr[0], 0, size * cellbytes, max - 1);
+		memcpy(arr[1], arr[0], 0, size << __COMPILER_CELL_SHIFT, max - 1);
 		arr[0] = value;
 	}
 	else
 	{
 		new idx = _Sorted_FindInsert(arr, size, value);
-		memcpy(arr[idx + 1], arr[idx], 0, (size - idx) * cellbytes, max - idx - 1);
+		memcpy(arr[idx + 1], arr[idx], 0, (size - idx) << __COMPILER_CELL_SHIFT, max - idx - 1);
 		arr[idx] = value;
 	}
 	++size;
@@ -253,7 +254,7 @@ stock bool:_Sorted_Remove(arr[], &size, value)
 		return true;
 	}
 	// We are shrinking the array, so the destination size doesn't matter.
-	memcpy(arr[idx], arr[idx + 1], 0, (size - idx) * cellbytes, cellmax);
+	memcpy(arr[idx], arr[idx + 1], 0, (size - idx) << __COMPILER_CELL_SHIFT, cellmax);
 	return true;
 }
 #define Sorted_Remove SORTED_FUNC_N<Sorted_Remove>

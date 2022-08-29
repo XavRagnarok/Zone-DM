@@ -20,7 +20,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -163,16 +164,16 @@ static stock
 	YSI_g_sTDDisplay[Text:MAX_TEXT_DRAWS][E_TD_DISPLAY],
 	//YSI_g_sTDTimers[Text:MAX_TEXT_DRAWS][MAX_PLAYERS],
 	// This is actually dual purpose.
-	Text:YSI_g_sUnused,
+	Text:YSI_g_sUnused = Text:0,
 	BitArray:YSI_g_sPlayerDraws[MAX_PLAYERS]<_:MAX_TEXT_DRAWS>;
 	//Bit:YSI_g_sPlayerDraws[MAX_PLAYERS][Bit_Bits(MAX_TEXT_DRAWS)];
 
 //static stock TD_SetTimer(playerid, Text:td, time, revision)
 //{
-//	SetTimerEx("TD_HideForPlayer", time, 0, "iii", playerid, _:td, revision);
+//	YSI_SetTimerEx("TD_HideForPlayer", time, false, "iii", playerid, _:td, revision);
 //}
 
-#define TD_SetTimer(%0,%1,%2,%3) SetTimerEx("TD_HideForPlayerPub", (%2), 0, "iii", (%0), _:(%1), (%3))
+#define TD_SetTimer(%0,%1,%2,%3) YSI_SetTimerEx("TD_HideForPlayerPub", (%2), false, "iii", (%0), _:(%1), (%3))
 
 /*-------------------------------------------------------------------------*//**
  * <param name="id">Text draw style to check validity of,</param>
@@ -200,7 +201,7 @@ P:D(bool:TD_IsValidStyle(Style:id));
  * </remarks>
  *//*------------------------------------------------------------------------**/
 
-HOOK__ OnScriptInit()
+HOOK__ OnYSIInit()
 {
 	if (YSI_g_sXMLRules == NO_XML_FILE)
 	{
@@ -216,7 +217,7 @@ HOOK__ OnScriptInit()
 			//XML_AddHandler(YSI_g_sXMLRules, "style", "TD_Style");
 		}
 	}
-	for (new Text:i; Text:i < Text:MAX_TEXT_DRAWS; i++)
+	for (new Text:i = Text:0; Text:i < Text:MAX_TEXT_DRAWS; i++)
 	{
 		YSI_g_sTDDisplay[i][E_TD_DISPLAY_REAL] = Text:INVALID_TEXT_DRAW;
 		YSI_g_sTDDisplay[i][E_TD_DISPLAY_NEXT] = i + Text:1;
@@ -248,8 +249,8 @@ public TD_LoadColour()
 		name[MAX_XML_ENTRY_NAME],
 		val[MAX_XML_ENTRY_TEXT];
 	new
-		colour,
-		hash;
+		colour = 0,
+		hash = 0;
 	while (XML_GetKeyValue(name, val))
 	{
 		if (!strcmp(name, "name", true))
@@ -310,7 +311,7 @@ stock Style:TD_Create(Float:x = 0.0, Float:y = 0.0, Float:letterX = 0.48, Float:
 {
 	P:3("Text:TD_Create called: %f, %f, %f, %f, %f, %f, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, \"%s\"", x, y, letterX, letterY, textX, textY, colour, boxColour, bgColour, shadow, outline, align, font, _:proportional, _:box, time, name);
 	new
-		Style:i;
+		Style:i = Style:0;
 	while (_TD_IsValid(i))
 	{
 		++i;
@@ -322,7 +323,7 @@ stock Style:TD_Create(Float:x = 0.0, Float:y = 0.0, Float:letterX = 0.48, Float:
 	#if !defined TEXT_DRAW_NO_STYLE_NAME
 		strpack(YSI_g_sTDData[i][E_TD_DATA_NAME], name, MAX_XML_ENTRY_NAME);
 	#endif
-	YSI_g_sTDData[i][E_TD_DATA_HASH] = bernstein(name);
+	YSI_g_sTDData[i][E_TD_DATA_HASH] = BernsteinHash(name);
 	YSI_g_sTDData[i][E_TD_DATA_X] = x;
 	YSI_g_sTDData[i][E_TD_DATA_Y] = y;
 	YSI_g_sTDData[i][E_TD_DATA_LX] = letterX;
@@ -364,7 +365,7 @@ public TD_Textdraw()
 			name[MAX_XML_ENTRY_NAME],
 			val[MAX_XML_ENTRY_TEXT];
 		new
-			e_TD_BITS:bits,
+			e_TD_BITS:bits = e_TD_BITS:0,
 			// Bernstein hash of 1.
 			hash = -32;
 		// !"\1"
@@ -409,7 +410,7 @@ public TD_Textdraw()
 				// This could now be done with the sscanf "n" type for "number".
 				#if defined _inc_sscanf2 || defined unformat
 					new
-						colour;
+						colour = 0;
 					if (!unformat(val, "n", colour)) YSI_g_sTDData[i][E_TD_DATA_COLOUR] = colour;
 				#else
 					if (ishex(val)) YSI_g_sTDData[i][E_TD_DATA_COLOUR] = hexstr(val);
@@ -439,7 +440,7 @@ public TD_Textdraw()
 			{
 				#if defined _inc_sscanf2 || defined unformat
 					new
-						colour;
+						colour = 0;
 					if (!unformat(val, "n", colour)) YSI_g_sTDData[i][E_TD_DATA_BG] = colour;
 				#else
 					if (ishex(val)) YSI_g_sTDData[i][E_TD_DATA_BG] = hexstr(val);
@@ -466,7 +467,7 @@ public TD_Textdraw()
 				#if !defined TEXT_DRAW_NO_STYLE_NAME
 					strpack(YSI_g_sTDData[i][E_TD_DATA_NAME], val, MAX_XML_ENTRY_NAME);
 				#endif
-				hash = bernstein(val);
+				hash = BernsteinHash(val);
 			}
 		}
 		YSI_g_sTDData[i][E_TD_DATA_BITS] = bits;
@@ -474,7 +475,7 @@ public TD_Textdraw()
 		{
 			YSI_g_sTDData[i][E_TD_DATA_NAME] = 0x01000000;
 		}*/
-		//YSI_g_sTDData[i][E_TD_DATA_HASH] = bernstein(YSI_g_sTDData[i][E_TD_DATA_NAME]);
+		//YSI_g_sTDData[i][E_TD_DATA_HASH] = BernsteinHash(YSI_g_sTDData[i][E_TD_DATA_NAME]);
 		YSI_g_sTDData[i][E_TD_DATA_HASH] = hash;
 		P:5("TD data: %.2f %.2f %.2f %.2f %.2f %.2f %x %d %x %d %d", YSI_g_sTDData[i][E_TD_DATA_X], YSI_g_sTDData[i][E_TD_DATA_Y], YSI_g_sTDData[i][E_TD_DATA_LX], YSI_g_sTDData[i][E_TD_DATA_LY], YSI_g_sTDData[i][E_TD_DATA_TX], YSI_g_sTDData[i][E_TD_DATA_TY], YSI_g_sTDData[i][E_TD_DATA_COLOUR], YSI_g_sTDData[i][E_TD_DATA_BOX], YSI_g_sTDData[i][E_TD_DATA_BG], YSI_g_sTDData[i][E_TD_DATA_TIME], YSI_g_sTDData[i][E_TD_DATA_BITS]);//, YSI_g_sTDData[i][E_TD_DATA_NAME]);
 	}
@@ -488,10 +489,10 @@ public TD_Textdraw()
 stock Style:TD_GetNamed(const name[])
 {
 	new
-		hash = bernstein(name);
+		hash = BernsteinHash(name);
 	P:3("Text:TD_GetID called: %i", hash);
 	new
-		Style:i;
+		Style:i = Style:0;
 	while (i != MAX_TEXT_DRAW_STYLES && YSI_g_sTDData[i][E_TD_DATA_HASH] != hash)
 	{
 		++i;
@@ -507,7 +508,7 @@ stock Style:TD_GetID(hash)
 {
 	P:3("Text:TD_GetID called: %i", hash);
 	new
-		Style:i;
+		Style:i = Style:0;
 	while (i != MAX_TEXT_DRAW_STYLES && YSI_g_sTDData[i][E_TD_DATA_HASH] != hash)
 	{
 		++i;
@@ -531,7 +532,7 @@ stock Style:TD_Clone(Style:styleID, const name[] = "\1")
 		return MAX_TEXT_DRAW_STYLES;
 	}
 	new
-		Style:i;
+		Style:i = Style:0;
 	while (_TD_IsValid(i))
 	{
 		i++;
@@ -544,7 +545,7 @@ stock Style:TD_Clone(Style:styleID, const name[] = "\1")
 	#if !defined TEXT_DRAW_NO_STYLE_NAME
 		strpack(YSI_g_sTDData[i][E_TD_DATA_NAME], name, MAX_XML_ENTRY_NAME);
 	#endif
-	YSI_g_sTDData[i][E_TD_DATA_HASH] = bernstein(name);
+	YSI_g_sTDData[i][E_TD_DATA_HASH] = BernsteinHash(name);
 	// memcpy?
 	/*YSI_g_sTDData[i][E_TD_DATA_X] = YSI_g_sTDData[styleID][E_TD_DATA_X];
 	YSI_g_sTDData[i][E_TD_DATA_Y] = YSI_g_sTDData[styleID][E_TD_DATA_Y];
@@ -592,7 +593,7 @@ stock TD_Name(Style:styleID, const name[])
 	#if !defined TEXT_DRAW_NO_STYLE_NAME
 		strpack(YSI_g_sTDData[styleID][E_TD_DATA_NAME], name, MAX_XML_ENTRY_NAME);
 	#endif
-	YSI_g_sTDData[styleID][E_TD_DATA_HASH] = bernstein(name);
+	YSI_g_sTDData[styleID][E_TD_DATA_HASH] = BernsteinHash(name);
 	return 1;
 }
 
@@ -1078,14 +1079,17 @@ stock TD_SetTime(Style:styleID, time, bool:existing = false)
  * </remarks>
  *//*------------------------------------------------------------------------**/
 
-#if !defined CST_TextDrawCreate
-	native Text:CST_TextDrawCreate(Float:x, Float:y, const text[]) = TextDrawCreate;
+#if defined _ALS_TextDrawCreate
+	#define TD_TextDrawCreate TextDrawCreate
+#else
+	native Text:TD_TextDrawCreate(Float:x, Float:y, const text[]) = TextDrawCreate;
 #endif
+
 static stock Text:TD_RenderInternal(const text[], const style[E_TD_DATA], Float:x, Float:y)
 {
 	//P:4("Text:TD_Render called: \"%s\", %i, %i", text, _:id, _:slot);
 	new
-		Text:textDraw = CST_TextDrawCreate(x, y, text);
+		Text:textDraw = TD_TextDrawCreate(x, y, text);
 	if (textDraw != Text:INVALID_TEXT_DRAW)
 	{
 		new
@@ -1158,7 +1162,7 @@ stock TD_Update(Style:id, bool:pos = false)
 	// Update the apperance after a load of updates have been applied.
 	if (YSI_g_sTDData[id][E_TD_DATA_UPDATE] == -1)
 	{
-		YSI_g_sTDData[id][E_TD_DATA_UPDATE] = SetTimerEx("TD_UpdateInternal", 1, 0, "i", _:id);
+		YSI_g_sTDData[id][E_TD_DATA_UPDATE] = YSI_SetTimerEx("TD_UpdateInternal", 1, false, "i", _:id);
 	}
 }
 
@@ -1471,7 +1475,7 @@ stock Text:TD_Display(const text[], Style:id, Float:x = (Float:TEXT_DRAW_NAN), F
 	YSI_g_sTDDisplay[YSI_g_sUnused][E_TD_DISPLAY_REAL] = textDraw;
 	YSI_g_sTDDisplay[YSI_g_sUnused][E_TD_DISPLAY_LINKED] = YSI_g_sUnused;
 	// I don't know wether or not to use strpack here.
-	//strcpy(YSI_g_sTDDisplay[YSI_g_sUnused][E_TD_DISPLAY_TEXT], text, MAX_TEXT_DRAW_LINE);
+	//StrCpy(YSI_g_sTDDisplay[YSI_g_sUnused][E_TD_DISPLAY_TEXT], text, MAX_TEXT_DRAW_LINE);
 	strpack(YSI_g_sTDDisplay[YSI_g_sUnused][E_TD_DISPLAY_TEXT], text, MAX_TEXT_DRAW_LINE char);
 	textDraw = Text:YSI_g_sUnused;
 	YSI_g_sUnused = YSI_g_sTDDisplay[YSI_g_sUnused][E_TD_DISPLAY_NEXT];
@@ -1520,8 +1524,10 @@ stock Style:TD_GetDisplayStyle(Text:td)
  * </remarks>
  *//*------------------------------------------------------------------------**/
 
-#if !defined CST_TextDrawSetString
-	native CST_TextDrawSetString(Text:text, const string[]) = TextDrawSetString;
+#if defined _ALS_TextDrawSetString
+	#define TD_TextDrawSetString TextDrawSetString
+#else
+	native TD_TextDrawSetString(Text:text, const string[]) = TextDrawSetString;
 #endif
 
 stock TD_SetString(Text:td, const text[])
@@ -1529,7 +1535,7 @@ stock TD_SetString(Text:td, const text[])
 	P:3("TD_SetString called: %i, \"%s\"", _:td, text);
 	if (_TD_TextValid(td))
 	{
-		//strcpy(YSI_g_sTDDisplay[td][E_TD_DISPLAY_TEXT], text, MAX_TEXT_DRAW_LINE);
+		//StrCpy(YSI_g_sTDDisplay[td][E_TD_DISPLAY_TEXT], text, MAX_TEXT_DRAW_LINE);
 		strpack(YSI_g_sTDDisplay[td][E_TD_DISPLAY_TEXT], text, MAX_TEXT_DRAW_LINE char);
 		new
 			Text:real = YSI_g_sTDDisplay[td][E_TD_DISPLAY_REAL];
@@ -1539,7 +1545,7 @@ stock TD_SetString(Text:td, const text[])
 			return 0;
 		}
 		// Get the style information for showing this TD.
-		CST_TextDrawSetString(real, text);
+		TD_TextDrawSetString(real, text);
 	}
 	return 1;
 }
@@ -1591,17 +1597,17 @@ stock Text:TD_DisplayHashedForAll(const text[], hash, Float:x = (Float:TEXT_DRAW
 
 stock Text:TD_DisplayNamed(const text[], const style[], Float:x = (Float:TEXT_DRAW_NAN), Float:y = (Float:TEXT_DRAW_NAN))
 {
-	return TD_DisplayHashed(text, bernstein(style), x, y);
+	return TD_DisplayHashed(text, BernsteinHash(style), x, y);
 }
 
 stock Text:TD_DisplayNamedForPlayer(playerid, const text[], const style[], Float:x = (Float:TEXT_DRAW_NAN), Float:y = (Float:TEXT_DRAW_NAN))
 {
-	return TD_DisplayHashedForPlayer(playerid, text, bernstein(style), x, y);
+	return TD_DisplayHashedForPlayer(playerid, text, BernsteinHash(style), x, y);
 }
 
 stock Text:TD_DisplayNamedForAll(const text[], const style[], Float:x = (Float:TEXT_DRAW_NAN), Float:y = (Float:TEXT_DRAW_NAN))
 {
-	return TD_DisplayHashedForAll(text, bernstein(style), x, y);
+	return TD_DisplayHashedForAll(text, BernsteinHash(style), x, y);
 }
 
 /*-------------------------------------------------------------------------*//**
@@ -1649,7 +1655,7 @@ stock TD_ShowForPlayer(playerid, Text:textDraw)
 		}*/
 		if (time)
 		{
-			//YSI_g_sTDTimers[textDraw][playerid] = SetTimerEx("TD_HideForPlayer", time, 0, "ii", playerid, _:textDraw);
+			//YSI_g_sTDTimers[textDraw][playerid] = YSI_SetTimerEx("TD_HideForPlayer", time, false, "ii", playerid, _:textDraw);
 			TD_SetTimer(playerid, textDraw, time, YSI_g_sTDDisplay[textDraw][E_TD_DISPLAY_REVISION]);
 		}
 		return 1;
@@ -1928,8 +1934,8 @@ stock TD_Morph(Text:textDraw, Style:style, time, delay = 0)
 		//FOREACH__ (new playerid : PS(players))
 		//{
 			//TD_MorphInternal(playerid, textDraw, style);
-		SetTimerEx("TD_MorphTDInternal", delay + Y_TD_FRAME_TIME, 0, "iiiiii", _:textDraw, _:TD_GetDisplayStyle(textDraw), _:style, time, Y_TD_FRAME_TIME, YSI_g_sTDDisplay[textDraw][E_TD_DISPLAY_REVISION]); //, YSI_g_sTDDisplay[textDraw][E_TD_DISPLAY_REAL]);
-		//SetTimerEx("TD_MorphTDInternal", delay + Y_TD_FRAME_TIME, 0, "iiiiii", _:textDraw, TD_GetDisplayStyle());
+		YSI_SetTimerEx("TD_MorphTDInternal", delay + Y_TD_FRAME_TIME, false, "iiiiii", _:textDraw, _:TD_GetDisplayStyle(textDraw), _:style, time, Y_TD_FRAME_TIME, YSI_g_sTDDisplay[textDraw][E_TD_DISPLAY_REVISION]); //, YSI_g_sTDDisplay[textDraw][E_TD_DISPLAY_REAL]);
+		//YSI_SetTimerEx("TD_MorphTDInternal", delay + Y_TD_FRAME_TIME, false, "iiiiii", _:textDraw, TD_GetDisplayStyle());
 		//}
 		return 1;
 	}
@@ -1953,9 +1959,9 @@ public TD_MorphTDInternal(Text:td, Style:from, Style:to, speed, pos, revision)
 	// Get the current style data.
 	TD_GetStyleData(to, sTo);
 	new
-		Text:real,
-		index,
-		Bit:mask;
+		Text:real = Text:0,
+		index = 0,
+		Bit:mask = Bit:0;
 	if (pos >= speed)
 	{
 		// We could add a callback here to indicate that the morph is done.
@@ -2014,11 +2020,11 @@ public TD_MorphTDInternal(Text:td, Style:from, Style:to, speed, pos, revision)
 		// Loop through all linked TDs and show them to all players.
 		TDL_START(td)
 		{
-			//printf("TDL_Start");
+			//print("TDL_Start");
 			// Hide this TD for everyone.
 			new
 				Text:old = YSI_g_sTDDisplay[td][E_TD_DISPLAY_REAL];
-			//printf("Destroyed");
+			//print("Destroyed");
 			// Render the new version.
 			real = TD_RenderInternal(YSI_g_sTDDisplay[td][E_TD_DISPLAY_TEXT], sFrom, YSI_g_sTDDisplay[td][E_TD_DISPLAY_X] + x, YSI_g_sTDDisplay[td][E_TD_DISPLAY_Y] + y);
 			printf("New real: %d %f %f", _:real, YSI_g_sTDDisplay[td][E_TD_DISPLAY_X] + x, YSI_g_sTDDisplay[td][E_TD_DISPLAY_Y] + y);
@@ -2027,10 +2033,10 @@ public TD_MorphTDInternal(Text:td, Style:from, Style:to, speed, pos, revision)
 			mask = Bit_Mask(_:td);
 			FOREACH__ (new playerid : Player)
 			{
-				//printf("player %d");
+				//print("player %d");
 				if (YSI_g_sPlayerDraws[playerid][index] & mask)
 				{
-					//printf("yes");
+					//print("yes");
 					TextDrawShowForPlayer(playerid, real);
 				}
 			}
@@ -2044,7 +2050,7 @@ public TD_MorphTDInternal(Text:td, Style:from, Style:to, speed, pos, revision)
 		// Even though "td" changes in the loop, the end condition is that "td"
 		// is the same as when the loop started, meaning that it's fine to reuse
 		// it here.
-		SetTimerEx("TD_MorphTDInternal", Y_TD_FRAME_TIME, false, "iiiiii", _:td, _:from, _:to, speed, pos + Y_TD_FRAME_TIME, revision);
+		YSI_SetTimerEx("TD_MorphTDInternal", Y_TD_FRAME_TIME, false, "iiiiii", _:td, _:from, _:to, speed, pos + Y_TD_FRAME_TIME, revision);
 	}
 	return 1;
 }

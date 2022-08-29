@@ -1378,7 +1378,7 @@ the wrong place - this might work slightly, but not fully.
 Function qualifiers are the bits that come before the name, i.e. `stock`,
 `static`, `const`, `new`, `operator`, `forward`, `public`, and `native`.  If you
 are using YSI, this extends to include `global`, `foreign`, `timer`, `inline`,
-`ptask`, `task`, `remoterunc`, `hook`, `group_hook`, `master_hook`,
+`ptask`, `task`, `remotefunc`, `hook`, `group_hook`, `master_hook`,
 `master_task`, `master_ptask`, `master_func`, `@foreign`, `@global`,
 `timerfunc`, `loadtext`, `pvar`, and `svar`.  Several are only valid on
 variables, `const` and `inline` are only used on inline functions, and more of
@@ -1637,7 +1637,7 @@ your own input to the magical `PARSER@FUNC:` macro:
 ```pawn
 #define void:
 #define string:
-#define u@$ 0]);
+#define u@$ 1]);
 #define PARSER@FUNC:%0$ u@(u[_:%0 u@$
 #define c@:%8(%0,%1,%9const%2) %8(%0const ,%1,%9%2)
 #define t@:%8(%0,%1,%9:%2) %8(%0,%1%9:,%2)

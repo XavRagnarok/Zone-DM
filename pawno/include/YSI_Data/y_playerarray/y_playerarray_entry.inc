@@ -20,7 +20,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -109,13 +110,13 @@ stock PA_Init(Bit:a[], bool:init = false, s = bits<MAX_PLAYERS>)
 
 #define PA_FastInit(%0) %0[0]=Bit:PA_TYPE_PA
 
-#define PA_GetBit(%1,%2) (%1[((%2)>>>CELLSHIFT)+1]&Bit:(1<<((%2)&cellbits-1)))
+#define PA_GetBit(%1,%2) (%1[((%2)>>>CELLSHIFT)+1]>>>Bit:((%2)&cellbits-1)&Bit:1)
 
-#define PA_Get(%1,%2) bool:PA_GetBit(Bit:%1,_:%2)
+#define PA_Get(%1,%2) bool:PA_GetBit(%1,_:%2)
 
-#define PA_Let(%1,%2) %1[((%2)>>>CELLSHIFT)+1]|=Bit:(1<<((%2)&cellbits-1))
+#define PA_Let(%1,%2) (%1[((%2)>>>CELLSHIFT)+1]|=Bit:(1<<((%2)&cellbits-1)))
 
-#define PA_Vet(%1,%2) %1[((%2)>>>CELLSHIFT)+1]&=Bit:~(1<<((%2)&cellbits-1))
+#define PA_Vet(%1,%2) (%1[((%2)>>>CELLSHIFT)+1]&=Bit:~(1<<((%2)&cellbits-1)))
 
 #define PA_GetCount(%1) Bit_GetCount(%1[1],bits<MAX_PLAYERS>)
 
@@ -144,7 +145,7 @@ stock Iter_Func@PA(start, const PlayerArray:data<>)
 	++start;
 	YSI_gAPAFunc_loop:
 	new
-		cur,
+		cur = 0,
 		i = Bit_Slot(start) + 1;
 	if ((cur = (_:data[i] & (~((1 << start) - 1)))))
 	{

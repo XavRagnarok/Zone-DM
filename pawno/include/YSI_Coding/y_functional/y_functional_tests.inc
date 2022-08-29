@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -70,7 +71,7 @@ Optional plugins:
 	Me - sscanf2, fixes2, Whirlpool.
 */
 
-#define FUNC_CHECK_ARR(%0,%1) for (new __i, __j = min(sizeof (%0), sizeof (%1)); __i != __j; ++__i) ASSERT(%0[__i] == %1[__i])
+#define FUNC_CHECK_ARR(%0,%1) for (new __i = 0, __j = min(sizeof (%0), sizeof (%1)); __i != __j; ++__i) ASSERT(%0[__i] == %1[__i])
 
 TEST__ FUNC_Map1()
 {
@@ -191,7 +192,7 @@ TEST__ FUNC_FoldR1()
 {
 	new
 		a0[10] = { 0,  1,  2, ...},
-		ret;
+		ret = 0;
 	ret = FoldR({_0 * _1}, a0, 10);
 	ASSERT_ZE(ret);
 }
@@ -200,7 +201,7 @@ TEST__ FUNC_FoldR2()
 {
 	new
 		a0[10] = { 1,  2,  3, ...},
-		ret;
+		ret = 0;
 	ret = FoldR({_0 * _1}, a0, 10);
 	ASSERT_EQ(ret, 1 * 2 * 3 * 4 * 5 * 6 * 7 * 8 * 9 * 10 * 10);
 }
@@ -209,7 +210,7 @@ TEST__ FUNC_FoldL1()
 {
 	new
 		a0[10] = { 1,  2,  3, ...},
-		ret;
+		ret = 0;
 	ret = FoldL({_0 * _1}, 11, a0);
 	ASSERT_EQ(ret, 1 * 2 * 3 * 4 * 5 * 6 * 7 * 8 * 9 * 10 * 11);
 }
@@ -218,9 +219,9 @@ TEST__ FUNC_FoldL_multiple()
 {
 	new
 		a0[10] = { 1,  2,  3, ...},
-		ret;
+		ret = 0;
 	ret = FoldL({ _0 * _1 }, 11, a0) + FoldL({ _0 + _1 }, 11, a0);
-	ASSERT_EQ(ret, 1 * 2 * 3 * 4 * 5 * 6 * 7 * 8 * 9 * 10 * 11 + 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11);
+	ASSERT_EQ(ret,1*2*3*4*5*6*7*8*9*10*11+1+2+3+4+5+6+7+8+9+10+11);
 }
 
 static FUNC_FoldL_nested_Add(a, b)
@@ -232,25 +233,25 @@ TEST__ FUNC_FoldL_params()
 {
 	new
 		a0[10] = { 1,  2,  3, ...},
-		ret;
+		ret = 0;
 	ret = FUNC_FoldL_nested_Add(FoldL({ _0 * _1 }, 11, a0), FoldL({ _0 + _1 }, 11, a0));
-	ASSERT_EQ(ret, 1 * 2 * 3 * 4 * 5 * 6 * 7 * 8 * 9 * 10 * 11 + 1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11);
+	ASSERT_EQ(ret,1*2*3*4*5*6*7*8*9*10*11+1+2+3+4+5+6+7+8+9+10+11);
 }
 
 TEST__ FUNC_FoldL_nested()
 {
 	new
 		a0[10] = { 1,  2,  3, ...},
-		ret;
+		ret = 0;
 	ret = FoldL({ _0 * _1 }, FoldL({ _0 + _1 }, 11, a0), a0);
-	ASSERT_EQ(ret, 1 * 2 * 3 * 4 * 5 * 6 * 7 * 8 * 9 * 10 * (1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10 + 11));
+	ASSERT_EQ(ret,1*2*3*4*5*6*7*8*9*10*(1+2+3+4+5+6+7+8+9+10+11));
 }
 
 TEST__ FUNC_FoldR3()
 {
 	new
 		a0[10] = { 1,  2,  3, ...},
-		ret;
+		ret = 0;
 	ret = FoldR({_0 * _1}, a0, 15, 0);
 	ASSERT_EQ(ret, 15);
 }
@@ -259,7 +260,7 @@ TEST__ FUNC_FoldL2()
 {
 	new
 		a0[10] = { 1,  2,  3, ...},
-		ret;
+		ret = 0;
 	ret = FoldL({_0 * _1}, 99, a0, 0);
 	ASSERT_EQ(ret, 99);
 }

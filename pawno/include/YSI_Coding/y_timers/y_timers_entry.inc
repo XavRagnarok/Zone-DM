@@ -20,7 +20,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -89,12 +90,7 @@ Optional plugins:
 #include "..\y_hooks"
 
 #include "y_timers_impl"
-#if defined _YSI_PLUGINS_FIXES_2
-	//#error V3
-	#include "y_timers_v3"
-#else
-	#include "y_timers_v2"
-#endif
+#include "y_timers_macros"
 
 #if defined YSI_TESTS
 	#include "..\..\YSI_Coding\y_va"
@@ -102,4 +98,7 @@ Optional plugins:
 	#include "y_timers_tests"
 	#include "..\y_hooks"
 #endif
+
+// Decorator syntax.
+#define @timer(%0)%1(%2) TIMER__ %1[%0](%2)
 

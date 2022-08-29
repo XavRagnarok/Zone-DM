@@ -34,7 +34,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -61,6 +61,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -92,15 +93,20 @@ Optional plugins:
 #define _Y_MASTER_INCLUDED
 
 #if !defined _INC_y_master
-	#include "..\..\YSI_Core\y_utils"
-	#include "..\..\YSI_Coding\y_hooks"
-	
+	#include "..\y_utils"
+	#include "..\y_core\y_codeparse"
+
 	CHAIN_HOOK(Master)
 	#undef CHAIN_ORDER
 	#define CHAIN_ORDER CHAIN_NEXT(Master)
 	
+	#if !defined YSI_NO_MASTER
+		#include "..\y_core\y_rconfix"
+	#endif
 	#include "y_master_once"
-	#include "y_distribute"
+	#if !defined YSI_NO_MASTER
+		#include "y_distribute"
+	#endif
 #endif
 
 // ALWAYS!  The compiler defines this automatically, don't use it as this is
@@ -155,6 +161,7 @@ Optional plugins:
 
 // Only include this lot once.
 #if defined YSI_TESTS
+	#include "..\..\YSI_Coding\y_hooks"
 	// Get the new master.
 	#define MASTER 58
 	#include "y_master_entry"
@@ -162,5 +169,102 @@ Optional plugins:
 	#include "y_master_tests"
 	// Pop the master.
 	#include "y_master_entry"
+
+	#define MASTER 57
+	#define YSIM_U_ENABLE
+	#include "y_master_entry"
+	#include "y_master_module_tests"
+	#include "y_master_entry"
+#elseif defined YSIM_TEST_MODULE
+	#if YSIM_TEST_MODULE == 1
+	
+	/*
+		#define YSI_NO_VERSION_CHECK
+		#define YSI_NO_OPTIMISATION_MESSAGE
+		#define YSIM_TEST_MODULE 1
+
+		#define YSI_NO_MODE_CACHE
+		#define print print2
+		#define printf printf2
+		#include <a_samp>
+		#undef print
+		#undef printf
+
+		#include <YSI_Core\y_master>
+	*/
+
+		#define MASTER 57
+		#include "y_master_entry"
+		#include "y_master_module_funcs"
+		#include "y_master_entry"
+	#elseif YSIM_TEST_MODULE == 2
+	
+	/*
+		#define YSI_NO_VERSION_CHECK
+		#define YSI_NO_OPTIMISATION_MESSAGE
+		#define YSIM_TEST_MODULE 2
+		#define _DEBUG 2
+
+		#define YSI_NO_MODE_CACHE
+		#define print print2
+		#define printf printf2
+		#include <a_samp>
+		#undef print
+		#undef printf
+
+		#include <YSI_Core\y_master>
+	*/
+
+		#define MASTER 57
+		#define YSIM_S_ENABLE
+		#include "y_master_entry"
+		#include "y_master_module_funcs"
+		#include "y_master_entry"
+	#elseif YSIM_TEST_MODULE == 3
+	
+	/*
+		#define YSI_NO_VERSION_CHECK
+		#define YSI_NO_OPTIMISATION_MESSAGE
+		#define YSIM_TEST_MODULE 3
+
+		#define YSI_NO_MODE_CACHE
+		#define print print2
+		#define printf printf2
+		#include <a_samp>
+		#undef print
+		#undef printf
+
+		#include <YSI_Core\y_master>
+	*/
+
+		#define MASTER 57
+		#define YSIM_C_ENABLE
+		#include "y_master_entry"
+		#include "y_master_module_funcs"
+		#include "y_master_entry"
+	#elseif YSIM_TEST_MODULE == 4
+	
+	/*
+		#define YSI_NO_VERSION_CHECK
+		#define YSI_NO_OPTIMISATION_MESSAGE
+		#define YSIM_TEST_MODULE 4
+		#define _DEBUG 3
+
+		#define YSI_NO_MODE_CACHE
+		#define print print2
+		#define printf printf2
+		#include <a_samp>
+		#undef print
+		#undef printf
+
+		#include <YSI_Core\y_master>
+	*/
+
+		#define MASTER 57
+		#define YSIM_VERSION 8
+		#include "y_master_entry"
+		#include "y_master_module_funcs"
+		#include "y_master_entry"
+	#endif
 #endif
 

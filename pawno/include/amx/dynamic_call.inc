@@ -23,6 +23,19 @@
 #endif
 #define DYNAMIC_CALL_INC
 
+/**
+ * <library name="amx_assembly dynamic_call" summary="AMX Assembly; Call arbitrary functions by name.">
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
+ * </library>
+ */
+
+/// <p/>
+
 #include "amx_jit"
 #include "amx_header"
 #include "amx_memory"
@@ -45,9 +58,13 @@ forward CallFunction(address, {Float,_}:...);
 forward CallNative(index, {Float,_}:...);
 forward CallNativeByAddress(address, {Float,_}:...);
 
+/// <library>amx_assembly dynamic_call</library>
 static stock g_nargs = 0;
+
+/// <library>amx_assembly dynamic_call</library>
 static stock g_args[DYNAMIC_CALL_MAX_ARGS];
 
+/// <library>amx_assembly dynamic_call</library>
 stock bool:Push(arg) {
 	if (g_nargs < sizeof(g_args)) {
 		g_args[g_nargs++] = arg;
@@ -56,13 +73,15 @@ stock bool:Push(arg) {
 	return false;
 }
 
+/// <library>amx_assembly dynamic_call</library>
 stock bool:PushString(const string[]) {
-	new address;
+	new address = 0;
 	#emit load.s.pri string
 	#emit stor.s.pri address
 	return Push(address);
 }
 
+/// <library>amx_assembly dynamic_call</library>
 stock bool:Pop(&arg = 0) {
 	if (g_nargs > 0) {
 		arg = g_args[--g_nargs];
@@ -71,11 +90,12 @@ stock bool:Pop(&arg = 0) {
 	return false;
 }
 
+/// <library>amx_assembly dynamic_call</library>
 stock Call(address, bool:auto_pop = true) {
 	new arg = 0;
 	new index = g_nargs;
 	new bytes = g_nargs * 4;
-	new retval;
+	new retval = 0;
 
 	while (--index >= 0) {
 		arg = g_args[index];
@@ -101,13 +121,14 @@ stock Call(address, bool:auto_pop = true) {
 	return retval;
 }
 
+/// <library>amx_assembly dynamic_call</library>
 stock CallN(address, args_to_push, bool:auto_pop = true) {
 	// Like "Call", but doesn't pass all parameters.
 	new arg = 0;
 	new index = g_nargs;
 	new bytes = args_to_push * 4;
 	new end = g_nargs - args_to_push;
-	new retval;
+	new retval = 0;
 
 	if (end < 0) {
 		return cellmin;
@@ -137,8 +158,9 @@ stock CallN(address, args_to_push, bool:auto_pop = true) {
 	return retval;
 }
 
+/// <library>amx_assembly dynamic_call</library>
 stock CallFunction(address, {Float,_}:...) {
-	new arg_bytes, arg_begin, arg_end;
+	new arg_bytes = 0, arg_begin = 0, arg_end = 0;
 
 	// Get number of bytes passed.
 	#emit load.s.pri 0x8
@@ -183,13 +205,14 @@ stock CallFunction(address, {Float,_}:...) {
 	return 0; // make compiler happy
 }
 
+/// <library>amx_assembly dynamic_call</library>
 stock SysreqC(index, bool:auto_pop = true) {
 	new arg = 0;
 	new i = g_nargs;
 	new bytes = g_nargs * 4;
-	new tmp;
+	new tmp = 0;
 	new Opcode:sysreq_c = RelocateOpcode(OP_SYSREQ_C);
-	new retval;
+	new retval = 0;
 
 	if (GetJITGeneratorVersion()) {
 		return cellmin;
@@ -247,13 +270,14 @@ stock SysreqC(index, bool:auto_pop = true) {
 	return retval;
 }
 
+/// <library>amx_assembly dynamic_call</library>
 stock SysreqD(address, bool:auto_pop = true) {
 	new arg = 0;
 	new i = g_nargs;
 	new bytes = g_nargs * 4;
-	new tmp;
+	new tmp = 0;
 	new Opcode:sysreq_d = RelocateOpcode(OP_SYSREQ_D);
-	new retval;
+	new retval = 0;
 
 	if (GetJITGeneratorVersion()) {
 		return cellmin;
@@ -310,14 +334,15 @@ stock SysreqD(address, bool:auto_pop = true) {
 	return retval;
 }
 
+/// <library>amx_assembly dynamic_call</library>
 stock SysreqCN(index, args_to_push, bool:auto_pop = true) {
 	new arg = 0;
 	new i = g_nargs;
 	new bytes = args_to_push * 4;
-	new tmp;
+	new tmp = 0;
 	new Opcode:sysreq_c = RelocateOpcode(OP_SYSREQ_C);
 	new end = g_nargs - args_to_push;
-	new retval;
+	new retval = 0;
 
 	if (GetJITGeneratorVersion()) {
 		return cellmin;
@@ -377,14 +402,15 @@ stock SysreqCN(index, args_to_push, bool:auto_pop = true) {
 	return retval;
 }
 
+/// <library>amx_assembly dynamic_call</library>
 stock SysreqDN(address, args_to_push, bool:auto_pop = true) {
 	new arg = 0;
 	new i = g_nargs;
 	new bytes = args_to_push * 4;
-	new tmp;
+	new tmp = 0;
 	new Opcode:sysreq_d = RelocateOpcode(OP_SYSREQ_D);
 	new end = g_nargs - args_to_push;
-	new retval;
+	new retval = 0;
 
 	if (GetJITGeneratorVersion()) {
 		return cellmin;
@@ -445,8 +471,9 @@ stock SysreqDN(address, args_to_push, bool:auto_pop = true) {
 	return retval;
 }
 
+/// <library>amx_assembly dynamic_call</library>
 stock CallNative(index, {Float,_}:...) {
-	new arg_bytes, arg_begin, arg_end;
+	new arg_bytes = 0, arg_begin = 0, arg_end = 0;
 	new Opcode:sysreq_c = RelocateOpcode(OP_SYSREQ_C);
 
 	if (GetJITGeneratorVersion()) {
@@ -472,7 +499,7 @@ stock CallNative(index, {Float,_}:...) {
 	#emit stor.s.pri arg_begin
 
 	new arg = arg_end;
-	new tmp;
+	new tmp = 0;
 
 	while (arg >= arg_begin) {
 		#emit lref.s.pri arg
@@ -511,7 +538,7 @@ stock CallNative(index, {Float,_}:...) {
 	#emit nop
 	#emit nop
 
-	new retval;
+	new retval = 0;
 	#emit stor.s.pri retval
 
 	// Pop native arguments.
@@ -524,9 +551,12 @@ stock CallNative(index, {Float,_}:...) {
 	return retval;
 }
 
-// Unlike CallNative(), this function calls natives directly via SYSREQ.D.
+/// <library>amx_assembly dynamic_call</library>
+/// <remarks>
+///   Unlike CallNative(), this function calls natives directly via SYSREQ.D.
+/// </remarks>
 stock CallNativeByAddress(address, {Float,_}:...) {
-	new arg_bytes, arg_begin, arg_end;
+	new arg_bytes = 0, arg_begin = 0, arg_end = 0;
 	new Opcode:sysreq_d = RelocateOpcode(OP_SYSREQ_D);
 
 	if (GetJITGeneratorVersion()) {
@@ -552,7 +582,7 @@ stock CallNativeByAddress(address, {Float,_}:...) {
 	#emit stor.s.pri arg_begin
 
 	new arg = arg_end;
-	new tmp;
+	new tmp = 0;
 
 	while (arg >= arg_begin) {
 		#emit lref.s.pri arg
@@ -591,7 +621,7 @@ stock CallNativeByAddress(address, {Float,_}:...) {
 	#emit nop
 	#emit nop
 
-	new retval;
+	new retval = 0;
 	#emit stor.s.pri retval
 
 	// Pop native arguments.
@@ -603,3 +633,4 @@ stock CallNativeByAddress(address, {Float,_}:...) {
 
 	return retval;
 }
+

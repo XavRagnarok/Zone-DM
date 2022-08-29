@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -72,25 +73,7 @@ Optional plugins:
 
 stock Bitmap_WritePixel(Bitmap:ctx, const x, const y, const colour)
 {
-	new
-		a = colour & 0xFF;
-	switch (a)
-	{
-		case 0: return;
-		case 0xFF: Bitmap_WriteCtx(ctx, x, y, colour);
-		default:
-		{
-			new
-				r = ((colour & 0xFF000000) >>> 8) * a,
-				g = ((colour & 0x00FF0000) >>> 8) * a,
-				b = ((colour & 0x0000FF00) >>> 8) * a,
-				oc = Bitmap_ReadCtx(ctx, x, y);
-			a = 256 - a;
-			oc =
-				((((oc & 0xFF000000) >>> 8) * a + r) & 0xFF000000) |
-				((((oc & 0x00FF0000) >>> 8) * a + g) & 0x00FF0000) |
-				((((oc & 0x0000FF00) >>> 8) * a + b) & 0x0000FF00) ;
-			Bitmap_WriteCtx(ctx, x, y, oc);
-		}
-	}
+	// Use the best available colourspace to blend the pixels at this point.
+	Bitmap_WriteCtx(ctx, x, y, InterpolateColourSRGB(Bitmap_ReadCtx(ctx, x, y), colour));
 }
+

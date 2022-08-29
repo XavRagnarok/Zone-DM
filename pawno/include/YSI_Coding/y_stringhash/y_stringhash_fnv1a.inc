@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -91,7 +92,7 @@ Optional plugins:
 #define HASH@fnv1a(%0) HASH_:_REHASH@a(%0,@,@)
 
 // Internal call.
-#define _REHASH@a(%0,%1) _HASH@a_%0(%1,)(2166136261)
+#define _REHASH@a(%0,%1)%9) _HASH@a_%0(%1,)(2166136261))
 
 // The bit that actually does the work.
 #define _DOHASH@a(%0,%1,%2)(%8) _HASH@a_%1(%2)(((%8^%0)*16777619))
@@ -193,10 +194,10 @@ Optional plugins:
 // ===============================
 
 // Signify the end with two "@" symbols.
-#define HASHi@fnv1a(%0) _REHASH@ia(%0,@,@)
+#define HASHi@fnv1a(%0) HASH_:_REHASH@ia(%0,@,@)
 
 // Internal call.
-#define _REHASH@ia(%0,%1) _HASH@ia_%0(%1,)(2166136261)
+#define _REHASH@ia(%0,%1)%9) _HASH@ia_%0(%1,)(2166136261))
 
 // The bit that actually does the work.
 #define _DOHASH@ia(%0,%1,%2)(%8) _HASH@ia_%1(%2)(((%8^%0)*16777619))

@@ -1,22 +1,27 @@
 /**
- * <library name="y_scriptinit">
- * <section>
- *  Description
- * </section>
- *  This file provides "OnScriptInit" and "OnScriptExit" which are called at the
- *  start and end of the current script, regardless of what the type of the
- *  script is (note: doesn't support NPC modes).  It also provides
- *  "YSI_FILTERSCRIPT" as a (partial) replacement for "FILTERSCRIPT" which
- *  detects what the mode is at runtime for a more reliable system (but it is a
- *  run-time variable, not a compile-time constant).
- * <section>
- *  Version
- * </section>
- *  1.0
+ * <library
+ *   name="y_scriptinit"
+ *   version="1.0"
+ *   license="(c) 2022 YSI contibutors, licensed under MPL 1.1"
+ * >
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
+ *   <remarks>
+ *     This file provides <c>OnScriptInit</c> and <c>OnScriptExit</c> which are
+ *     called at the start and end of the current script, regardless of what the
+ *     type of the script is.  It also provides <c>IS_FILTERSCRIPT</c> as a
+ *     (partial) replacement for <c>FILTERSCRIPT</c> which detects what the mode is
+ *     at runtime for a more reliable system (but it is a run-time variable, not a
+ *     compile-time constant).
+ *   </remarks>
  * </library>
  *//** *//*
 	
-	Now also provides OnCodeInit, which comes before OnScriptInit and should
+	Now also provides OnCodeInit, which comes before OnYSIInit and should
 	mostly be used for @emit code generation and other assembly related stuff
 	(since it is called by the JIT if that exists).
 Legal:
@@ -35,7 +40,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -62,6 +67,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.

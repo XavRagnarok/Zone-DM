@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -104,8 +105,8 @@ TEST__ y_cell_ReverseBits0()
 
 TEST__ y_cell_ExpandCompress()
 {
-	new o, x, m, n;
-	//printf("1");
+	new o = 0, x = 0, m = 0, n = 0;
+	//print("1");
 	o = 0b11110000101001011100001100001111;
 	m = 0b01010000000000000000000000000000;
 	//PRINT(x);
@@ -114,7 +115,7 @@ TEST__ y_cell_ExpandCompress()
 	ASSERT_EQ(o & m, n);
 	ASSERT_EQ(x, 0b00000000000000000000000000000011);
 	//PRINT(n);
-	//printf("2");
+	//print("2");
 	o = 0b11110000101001011100001100001111;
 	m = 0b01010101010100000000000000000000;
 	//PRINT(x);
@@ -123,7 +124,7 @@ TEST__ y_cell_ExpandCompress()
 	ASSERT_EQ(o & m, n);
 	ASSERT_EQ(x, 0b00000000000000000000000000110000);
 	//PRINT(n);
-	//printf("3");
+	//print("3");
 	o = 0b11110000101001011100001100001111;
 	m = 0b00111100000000000000000000000000;
 	//PRINT(x);
@@ -132,7 +133,7 @@ TEST__ y_cell_ExpandCompress()
 	ASSERT_EQ(o & m, n);
 	ASSERT_EQ(x, 0b00000000000000000000000000001100);
 	//PRINT(n);
-	//printf("4");
+	//print("4");
 	o = 0b11110000101001011100001100001111;
 	m = 0b00000000000000000000111111111111;
 	//PRINT(x);
@@ -141,7 +142,7 @@ TEST__ y_cell_ExpandCompress()
 	ASSERT_EQ(o & m, n);
 	ASSERT_EQ(x, 0b00000000000000000000001100001111);
 	//PRINT(n);
-	//printf("5");
+	//print("5");
 	o = 0b11110000101001011100001100001111;
 	m = 0b00000000000000000000111111000000;
 	//PRINT(x);
@@ -150,7 +151,7 @@ TEST__ y_cell_ExpandCompress()
 	ASSERT_EQ(o & m, n);
 	ASSERT_EQ(x, 0b00000000000000000000000000001100);
 	//PRINT(n);
-	//printf("6");
+	//print("6");
 	o = 0b11110000101001011100001100001111;
 	m = 0b00000110000000100001100001100000;
 	//PRINT(x);
@@ -424,7 +425,7 @@ static stock y_cell_CountBits_v3(GLOBAL_TAG_TYPES:data)
 	#emit SMUL.C               0x1010101
 	#emit SHR.C.pri            24
 	#emit RETN
-	__COMPILER_NAKED
+	__pragma("naked");
 }
 
 static stock y_cell_CountBits_v4(GLOBAL_TAG_TYPES:data)
@@ -491,7 +492,7 @@ static stock y_cell_CountBits_v4(GLOBAL_TAG_TYPES:data)
 	
 	// Return.
 	#emit RETN
-	__COMPILER_NAKED
+	__pragma("naked");
 }
 
 TEST__ y_cell_CountBits0()
@@ -505,7 +506,7 @@ TEST__ y_cell_CountBits0()
 	ASSERT_EQ(y_cell_CountBits_v4(0b1111000001111000011), 10);
 #if 0
 	new
-		t0, t1, t2, t3, t4;
+		t0 = 0, t1 = 0, t2 = 0, t3 = 0, t4 = 0;
 	t0 = GetTickCount();
 	for (new i = 0; i != 10000000; ++i)
 	{

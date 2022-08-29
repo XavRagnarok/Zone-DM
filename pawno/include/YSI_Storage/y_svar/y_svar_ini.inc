@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -110,16 +111,16 @@ Optional plugins:
 static stock
 	YSI_g_sFirstUVarData = -1,
 	// These three variables are used to speed up data loading through caching.
-	YSI_g_sLastName[32] = "\1\0",
-	YSI_g_sLastAddr,
-	YSI_g_sLastSize;
+	YSI_g_sLastName[FUNCTION_LENGTH] = "\1\0",
+	YSI_g_sLastAddr = 0,
+	YSI_g_sLastSize = 0;
 
 forward _y_svar_include_@();
 
 public _y_svar_include_@()
 {
-	//memset("", 0, 0, 0);
-	INI_WriteArray(INI_NO_FILE, "", "", 0);
+	//MemSet(YSI_EMPTY, 0, 0, 0);
+	INI_WriteArray(INI_NO_FILE, YSI_EMPTY, YSI_EMPTY, 0);
 }
 
 static stock Svar_FindData(const name[], const data[])
@@ -135,7 +136,7 @@ static stock Svar_FindData(const name[], const data[])
 		#emit STOR.S.pri data
 		if (!strcmp(data[3], name))
 		{
-			strcpy(YSI_g_sLastName, name);
+			StrCpy(YSI_g_sLastName, name);
 			YSI_g_sLastSize = data[2];
 			YSI_g_sLastAddr = data[1];
 			//printf("found %s, %d, %d, %d", YSI_g_sLastName, YSI_g_sLastSize, YSI_g_sLastPlayers, YSI_g_sLastAddr);
@@ -159,7 +160,7 @@ public _Config_Load_y_svar(name[], value[])
 		if (strcmp(name, YSI_g_sLastName))
 		{
 			// Find the data.
-			Svar_FindData(name, "");
+			Svar_FindData(name, YSI_EMPTY);
 		}
 		if (YSI_g_sLastAddr == -1)
 		{
@@ -176,7 +177,7 @@ public _Config_Load_y_svar(name[], value[])
 		if (strcmp(name[2], YSI_g_sLastName, false))
 		{
 			// Find the data.
-			Svar_FindData(name[2], "");
+			Svar_FindData(name[2], YSI_EMPTY);
 		}
 		if (YSI_g_sLastAddr == -1)
 		{
@@ -185,7 +186,7 @@ public _Config_Load_y_svar(name[], value[])
 		// This must come BEFORE the "#emit" due to bugs with braces.
 		new
 			len = strlen(value),
-			idx;
+			idx = 0;
 		// Save this pointer to an array variable for simplicity.
 		#emit LOAD.pri   YSI_g_sLastAddr
 		#emit STOR.S.pri name
@@ -264,12 +265,12 @@ stock M@(volatile const vardata[], dataSize, &pointer, ds2 = 1)
 	dataSize *= ds2;
 	P:2("M@ called");
 	new
-		sAddr;
+		sAddr = 0;
 	// Store the basic data, including linked-list pointers and a pointer to the
 	// location at which the data is stored.
 	#emit LOAD.S.pri vardata
 	#emit STOR.S.pri sAddr
-	printf("", YSI_g_sFirstUVarData);
+	printf(YSI_EMPTY, YSI_g_sFirstUVarData);
 	#emit LOAD.pri   YSI_g_sFirstUVarData
 	#emit SREF.S.pri sAddr
 	YSI_g_sFirstUVarData = sAddr;
@@ -302,7 +303,7 @@ Svar_Save()
 	INI_SetTag(__fwrite, "y_svar");
 	new
 		p = YSI_g_sFirstUVarData,
-		temp;
+		temp = 0;
 	while (p != -1)
 	{
 		// DO NOT CHANGE THE CODE BELOW HERE!!!
@@ -348,8 +349,8 @@ public OnCodeInit()
 	YSI_g_sFirstUVarData = -1;
 	// Call all @yS_ functions to get all required data.
 	new
-		idx,
-		buffer;
+		idx = 0,
+		buffer = 0;
 	while ((idx = AMX_GetPublicPointerSuffix(idx, buffer, _A<@yS_>)))
 	{
 		#emit PUSH.C     0

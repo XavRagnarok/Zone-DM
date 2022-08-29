@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -135,7 +136,7 @@ stock const
 stock _Bitmap_MakePattern(const pattern[], const posX, const posY, const offsetX, const offsetY)
 {
 	static
-		func[32] = "_BMP_PAT@";
+		func[FUNCTION_LENGTH] = "_BMP_PAT@";
 	new
 		pos = strfind(pattern, ",");
 	func[9] = '\0',
@@ -158,7 +159,7 @@ stock _Bitmap_Param(const str[], const find[])
 	new
 		pos = strfind(str, find, true),
 		len = strlen(str),
-		ch;
+		ch = 0;
 	if (0 < pos)
 	{
 		ch = str[pos - 1];
@@ -309,3 +310,4 @@ public _BMP_PAT@STRIPED(const posX, const posY, const offsetX, const offsetY, co
 		YSI_gBitmapAlphaY = stripes;
 	}
 }
+

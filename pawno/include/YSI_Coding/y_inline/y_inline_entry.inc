@@ -20,7 +20,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -88,11 +89,17 @@ CHAIN_HOOK(Inline)
 #undef CHAIN_ORDER
 #define CHAIN_ORDER CHAIN_NEXT(Inline)
 
-#include "y_inline_impl2"
+#include "y_inline_impl"
+
+// Not implemented errors.
 #include "y_inline_extra"
 
 #if defined YSI_TESTS
 	#include "..\y_hooks"
+	//#include "..\..\YSI_Extra\y_inline_bcrypt"
+	#include "..\..\YSI_Extra\y_inline_mysql"
+	#include "..\..\YSI_Extra\y_inline_requests"
+	#include "..\..\YSI_Extra\y_inline_timers"
 	#include "y_inline_tests"
 #endif
 

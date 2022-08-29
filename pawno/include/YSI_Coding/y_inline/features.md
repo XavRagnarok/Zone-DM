@@ -415,7 +415,7 @@ Any pointers parameters (references, strings, and arrays) to the caller function
 PrintLater(string:str[])
 {
 	new localString[32];
-	strcpy(localString, str);
+	StrCpy(localString, str);
 	inline const PrintNow()
 	{
 		print(localString);
@@ -472,6 +472,7 @@ Variables with destructors declared within the inline - either as parameters or 
 
 ```pawn
 #include <YSI_Coding\y_inline>
+#include <YSI_Extra\y_inline_mysql>
 
 ShowLogin(MySQL:handle, playerid)
 {
@@ -527,10 +528,10 @@ ShowLogin(MySQL:handle, playerid)
 			
 			// Called when the comparison between the stored and entered
 			// passwords is complete (so the login is complete).
-			inline const Checked()
+			inline const Checked(bool:same)
 			{
 				// Are the passwords the same?
-				if (bcrypt_is_equal())
+				if (same)
 				{
 					// The player logged in.  Tell everything else so they can
 					// respond appropriately (start loading data etc.)
@@ -577,4 +578,244 @@ public OnPlayerConnect(playerid)
 \* This is due to the way inlines are implemented with macros.  The compiler sees the outer function and any inline functions as one large function.  Thus, the compiler thinks that some parts of the large function has `return`s, while other parts don't.  This gives `warning 209: function "NAME" should return a value`.
 
 \*\* More strictly, the parameter itself IS stored in the closure, but the memory it points to isn't.  There is no good way at run-time to determine pointer parameters, and so their destination memory isn't stored, thus the target could be no longer valid, or garbage.
+
+# BCrypt
+
+There are two main BCrypt plugins, and YSI supports them both.  If you want to use the inline MySQL
+functions you just need to include MySQL at some point, and the code will work.  However, because YSI
+needs to know WHICH BCrypt plugin you're using, you need to include them first:
+
+```pawn
+//
+//   #include <samp_bcrypt>
+//
+// OR
+//
+//   #include <bcrypt>
+//
+#include <YSI_Coding\y_inline>
+#include <YSI_Extra\y_inline_bcrypt>
+```
+
+After that, the code is exactly the same - y_inline unifies the APIs and passes you the results:
+
+## Hashing
+
+```pawn
+HashPassword(const input[])
+{
+	inline const OnHashed(string:result[])
+	{
+		printf("Hashed as: %s", result);
+	}
+	// Use `_` instead of `12` for the default cost parameter.
+	BCrypt_HashInline(input, 12, using inline OnHashed);
+}
+```
+
+See below for an important note about string parameters.
+
+## Checking
+
+```pawn
+CheckPassword(const input[], const hash[])
+{
+	inline const OnChecked(bool:same)
+	{
+		printf("Are they the same?: %s", same ? ("Yes") : ("No"));
+	}
+	// Use `_` instead of `12` for the default cost parameter.
+	BCrypt_CheckInline(input, hash, using inline OnChecked);
+}
+```
+
+See below for an important note about string parameters.
+
+# String Parameters
+
+When an inline function is called it can access variables from the surrounding function.  For
+example:
+
+```pawn
+OuterFunc(a)
+{
+	new b;
+	inline InnerFunc(c)
+	{
+		new d;
+		printf("%d, %d, %d, %d", a, b, c, d);
+	}
+}
+```
+
+But there are exceptions - pass-by-reference parameters.  Most importantly, that includes strings.
+Strings (`param[]`), arrays (`param[]`), references (`&param`), and varargs (`...`), are all pointers
+to elsewhere in memory.  But when an inline function is called that memory has probably changed in
+the meantime to something else entirely.  This means that using any of those from within an inline
+function might give rubbish or even crash.  Sadly, there's no easy way to fix this.  PawnPlus
+resolves this issue in `async` functions by making a copy of the whole of memory, which is an
+unacceptable performance loss IMHO, but does point to the better solution - make a copy of just the
+memory you need.
+
+Instead of:
+
+```pawn
+OuterFunc(string[])
+{
+	inline InnerFunc()
+	{
+		printf("%s", string);
+	}
+}
+```
+
+Simply cache the string like so:
+
+```pawn
+OuterFunc(outerString[])
+{
+	new innerString[32];
+	StrCpy(innerString, outerString);
+	inline InnerFunc()
+	{
+		printf("%s", innerString);
+	}
+}
+```
+
+The function parameter `outerString` is somewhere else in memory.  The local variable `innerString`
+is on the stack, within the closure stored for the inline function.  This also means that you can
+modify `innerString` and the change will persist if the inline function is not `const`.
+
+Note that this does NOT apply to strings passed to outer inline functions - those are already on the
+stack.  This is fine as-is:
+
+```pawn
+OuterFunc()
+{
+	inline InnerFunc1(string:innerString[])
+	{
+		inline InnerFunc2()
+		{
+			printf("%s", innerString);
+		}
+	}
+}
+```
+
+## Extras
+
+The "extras" are functions already wrapped for use with inlines.  Functions that would normally take
+or require a callback, but that can now be used with callbacks instead (i.e. inlines or callbacks).
+These, as special extras, are under `YSI_Extra`, and there are currently (at least) four groups:
+
+```pawn
+#include <YSI_Extra\y_inline_bcrypt>
+#include <YSI_Extra\y_inline_mysql>
+#include <YSI_Extra\y_inline_requests>
+#include <YSI_Extra\y_inline_timers>
+```
+
+They used to be automatically included with *y_inline*, but doing so bloated the code even if you
+didn't use them, so now you have to be more explicit.  If you used them before, and don't update
+your code, you will now get a warning like:
+
+    error 004: function "ORM_InsertInline" is not implemented
+
+### y_inline_bcrypt
+
+* `BCrypt_CheckInline(const text[], const hash[], Func:cb<i>);`
+* `BCrypt_HashInline(const text[], cost = 12, Func:cb<s>);`
+
+There are two different BCrypt plugins, these functions work with either - but you must include one
+of them first.
+
+```pawn
+//
+//   #include <samp_bcrypt>
+//
+// OR
+//
+//   #include <bcrypt>
+//
+#include <YSI_Coding\y_inline>
+#include <YSI_Extra\y_inline_bcrypt>
+
+ComparePassword(const input[], const hash[])
+{
+	inline const OnCompared(bool:match)
+	{
+		printf("The passwords %s match", match ? ("do") : ("do not"));
+	}
+	BCrypt_CheckInline(input, hash, using inline OnCompared);
+}
+```
+
+### y_inline_mysql
+
+* `MySQL_PQueryInline(MySQL:handle, Func:cb<>, const query[], GLOBAL_TAG_TYPES:...);`
+* `MySQL_TQueryInline(MySQL:handle, Func:cb<>, const query[], GLOBAL_TAG_TYPES:...);`
+* `ORM_SelectInline(ORM:id, Func:cb<>);`
+* `ORM_UpdateInline(ORM:id, Func:cb<>);`
+* `ORM_InsertInline(ORM:id, Func:cb<>);`
+* `ORM_DeleteInline(ORM:id, Func:cb<>);`
+* `ORM_LoadInline(ORM:id, Func:cb<>);`
+* `ORM_SaveInline(ORM:id, Func:cb<>);`
+
+`MySQL_PQueryInline` and `MySQL_TQueryInline` both take variable parameters.  These are NOT passed
+to the inline function with the result (that's taken care of via closures).  Rather, they are
+formatting parameters for the query (wraps `mysql_format`).
+
+### y_inline_requests
+
+* `Request:RequestCallback(RequestsClient:id, const path[], E_HTTP_METHOD:method, Func:callback<iisi>, body[] = "", Headers:headers = Headers:-1);`
+* `Request:RequestJSONCallback(RequestsClient:id, const path[], E_HTTP_METHOD:method, Func:callback<iii>, Node:json = Node:-1, Headers:headers = Headers:-1);`
+
+### y_inline_timers
+
+* `Timer_CreateCallback(Func:func<>, initialOrTime, timeOrCount = 0, count = -1);`
+* `Timer_KillCallback(func);`
+
+There are several ways to use `Timer_CreateCallback` function:
+
+`Timer_CreateCallback(func, 100);` - Calls the function once every 100ms.
+
+`Timer_CreateCallback(func, 100, 0);` - Same as above (count is `0`, which means repeat forever).
+
+`Timer_CreateCallback(func, 100, 5);` - Calls the function once every 100ms, but only 5 times.
+
+`Timer_CreateCallback(func, 100, 200, 0);` - Calls the function once every 200ms, but the first call is after just 100ms.
+
+`Timer_CreateCallback(func, 100, 200, 42);` - Calls the function 42 times, first after 100ms, then every 200ms.
+
+In summary:
+
+When only one parameter is given its `time`.
+
+When two parameters are given they're `time` and `count`.
+
+When all three parameters are given they're `initial`, `time`, and `count`.
+
+Count is NOT like `repeat` in `SetTimer`.  `0` means repeat forever, anything not `0` means call it
+exactly that many times.
+
+`Timer_KillCallback` is used to kill a timer created by `Timer_CreateCallback`, since the normal
+`KillTimer` won't work for them:
+
+```pawn
+inline const AfterFiveSeconds()
+{
+	printf("Will never be called");
+}
+new timer = Timer_CreateCallback(using inline AfterFiveSeconds, 5000);
+Timer_KillCallback(timer);
+```
+
+There were two other functions, but they were quickly deprecated in favour of the open.mp-style
+function names above:
+
+* `SetCallbackTimer(Func:func<>, initialOrTime, timeOrCount = 0, count = -1);`
+* `KillCallbackTimer(func);`
+
+
 

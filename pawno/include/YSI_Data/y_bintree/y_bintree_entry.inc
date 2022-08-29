@@ -20,7 +20,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -195,11 +196,11 @@ stock Bintree_Reset(BinaryTree:tree<>, pointer = 0)
  * </remarks>
  *//*------------------------------------------------------------------------**/
 
-stock Bintree_FindValue(BinaryTree:tree<>, value, &cont = 0, &old = 0)
+stock Bintree_FindValue(const BinaryTree:tree<>, value, &cont = 0, &old = 0)
 {
 	P:3("Bintree_FindValue called: %s, %i, %i, %i", Bintree_DisplayOutput(tree), value, cont, old);
 	new
-		treeValue;
+		treeValue = 0;
 	while (cont != BINTREE_NO_BRANCH)
 	{
 		P:7("Bintree_FindValue: search %d %d %d %d", cont, old, tree[cont][E_BINTREE_TREE_VALUE], value);
@@ -322,7 +323,7 @@ stock Bintree_SortHalf(BinaryTree:output<>, data[][E_BINTREE_INPUT], index, uppe
 		new
 			half = num / 2,
 			off = half + index,
-			right;
+			right = 0;
 		while (off && data[off][E_BINTREE_INPUT_VALUE] == data[off - 1][E_BINTREE_INPUT_VALUE]) off--;
 		right = Bintree_SortHalf(output, data, index, off, offset + 1, offset);
 		output[offset][E_BINTREE_TREE_VALUE] = data[off][E_BINTREE_INPUT_VALUE];
@@ -347,7 +348,7 @@ stock Bintree_SortHalf(BinaryTree:output<>, data[][E_BINTREE_INPUT], index, uppe
  * <remarks>
  *  -
  *
- * native Bintree_Add(BinaryTree:tree<>, pointer, value, offset, maxsize = sizeof (data));
+ * native Bintree_Add(BinaryTree:tree&lt;&gt;, pointer, value, offset, maxsize = sizeof (data));
  *
  * </remarks>
  *//*------------------------------------------------------------------------**/
@@ -359,8 +360,8 @@ stock Bintree_Add(BinaryTree:data<>, pointer, value, offset, maxsize = sizeof (d
 	if (offset)
 	{
 		new
-			leaf,
-			old;
+			leaf = 0,
+			old = 0;
 		while (Bintree_FindValue(data, value, leaf, old) != BINTREE_NOT_FOUND) continue;
 		//Bintree_Reset(data, offset);
 		if (value < data[old][E_BINTREE_TREE_VALUE]) data[old][E_BINTREE_TREE_LEFT] = offset;
@@ -390,7 +391,7 @@ stock Bintree_Add(BinaryTree:data<>, pointer, value, offset, maxsize = sizeof (d
  * <remarks>
  *  The left branch is usually larger due to the division
  *  method used so we start there.  Even though right is
- *  >= and left is only < in even sized arrays the greater
+ *  &gt;= and left is only &lt; in even sized arrays the greater
  *  chunk (unless there's only 2 items) goes left.
  *
  *  Called itteratively to ensure branches are maintained.
@@ -401,7 +402,7 @@ stock Bintree_Delete(BinaryTree:source<>, index, count)
 {
 	P:3("Bintree_Delete called: %s, %i, %i", Bintree_DisplayOutput(source), index, count);
 	new
-		branch,
+		branch = 0,
 		old = index;
 	while (TRUE)
 	{
@@ -472,7 +473,7 @@ static stock Bintree_FindMin(BinaryTree:data<>, offset)
 {
 	P:4("Bintree_FindMin called: %s, %i", Bintree_DisplayOutput(data), offset);
 	new
-		branch;
+		branch = 0;
 	while ((branch = data[offset][E_BINTREE_TREE_LEFT]) != BINTREE_NO_BRANCH) offset = branch;
 	return offset;
 }
@@ -489,7 +490,7 @@ static stock Bintree_FindMax(BinaryTree:data<>, offset)
 {
 	P:4("Bintree_FindMax called: %s, %i", Bintree_DisplayOutput(data), offset);
 	new
-		branch;
+		branch = 0;
 	while ((branch = data[offset][E_BINTREE_TREE_RIGHT]) != BINTREE_NO_BRANCH) offset = branch;
 	return offset;
 }

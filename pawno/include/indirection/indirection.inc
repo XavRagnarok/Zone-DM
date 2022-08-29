@@ -1,7 +1,51 @@
+/*
+	Version: MPL 1.1
+	
+	The contents of this file are subject to the Mozilla Public License Version 
+	1.1 (the "License"); you may not use this file except in compliance with 
+	the License. You may obtain a copy of the License at 
+	http://www.mozilla.org/MPL/
+	
+	Software distributed under the License is distributed on an "AS IS" basis,
+	WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+	for the specific language governing rights and limitations under the
+	License.
+	
+	The Original Code is the indirection.inc function pointers library.
+	
+	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
+	Portions created by the Initial Developer are Copyright (c) 2022
+	the Initial Developer. All Rights Reserved.
+*/
+
 #if defined _INC_indirection
 	#endinput
 #endif
 #define _INC_indirection
+
+/**
+ * <library
+ *   name="indirection"
+ *   summary="Function pointers and code redirection."
+ *   license="Copyright (c) 2022 Alex &quot;Y_Less&quot; Cole.  Licensed under MPL 1.1"
+ * >
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
+ *   <remarks>
+ *     Indirection is a system for calling function pointers in a generic and
+ *     type-safe way.  Instead of <c>CallLocalFunction</c>, <c>Call</c>,
+ *     <c>defer</c>, <c>Callback_Call</c>, or any other method, this gives one
+ *     common interface which can be extended by library authors; utilising tags
+ *     for compile-time parameters.
+ *   </remarks>
+ * </library>
+ */
+
+/// <p/>
 
 #if !defined ADDRESSOF_INC
 	#tryinclude "..\amx\addressof"
@@ -79,9 +123,9 @@
 #endif
 
 #if defined CUSTOM_TAG_TYPES
-	#define GLOBAL_TAG_TYPES {_,Language,Bit,Text,Menu,Style,XML,Bintree,Group,Timer,File,Float,Text3D,CUSTOM_TAG_TYPES}
+	#define GLOBAL_TAG_TYPES {_,Bit,Text,Group,File,Float,Text3D,CUSTOM_TAG_TYPES}
 #else
-	#define GLOBAL_TAG_TYPES {_,Language,Bit,Text,Menu,Style,XML,Bintree,Group,Timer,File,Float,Text3D}
+	#define GLOBAL_TAG_TYPES {_,Bit,Text,Group,File,Float,Text3D}
 #endif
 
 enum E_INDIRECTION
@@ -94,11 +138,11 @@ enum E_INDIRECTION
 }
 
 stock
-	INDIRECTION_DATA,
-	INDIRECTION_TAG;
+	INDIRECTION_DATA = 0,
+	INDIRECTION_TAG = 0;
 
 static stock
-	gsCodSize; // The size of `COD`.
+	gsCodSize = 0; // The size of `COD`.
 
 #if !defined YSI_MAX_STRING
 	#define YSI_MAX_STRING (144)
@@ -107,26 +151,50 @@ static stock
 #define string:
 #define void:
 
+#define PP_LEFT_BRACKET<> (
+
 #if !defined TAGOF
 	#if ((__Pawn & 0x0F) >= 0x0A) || ((__Pawn & 0xF0) >= 0xA0)
-		#define TAGOF(%0);
 		// Defer `tagof` on things with colons slightly to remove anything after
 		// it.  This lets us do `tagof (Float:i)` with no problem, since the `i`
 		// is removed.
-		#define TAGOF@[%0] %0:
-		#define tagof(%0:%1)NO_TAGOF$ tagof(TAGOF@[%0])
+		#define TAGOF(%0);
+		#define __TAGOF__[%0] %0:
+		#define tagof(%0:%1) __NO_TAGOF:__IS_TAGOF:tagof PP_LEFT_BRACKET<>%0:$%1)
+		#define __NO_TAGOF:__IS_TAGOF:tagof%9<>%0)%2:$%1) tagof%9<>%0)%2:%1)
+		#define __IS_TAGOF:tagof%9<>%0:$%1) tagof%9<>__TAGOF__[%0])
+	#elseif defined __COMPILER_TAG_DATA
+		#define TAGOF(%0);
 	#else
-		#define TAGOF(%0); stock const %0:TAGOF@%0;
-		#define TAGOF@%0\32; TAGOF@
-		#define tagof(%0:%1)NO_TAGOF$ (tagof(TAGOF@%0))
+		#define TAGOF(%0); stock const %0:__TAGOF__%0;
+		#define __TAGOF__%0\32; __TAGOF__
+		#define tagof(%0:%1) __NO_TAGOF:__IS_TAGOF:tagof PP_LEFT_BRACKET<>%0:$%1)
+		#define __NO_TAGOF:__IS_TAGOF:tagof%9<>%0)%2:$%1) tagof%9<>%0)%2:%1)
+		#define __IS_TAGOF:tagof%9<>%0:$%1) tagof%9<>__TAGOF__%0)
 	#endif
-	#define TAGOF@F@_@%0\32; TAGOF@F@_@
-	#define SPECIFIER(%0) TAGOF(F@_@%0)
-	#define NO_TAGOF$
-	
-	TAGOF(Float);
-	TAGOF(File);
+
+	#if !defined __COMPILER_TAG_DATA
+		stock bool:operator==(_:a, __NO_TAGOF:b)
+		{
+			return a == _:b;
+		}
+
+		stock bool:operator!=(_:a, __NO_TAGOF:b)
+		{
+			return a != _:b;
+		}
+	#endif
+
+	#define __TAGOF__F@_@%0\32; __TAGOF__F@_@
+	#if defined __COMPILER_TAG_DATA
+		#define SPECIFIER(%0) __COMPILER_TAG_DATA(F@_@%0,0)
+	#else
+		#define SPECIFIER(%0) TAGOF(F@_@%0)
+	#endif
 #endif
+
+TAGOF(Float);
+TAGOF(File);
 
 // Technically the function tags are not always `F@_@`.  The third character can
 // be anything, and is reserved for representing the return type.  However, it
@@ -144,7 +212,7 @@ static stock
 // compiler where you can't (always) do `tagof (Float:)`.  This is relevant here
 // since the specifiers are passed as `F@_@i:Func`, so we need `tagof (F@_@i:)`
 // to get at the specifier.  However, since that doesn't work, we instead need
-// `tagof (TAGOF@F@_@i)` with `stock const F@_@i:TAGOF@F@_@i`.  I.e. we need a
+// `tagof (__TAGOF__F@_@i)` with `stock const F@_@i:__TAGOF__F@_@i`.  I.e. we need a
 // variable using the tag to get the tag from, instead of getting it directly.
 SPECIFIER(i);
 SPECIFIER(s);
@@ -162,10 +230,10 @@ SPECIFIER(s);
 //   
 // It would save the stack manipulation though (not convinced it would be less
 // code though with the generation of multiple function calls).
-#define @%0(%1) (Indirect_Call(_:INDIRECT_DOT:%0,_:(tagof(%0)NO_TAGOF$),%1))
-#define Indirect_Call(_:INDIRECT_DOT:%9&%0,_:(tagof(%9)NO_TAGOF$),%2) Indirect_Call(_:TAGOF_ADDRESSOF:addressof(%0),_:0,%2)
-#define INDIRECT_DOT:.%0,_:(tagof(.%0)NO_TAGOF$) %0,_:(tagof(%0)NO_TAGOF$)
-#define TAGOF_ADDRESSOF:addressof(%0<%2>),_:0, addressof(%0<%2>),_:tagof(F@_@%2:)NO_TAGOF$,
+#define @ str_new_static
+#define str_new_static.%0(%1) (Indirect_Call(_:%0,_:(tagof(%0)),%1))
+#define Indirect_Call(_:%9&%0,_:(tagof(%9)),%2) Indirect_Call(_:TAGOF_ADDRESSOF:addressof(%0),_:0,%2)
+#define TAGOF_ADDRESSOF:addressof(%0<%2>),_:0, addressof(%0<%2>),_:tagof(F@_@%2:),
 // Can now do:
 //   
 //   @.var(params)
@@ -178,15 +246,18 @@ SPECIFIER(s);
 	
 	public __Indirect_FuncInc__()
 	{
-		memcpy("", "", 0, 0, 0);
-		funcidx("");
+		memcpy
+			("", "", 0, 0, 0);
+		funcidx
+			("");
 	}
 #endif
 
+/// <library>indirection</library>
 stock Indirect_Call(func, tag, GLOBAL_TAG_TYPES:...)
 {
 	static
-		addr;
+		addr = 0;
 	#pragma unused tag
 	if (!func)
 	{
@@ -259,8 +330,8 @@ stock Indirect_Call(func, tag, GLOBAL_TAG_TYPES:...)
 	if (INDIRECTION_TAG)
 	{
 		static
-			i,
-			lTag[32];
+			i = 0,
+			lTag[64];
 		// Skip the `F@_@` prefix.
 		GetTagNameFromID(INDIRECTION_TAG, lTag);
 		if (lTag[0]) for (i = 4; ; )
@@ -287,11 +358,14 @@ stock Indirect_Call(func, tag, GLOBAL_TAG_TYPES:...)
 	return 0;
 }
 
-// Not `Indirect_CallString` to make use of the `string:` macro.
+/// <library>indirection</library>
+/// <remarks>
+///   Not `Indirect_CallString` to make use of the `string:` macro.
+/// </remarks>
 stock string:Indirect_Callstring(func, tag, GLOBAL_TAG_TYPES:...)
 {
 	static
-		addr;
+		addr = 0;
 	#pragma unused tag
 	if (!func)
 	{
@@ -369,8 +443,8 @@ stock string:Indirect_Callstring(func, tag, GLOBAL_TAG_TYPES:...)
 	if (INDIRECTION_TAG)
 	{
 		static
-			i,
-			lTag[32];
+			i = 0,
+			lTag[64];
 		// Skip the `F@_@` prefix.
 		GetTagNameFromID(INDIRECTION_TAG, lTag);
 		if (lTag[0]) for (i = 4; ; )
@@ -401,11 +475,14 @@ stock string:Indirect_Callstring(func, tag, GLOBAL_TAG_TYPES:...)
 	return ret;
 }
 
-// Not `Indirect_Callvoid` to make use of the `void:` macro.
+/// <library>indirection</library>
+/// <remarks>
+///   Not `Indirect_Callvoid` to make use of the `void:` macro.
+/// </remarks>
 stock void:Indirect_Callvoid(func, tag, GLOBAL_TAG_TYPES:...)
 {
 	static
-		addr;
+		addr = 0;
 	#pragma unused tag
 	if (!func)
 	{
@@ -473,8 +550,8 @@ stock void:Indirect_Callvoid(func, tag, GLOBAL_TAG_TYPES:...)
 	if (INDIRECTION_TAG)
 	{
 		static
-			i,
-			lTag[32];
+			i = 0,
+			lTag[64];
 		// Skip the `F@_@` prefix.
 		GetTagNameFromID(INDIRECTION_TAG, lTag);
 		if (lTag[0]) for (i = 4; ; )
@@ -501,11 +578,12 @@ stock void:Indirect_Callvoid(func, tag, GLOBAL_TAG_TYPES:...)
 	// Don't return anything.
 }
 
+/// <library>indirection</library>
 stock Indirect_Array(func, tag, const params[], size = sizeof (params))
 {
 	static
-		ret,
-		src;
+		ret = 0,
+		src = 0;
 	#pragma unused func, tag, params, size
 	// Get the previous frame.  This undoes the effects of our `PROC` so the
 	// called function must have a proper `PROC`.
@@ -593,8 +671,8 @@ stock Indirect_Array(func, tag, const params[], size = sizeof (params))
 	if (INDIRECTION_TAG)
 	{
 		static
-			i,
-			lTag[32];
+			i = 0,
+			lTag[64];
 		// Skip the `F@_@` prefix.
 		GetTagNameFromID(INDIRECTION_TAG, lTag);
 		if (lTag[0]) for (i = 4; ; )
@@ -622,6 +700,7 @@ stock Indirect_Array(func, tag, const params[], size = sizeof (params))
 }
 
 /*-------------------------------------------------------------------------*//**
+ * <library>indirection</library>
  * <param name="func">The function pointer with attached metadata.</param>
  * <remarks>
  *  Gets extra data from the pointer.
@@ -657,6 +736,7 @@ stock Indirect_GetMeta_(func)
 #define Indirect_GetMeta(%0) Indirect_GetMeta_(_:%0)
 
 /*-------------------------------------------------------------------------*//**
+ * <library>indirection</library>
  * <param name="func">The function pointer to attach metadata to.</param>
  * <param name="data">The metadata.</param>
  *//*------------------------------------------------------------------------**/
@@ -690,6 +770,7 @@ stock Indirect_SetMeta_(func, data)
 #define Indirect_SetMeta(%0) Indirect_SetMeta_(_:%0)
 
 /*-------------------------------------------------------------------------*//**
+ * <library>indirection</library>
  * <param name="func">The function pointer you want to use later.</param>
  * <remarks>
  *  If a function pointer is used within one function, that is not a problem.
@@ -734,6 +815,7 @@ stock Indirect_Claim_(func)
 #define Indirect_Claim(%0) Indirect_Claim_(_:%0)
 
 /*-------------------------------------------------------------------------*//**
+ * <library>indirection</library>
  * <param name="func">The function pointer you had previously stored.</param>
  * <remarks>
  *  If a function pointer is used within one function, that is not a problem.
@@ -779,6 +861,7 @@ stock Indirect_Release_(func)
 #define Indirect_Release(%0) Indirect_Release_(_:%0)
 
 /*-------------------------------------------------------------------------*//**
+ * <library>indirection</library>
  * <param name="id">The ID of the tag to get the specifiers from the name of.
  * </param>
  * <param name="dest">Where to store the name.</param>
@@ -791,7 +874,7 @@ stock Indirect_Release_(func)
 stock Indirect_Tag(id, dest[32])
 {
 	static
-		lTag[32];
+		lTag[64];
 	GetTagNameFromID(id, lTag),
 	dest[0] = '\0';
 	if (lTag[0])
@@ -799,6 +882,7 @@ stock Indirect_Tag(id, dest[32])
 }
 
 /*-------------------------------------------------------------------------*//**
+ * <library>indirection</library>
  * <param name="">The array to convert to an offset pointer.</param>
  * <remarks>
  *  Strings and arrays are passed relative to `COD` not `DAT` so they can be
@@ -818,6 +902,7 @@ stock Indirect_Ref_(...)
 #define Indirect_Ref(%0) Indirect_Ref_(_:(%0))
 
 /*-------------------------------------------------------------------------*//**
+ * <library>indirection</library>
  * <param name="">The array to convert to an offset pointer.</param>
  * <remarks>
  *  Strings and arrays are passed relative to `COD` not `DAT` so they can be
@@ -838,6 +923,7 @@ stock Indirect_Ptr_(ptr)
 #define Indirect_Ptr(%0) Indirect_Ptr_(_:(%0))
 
 /*-------------------------------------------------------------------------*//**
+ * <library>indirection</library>
  * <param name="">The array to convert to an offset pointer.</param>
  * <remarks>
  *  Strings and arrays are passed relative to `COD` not `DAT` so they can be
@@ -854,9 +940,10 @@ stock Indirect_DeRef_(...)
 	#emit RETN
 	return 0;
 }
-#define Indirect_DeRef(%0) Indirect_DeRef_(_:(%0))
+#define Indirect_DeRef(%0) Indirect_DeRef_(_:(%0), sizeof (%0[]))
 
 /*-------------------------------------------------------------------------*//**
+ * <library>indirection</library>
  * <param name="">The array to convert to an offset pointer.</param>
  * <remarks>
  *  Strings and arrays are passed relative to `COD` not `DAT` so they can be
@@ -881,6 +968,7 @@ stock Indirect_DePtr_(ptr)
 #endif
 
 /*-------------------------------------------------------------------------*//**
+ * <library>indirection</library>
  * <remarks>
  *  A generic public wrapper for calling inline functions.
  * </remarks>
@@ -897,6 +985,7 @@ public Indirect_FromCallback(Func:cb<>, bool:release)
 }
 
 /*-------------------------------------------------------------------------*//**
+ * <library>indirection</library>
  * <remarks>
  *  Get the size of the COD AMX segment.
  * </remarks>
@@ -914,6 +1003,7 @@ Indirect_Init()
 	}
 }
  
+/// <library>indirection</library>
 public OnJITCompile()
 {
 	Indirect_Init();
@@ -924,6 +1014,7 @@ public OnJITCompile()
 	#endif
 }
 
+/// <library>indirection</library>
 public OnFilterScriptInit()
 {
 	Indirect_Init();
@@ -933,6 +1024,7 @@ public OnFilterScriptInit()
 	return 1;
 }
 
+/// <library>indirection</library>
 public OnGameModeInit()
 {
 	Indirect_Init();

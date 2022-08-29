@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -236,7 +237,7 @@ P:D(bool:Race_IsValid(raceid));
 
 /*-------------------------------------------------------------------------*//**
  * <param name="laps">Number of laps to race for.</param>
- * <param name="entry">Cost of entry.</param>
+ * <param name="entryCost">Cost of entry.</param>
  * <param name="countdown">Time to count down from for start.</param>
  * <param name="arial">Use arial checkpoints instead.</param>
  * <param name="fixedPrize">Set prize amounts manually.</param>
@@ -258,7 +259,7 @@ stock Races_SetupGroups() <>
 
 /*-------------------------------------------------------------------------*//**
  * <param name="laps">Number of laps to race for.</param>
- * <param name="entry">Cost of entry.</param>
+ * <param name="entryCost">Cost of entry.</param>
  * <param name="countdown">Time to count down from for start.</param>
  * <param name="arial">Use arial checkpoints instead.</param>
  * <param name="fixedPrize">Set prize amounts manually.</param>
@@ -274,15 +275,15 @@ stock Races_SetupGroups() <>
 
 FOREIGN__ _Race_Create(l,e,c,a,f,x,i,w,r);
 
-stock Race_Create(laps = 0, entry = 0, countdown = 3, bool:arial = false, bool:fixedPrize = true, exitTime = 0, interior = 0, world = 0, bool:restart = false)
+stock Race_Create(laps = 0, entryCost = 0, countdown = 3, bool:arial = false, bool:fixedPrize = true, exitTime = 0, interior = 0, world = 0, bool:restart = false)
 {
-	return _Race_Create(laps, entry, countdown, _:arial, _:fixedPrize, exitTime, interior, world, _:restart);
+	return _Race_Create(laps, entryCost, countdown, _:arial, _:fixedPrize, exitTime, interior, world, _:restart);
 }
 
 GLOBAL__ _Race_Create(l,e,c,a,f,x,i,w,r)
 {
 	new
-		raceid;
+		raceid = 0;
 	for (raceid = 0; raceid < MAX_RACES; raceid++) if (!Race__IsActive(raceid)) break;
 	if (raceid == MAX_RACES) return NO_RACE;
 	YSI_g_sRaceData[raceid][E_RACE_FLAGS] = e_RACE_FLAGS_ACTIVE |
@@ -589,7 +590,7 @@ GLOBAL__ void:Race_SetEntry(raceid, cost)
 
 _Y_RACES_STATIC Race_Dropout(playerid)
 {
-	SetTimerEx("Race_Timeout", (YSI_g_sRaceData[(YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE])][E_RACE_FLAGS] & e_RACE_FLAGS_EXIT_TIME), 0, "i", playerid);
+	YSI_SetTimerEx("Race_Timeout", (YSI_g_sRaceData[(YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE])][E_RACE_FLAGS] & e_RACE_FLAGS_EXIT_TIME), false, "i", playerid);
 	YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE] |= RACE_PLAYER_OUT;
 	YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_TOUT] = GetTickCount();
 }
@@ -696,7 +697,7 @@ _Y_RACES_STATIC Race_PlayerDone(playerid)
 			//SetPlayerPos(playerid, YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_X], YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_Y], YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_Z]);
 			//SetPlayerFacingAngle(playerid, YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_A]);
 			new
-				vehicleid;
+				vehicleid = 0;
 			if ((vehicleid = GetPlayerVehicleID(playerid)))
 			{
 				SetVehiclePos(vehicleid, YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_X], YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_Y], YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_Z]);
@@ -797,7 +798,7 @@ _Y_RACES_STATIC Race_Finish(playerid)
 	YSI_g_sRaceData[slot][E_RACE_FINISHED]++;
 	Race_PlayerDone(playerid);
 	new
-		prize;
+		prize = 0;
 	if (winners < MAX_RACE_WINNERS) prize = YSI_g_sRaceData[slot][E_RACE_PRIZES][winners];
 	GivePlayerMoney(playerid, prize);
 	CallRemoteFunction("OnPlayerFinishRace", "iiiii", playerid, slot, winners + 1, prize, YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_TIME]);
@@ -819,12 +820,12 @@ GLOBAL__ Race_Start(race)
 	if (!Race_IsValid(race)) return 0;
 	new
 		bool:exited = true,
-		j;
-	for (new i = Iter_First(YSI_g_sRacePeople[race]), k; (k = Iter_Next(YSI_g_sRacePeople[race], i)), i != Iter_End(YSI_g_sRacePeople[race]); i = k)
+		j = 0;
+	for (new i = Iter_First(YSI_g_sRacePeople[race]), k = 0; (k = Iter_Next(YSI_g_sRacePeople[race], i)), i != Iter_End(YSI_g_sRacePeople[race]); i = k)
 	//FOREACH__ (new i : YSI_g_sRacePeople[race])
 	{
 		new
-			vehicleid;
+			vehicleid = 0;
 		GetPlayerPos(i, YSI_g_sPlayerRace[i][E_RACE_PLAYER_X], YSI_g_sPlayerRace[i][E_RACE_PLAYER_Y], YSI_g_sPlayerRace[i][E_RACE_PLAYER_Z]);
 		if ((vehicleid = GetPlayerVehicleID(i)))
 		{
@@ -854,7 +855,7 @@ GLOBAL__ Race_Start(race)
 		if (YSI_g_sRaceData[race][E_RACE_FLAGS] & e_RACE_FLAGS_REL_WIN)
 		{
 			new
-				prize;
+				prize = 0;
 			if (j < MAX_RACE_WINNERS) prize = ((j * j) + j) / 2;
 			else prize = (MAX_RACE_WINNERS * (MAX_RACE_WINNERS + 1)) / 2;
 			new
@@ -883,16 +884,16 @@ public Race_Countdown(race, time)
 	if (time)
 	{
 		Text_Send(YSI_g_sRacers[race], $YSI_RACE_COUNTDOWN, time);
-		SetTimerEx("Race_Countdown", 1000, 0, "ii", race, time - 1);
+		YSI_SetTimerEx("Race_Countdown", 1000, false, "ii", race, time - 1);
 	}
 	else
 	{
 		Text_Send(YSI_g_sRacers[race], $YSI_RACE_GO);
 		new
 			startTime = GetTickCount(),
-			vehicleid,
-			pos;
-		//for (new i = Iter_First(YSI_g_sRacePeople[race]), j; j = Iter_Next(YSI_g_sRacePeople[race], i), i != Iter_End(YSI_g_sRacePeople[race]); i = j)
+			vehicleid = 0,
+			pos = 0;
+		//for (new i = Iter_First(YSI_g_sRacePeople[race]), j = 0; j = Iter_Next(YSI_g_sRacePeople[race], i), i != Iter_End(YSI_g_sRacePeople[race]); i = j)
 		FOREACH__ (new i : YSI_g_sRacePeople[race])
 		{
 			if ((vehicleid = GetPlayerVehicleID(i)))
@@ -914,7 +915,7 @@ public Race_Countdown(race, time)
  * Sets up important variables
  *//*------------------------------------------------------------------------**/
 
-MASTER_HOOK__ OnScriptInit()
+MASTER_HOOK__ OnYSIInit()
 {
 	for (new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -1021,7 +1022,10 @@ _Y_RACES_STATIC Race_DoEnterRaceCP(playerid)
  *  calls the relevant functions.
  *//*------------------------------------------------------------------------**/
 
-MASTER_HOOK__ OnPlayerStateChange(playerid, newstate, oldstate)
+#if !defined PLAYER_STATE
+	#define PLAYER_STATE: _:
+#endif
+MASTER_HOOK__ OnPlayerStateChange(playerid, PLAYER_STATE:newstate, PLAYER_STATE:oldstate)
 {
 	new
 		race = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_RACE];
@@ -1100,10 +1104,10 @@ MASTER_HOOK__ OnPlayerConnect(playerid)
 		{
 			new
 				start = YSI_g_sRaceData[race][E_RACE_CP_START],
-				lap,
+				lap = 0,
 				cp = Iter_Count(YSI_g_sRacePeople[race]),
-				Float:togo,
-				pos;
+				Float:togo = 0.0,
+				pos = 0;
 			if (!cp)
 			{
 				return;
@@ -1113,9 +1117,9 @@ MASTER_HOOK__ OnPlayerConnect(playerid)
 				lap = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_LAP],
 				cp = YSI_g_sPlayerRace[playerid][E_RACE_PLAYER_CP] + start;
 				static
-					Float:x,
-					Float:y,
-					Float:z;
+					Float:x = 0.0,
+					Float:y = 0.0,
+					Float:z = 0.0;
 				GetPlayerPos(playerid, x, y, z);
 				// Get the player's (squared) distance to the next checkpoint.
 				x -= YSI_g_sRaceCheckpoints[cp][0];

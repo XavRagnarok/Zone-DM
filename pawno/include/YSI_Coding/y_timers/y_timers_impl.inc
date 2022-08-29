@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -75,29 +76,33 @@ Optional plugins:
 static stock
 	Alloc:YSI_g_sLastSlot = NO_ALLOC,
 	Alloc:YSI_g_sFirstSlot = NO_ALLOC,
-	YSI_g_sPlayerTimers = -1;
+	YSI_g_sPlayerTimers = -1,
+	YSI_g_sUserId = 0,
+	Alloc:YSI_g_sTimerList = NO_ALLOC;
+
+stock
+	Timer:_YSI_g_sCurrentTimer = Timer:0;
 
 public OnCodeInit()
 {
-	P:1("hook Timers_OnScriptInit called");
+	P:1("hook Timers_OnYSIInit called");
 	new
-		pointer,
-		time,
-		idx,
-		entry;
-	while ((idx = AMX_GetPublicEntryPrefix(idx, entry, _A<@yT_>)))
-	//while ((idx = AMX_GetPublicPointerSuffix(idx, pointer, _A<@yT_>)))
+		pointer = 0,
+		time = 0,
+		idx = 0,
+		publicTableEntry = 0;
+	while ((idx = AMX_GetPublicEntryPrefix(idx, publicTableEntry, _A<@yT_>)))
 	{
-		P:6("Timer_OnScriptInit: entry: %d", entry);
-		#emit LREF.S.pri entry
+		P:6("Timer_OnYSIInit: publicTableEntry: %d", publicTableEntry);
+		#emit LREF.S.pri publicTableEntry
 		#emit STOR.S.pri pointer
 		//YSI_g_sCurFunc = pointer;
 		// Don't bother with the real name, call the function by address to get
 		// the time the function runs for.
-		P:7("Timer_OnScriptInit: pointer: %d", pointer);
+		P:7("Timer_OnYSIInit: pointer: %d", pointer);
 		// Push the address of the current function.
 		#emit PUSH.S     pointer
-		#emit PUSH.C     0xFFFFFFFF
+		#emit PUSH.C     0xFFFFFFFF // -1: Initial list action for `_Timer_D`.
 		#emit PUSH.C     8
 		#emit LCTRL      6
 		#emit ADD.C      36
@@ -107,7 +112,7 @@ public OnCodeInit()
 		#emit SCTRL      6
 		#emit STOR.S.pri time
 		//YSI_g_sCurFunc = 0;
-		P:7("Timer_OnScriptInit: time: %d", time);
+		P:7("Timer_OnYSIInit: time: %d", time);
 		if (time != -1)
 		{
 			// Find all the functions with the same time.  This is less
@@ -115,11 +120,11 @@ public OnCodeInit()
 			// more robust as it won't fail no matter how many different times
 			// there are - old ones relied on an array with a finite size.
 			new
-				pointer2,
-				time2,
-				idx2,
-				total,
-				pre;
+				pointer2 = 0,
+				time2 = 0,
+				idx2 = 0,
+				total = 0,
+				pre = 0;
 			while ((idx2 = AMX_GetPublicPointerPrefix(idx2, pointer2, _A<@yT_>)))
 			{
 				// Call the functions a second time to guarantee getting
@@ -144,22 +149,22 @@ public OnCodeInit()
 					}
 				}
 			}
-			P:7("Timer_OnScriptInit: total: %d, time: %d, pre: %d", total, time, pre);
+			P:7("Timer_OnYSIInit: total: %d, time: %d, pre: %d", total, time, pre);
 			// Now we know what time this function has, how many others have
 			// that time and how many have already been started.
 			new
-				buffer[32];
-			entry += 4;
-			#emit LREF.S.pri entry
+				buffer[FUNCTION_LENGTH];
+			publicTableEntry += 4;
+			#emit LREF.S.pri publicTableEntry
 			#emit STOR.S.pri pointer
 			AMX_ReadString(AMX_BASE_ADDRESS + pointer, buffer);
-			P:7("Timer_OnScriptInit: %s", unpack(buffer));
+			P:7("Timer_OnYSIInit: %s", Unpack(buffer));
 			// Get the time offset for the current call.  This should mean that
 			// all the functions are nicely spread out.
-			O@(buffer, time * pre / total, 0, "ii", 1, -1);
+			YSI_SetTimerEx(buffer, time * pre / total, false, "ii", 1, -1);
 		}
 	}
-	P:1("hook Timers_OnScriptInit ended");
+	P:1("hook Timers_OnYSIInit ended");
 	
 	#if defined Timers_OnCodeInit
 		Timers_OnCodeInit();
@@ -180,7 +185,7 @@ HOOK__ OnPlayerConnect(playerid)
 	// linked list hidden in static variables (which are really global).
 	new
 		cur = YSI_g_sPlayerTimers,
-		data;
+		data = 0;
 	while (cur != -1)
 	{
 		#emit LREF.S.pri  cur
@@ -217,7 +222,7 @@ HOOK__ OnPlayerDisconnect(playerid, reason)
 	// linked list hidden in static variables (which are really global).
 	new
 		cur = YSI_g_sPlayerTimers,
-		data;
+		data = 0;
 	while (cur != -1)
 	{
 		#emit LREF.S.pri  cur
@@ -254,17 +259,17 @@ stock _Timer_I(const func[], interval, action, &result)
 	{
 		case 0:
 		{
-			if (result != -1)
+			if (result)
 			{
 				KillTimer(result),
-				result =- 1;
+				result = 0;
 			}
 		}
 		case 1:
 		{
-			if (result == -1)
+			if (!result)
 			{
-				result = O@(func, interval, 1);
+				result = YSI_SetTimer(func, interval, true);
 			}
 		}
 	}
@@ -272,7 +277,7 @@ stock _Timer_I(const func[], interval, action, &result)
 }
 
 // Attempt to stop or start a task, possibly for a single player.
-stock _Timer_D(const func[], interval, const action, who, results[MAX_PLAYERS], a[2])
+stock _Timer_D(const func[], interval, const action, who, results[], a[2])
 {
 	P:3("_Timer_D called");
 	switch (action)
@@ -296,17 +301,17 @@ stock _Timer_D(const func[], interval, const action, who, results[MAX_PLAYERS], 
 			{
 				FOREACH__ (who : Player)
 				{
-					if (results[who] != -1)
+					if (results[who])
 					{
 						KillTimer(results[who]);
-						results[who] = -1;
+						results[who] = 0;
 					}
 				}
 			}
-			else if (results[who] != -1)
+			else if (results[who])
 			{
 				KillTimer(results[who]);
-				results[who] = -1;
+				results[who] = 0;
 			}
 		}
 		case 1:
@@ -316,15 +321,15 @@ stock _Timer_D(const func[], interval, const action, who, results[MAX_PLAYERS], 
 			{
 				FOREACH__ (who : Player)
 				{
-					if (results[who] == -1)
+					if (!results[who])
 					{
-						results[who] = O@(func, interval, true, "i", who);
+						results[who] = YSI_SetTimerEx(func, interval, true, "i", who);
 					}
 				}
 			}
-			else if (results[who] == -1)
+			else if (!results[who])
 			{
-				results[who] = O@(func, interval, true, "i", who);
+				results[who] = YSI_SetTimerEx(func, interval, true, "i", who);
 			}
 		}
 	}
@@ -335,9 +340,19 @@ stock _Timer_D(const func[], interval, const action, who, results[MAX_PLAYERS], 
 static stock Alloc:Timer_GetSingleSlot(len)
 {
 	// Allocates memory and secretly appends data to the start.
+	++len;
 	P:4("Timer_GetSingleSlot called: %d", len);
+	// `6` is for the timer header, `- 1` for `++` above.  Slots:
+	//
+	// 0 - Next.
+	// 1 - Native timer ID.
+	// 2 - Repeat count remaining.
+	// 3 - Repeat count total (or count for `0`).
+	// 4 - User timer ID.
+	// 5 - Next existing timer.
+	//
 	new
-		Alloc:slot = malloc(len + 1);
+		Alloc:slot = malloc(len ? len : (6 - 1));
 	if (slot == NO_ALLOC)
 	{
 		return NO_ALLOC;
@@ -346,19 +361,67 @@ static stock Alloc:Timer_GetSingleSlot(len)
 	// Standard linked list.
 	if (YSI_g_sFirstSlot == NO_ALLOC)
 	{
-		YSI_g_sFirstSlot = slot;
+		if (len)
+		{
+			// Initial value allocation to store the timer ID.
+			Timer_GetSingleSlot(-1);
+			mset(YSI_g_sLastSlot, 0, _:slot);
+		}
+		else
+		{
+			YSI_g_sFirstSlot = slot;
+		}
 	}
 	else
 	{
 		mset(YSI_g_sLastSlot, 0, _:slot);
 	}
+	mset(slot, 0, -1);
 	YSI_g_sLastSlot = slot;
-	mset(YSI_g_sLastSlot, 0, -1);
-	return slot;// + Alloc:1;
+	return slot;
+}
+
+static stock Alloc:_Timer_Get(Timer:slot)
+{
+	new Alloc:cur = YSI_g_sTimerList;
+	while (cur != NO_ALLOC)
+	{
+		if (Timer:mget(cur, 4) == slot)
+		{
+			return cur;
+		}
+		cur = Alloc:mget(cur, 5);
+	}
+	return NO_ALLOC;
+}
+
+stock Timer_GetCallCount(Timer:slot = Timer:0)
+{
+	if (!slot)
+	{
+		slot = _YSI_g_sCurrentTimer;
+	}
+	if ((slot = Timer:_Timer_Get(slot)))
+	{
+		new count = mget(Alloc:slot, 2);
+		// Repeat forever, or repeat N?  If forever, `count` is `0` and slto 3 is
+		// the true count.
+		return mget(Alloc:slot, 3) - count;
+	}
+	return -1;
+}
+
+stock bool:Timer_IsRunning(Timer:slot = Timer:0)
+{
+	if (!slot)
+	{
+		slot = _YSI_g_sCurrentTimer;
+	}
+	return _Timer_Get(slot) != NO_ALLOC;
 }
 
 // Allocate memory to store a string.
-stock _Timer_S(string:str[])
+stock _Timer_S(const string:str[])
 {
 	P:3("_Timer_S called");
 	new
@@ -378,7 +441,7 @@ stock _Timer_S(string:str[])
 }
 
 // Allocate memory to store an array.
-stock _Timer_A(str[], len)
+stock _Timer_A(const str[], len)
 {
 	P:3("_Timer_A called");
 	new
@@ -391,86 +454,150 @@ stock _Timer_A(str[], len)
 	return _:slot + 1;
 }
 
-//stock
-//	I@ = -1;
-
 // Create the timer setup.
-stock _Timer_C(tt, g)
+stock Timer:_Timer_C(timerID)
 {
-	P:3("_Timer_C called: %d, %d", tt, g);
-	//P:3("_Timer_C called: %d", tt);
+	P:3("_Timer_C called: %d", timerID);
 	// This is done here for convenience.
 	I@ = -1;
 	// Only repeating timers are freed like this.
 	// UPDATE: Now all timers with array parameters, regardless of repeat status
 	// are freed like this.  Only timers with no malloc aren't.
-	if (g)
+	// UPDATE 2: Now ALL timers are freed like this, because we need an ID we
+	// can know in advance.
+	mset(YSI_g_sFirstSlot, 1, timerID);
+	// Set the ID we return to the user.
+	if (++YSI_g_sUserId == 0)
 	{
-		new
-			Alloc:slot = Timer_GetSingleSlot(1);
-		P:5("_Timer_C: slot = %d", _:slot);
-		if (slot == NO_ALLOC)
-		{
-			// Not a graceful fail!
-			return 0;
-		}
-		mset(slot, 1, tt);
-		// Just so it isn't a real timer ID (or possibly isn't).
-		slot = ~YSI_g_sFirstSlot;// ^ Alloc:-1;
-		YSI_g_sFirstSlot = NO_ALLOC;
-		YSI_g_sLastSlot = NO_ALLOC;
-		return _:slot;
+		++YSI_g_sUserId;
 	}
-	// Reset these variables on all timers, including self-cleaning ones.
+	mset(YSI_g_sFirstSlot, 4, YSI_g_sUserId);
+	mset(YSI_g_sFirstSlot, 5, _:YSI_g_sTimerList);
+	mset(YSI_g_sFirstSlot, 6, _:NO_ALLOC);
+	if (YSI_g_sTimerList != NO_ALLOC)
+	{
+		mset(YSI_g_sTimerList, 6, _:YSI_g_sFirstSlot);
+	}
+	YSI_g_sTimerList = YSI_g_sFirstSlot;
+	// Just so it isn't a real timer ID (or possibly isn't).
 	YSI_g_sFirstSlot = NO_ALLOC;
 	YSI_g_sLastSlot = NO_ALLOC;
-	return tt;
+	return Timer:YSI_g_sUserId;
 }
 
-// Free all timer resources.
-stock _Timer_F(slot)
+// Allocate the ID.
+stock _Timer_B(repeatCount)
 {
-	P:3("_Timer_F called");
-	// This is done here for convenience.
-	if (slot & 0x80000000)
+	P:3("_Timer_B called: %d", repeatCount);
+	if (YSI_g_sFirstSlot == NO_ALLOC)
 	{
-		new
-			next;
-		slot = ~slot; //^= -1;
-		for ( ; ; )
-		{
-			next = mget(Alloc:slot, 0);
-			P:6("_Timer_F: slot = %d, next = %d", slot, next);
-			// Out of stored strings and arrays.
-			if (next == -1)
-			{
-				KillTimer(mget(Alloc:slot, 1));
-				free(Alloc:slot);
-				break;
-			}
-			free(Alloc:slot);
-			slot = next;
-		}
+		Timer_GetSingleSlot(-1);
+	}
+	P:5("_Timer_B: slot = %d", _:YSI_g_sFirstSlot);
+	if (YSI_g_sFirstSlot == NO_ALLOC)
+	{
+		// Not a graceful fail!
+		return 0;
+	}
+	mset(YSI_g_sFirstSlot, 2, repeatCount);
+	if (repeatCount)
+	{
+		mset(YSI_g_sFirstSlot, 3, repeatCount);
 	}
 	else
 	{
-		KillTimer(slot);
+		mset(YSI_g_sFirstSlot, 3, 0);
 	}
+	// Just so it isn't a real timer ID (or possibly isn't).
+	return _:YSI_g_sFirstSlot;
+}
+
+// Free all timer resources.
+stock _Timer_F(Timer:slot = Timer:0, force = 0)
+{
+	P:3("_Timer_F called");
+	// This is done here for convenience.
+	// Always called with the first ID.
+	switch (force)
+	{
+	case 0:
+	{
+		if (!(slot = _YSI_g_sCurrentTimer))
+		{
+			return 0;
+		}
+		// "next"
+		force = mget(Alloc:slot, 2);
+		if (--force == -1)
+		{
+			// Repeat forever, update the count.
+			mset(Alloc:slot, 3, mget(Alloc:slot, 3) + 1);
+			return 0;
+		}
+		else if (force)
+		{
+			// Decremented the count, still runs left.
+			mset(Alloc:slot, 2, force);
+			return 0;
+		}
+	}	
+	case 1:
+	{
+		// Given an ID.
+		if (!(slot = Timer:_Timer_Get(slot)))
+		{
+			return 0;
+		}
+	}
+	case 2:
+	{
+		// Current timer.
+		if (!(slot = _YSI_g_sCurrentTimer))
+		{
+			return 0;
+		}
+		// Clear the current timer ID.
+		_YSI_g_sCurrentTimer = Timer:0;
+	}
+	}
+	// Remove from the list.
+	new
+		Alloc:next = Alloc:mget(Alloc:slot, 5),
+		Alloc:prev = Alloc:mget(Alloc:slot, 6);
+	if (prev == NO_ALLOC)
+	{
+		// First timer.
+		YSI_g_sTimerList = next;
+	}
+	else
+	{
+		mset(prev, 5, _:next);
+	}
+	if (next != NO_ALLOC)
+	{
+		mset(next, 6, _:prev);
+	}
+	// Kill time timer.
+	KillTimer(mget(Alloc:slot, 1));
+	do
+	{
+		// Free all the slots in the linked list of allocations.
+		force = mget(Alloc:slot, 0);
+		P:6("_Timer_F: slot = %d, next = %d", _:slot, force);
+		free(Alloc:slot);
+	}
+	while ((_:slot = force) != -1);
 	return 1;
 }
 
-stock _Timer_H(slot)
-{
-	_Timer_F(~(slot - 1));
-}
-
-#define TASK__%0[%1](%2) @yT_%0(g,p);@yT_%0(g,p){static s=-1;return _Timer_I(#%0,%1,g,s);}%0();public%0()
+#define TASK__%0[%1](%2) @yT_%0(g,p);@yT_%0(g,p){static s=0;return _Timer_I(#%0,%1,g,s);}%0();public%0()
 
 // 
-#define PTASK__%0[%1](%2) @yT_%0(g,p);@yT_%0(g,p){static s[MAX_PLAYERS]={-1,...},a[2];return _Timer_D(#%0,%1,g,p,s,a);}%0(%2);public%0(%2)
+#define PTASK__%0[%1](%2) @yT_%0(g,p);@yT_%0(g,p){static s[MAX_PLAYERS]={0,...},a[2];return _Timer_D(#%0,%1,g,p,s,a);}%0(%2);public%0(%2)
 
-#define @yT_%0\32;%1(%2) @yT_%0%1(%2)
-//#define @_yT%0;\32%1(%2) @_yT%0%1(%2)
+#define _yT@%0\32; _yT@
+#define @_yT%0\32; @_yT
+#define @yT_%0\32; @yT_
 
 #define PAUSE__%0; {J@=_:@Ym:@yT_%0(0,-1);}
 #define RESUME__%0; {J@=_:@Ym:@yT_%0(1,-1);}

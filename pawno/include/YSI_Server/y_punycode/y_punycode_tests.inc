@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -98,7 +99,7 @@ TEST__ y_punycode_2()
 {
 	new
 		dst[32],
-		hash;
+		hash = 0;
 	Puny_EncodeHash(dst, "b�cher", hash);
 	P:1("TEST__ y_punycode_2: dst = %s", dst);
 	ASSERT_SAME(dst, "bcher-kva");
@@ -114,6 +115,30 @@ TEST__ y_punycode_2()
 	Puny_EncodeHash(dst, "b�cher", hash);
 	P:1("TEST__ y_punycode_2: dst = %s", dst);
 	ASSERT_SAME(dst, "bcher-kva");
+	Puny_EncodeHash(dst, "b�cher", hash, 32, '@');
+	P:1("TEST__ y_punycode_2: dst = %s", dst);
+	ASSERT_SAME(dst, "bcher@kva");
+}
+
+TEST__ y_punycode_hash()
+{
+	new
+		dst[32],
+		hash1 = 0,
+		hash2 = 0,
+		hash3 = 0;
+	Puny_EncodeHash(dst, "hello", hash1);
+	hash2 = YHash("hello");
+	hash3 = BernsteinHash("hello");
+	ASSERT_EQ(hash1, hash2);
+	ASSERT_EQ(hash2, hash3);
+	ASSERT_EQ(hash3, hash1);
+	Puny_EncodeHash(dst, "world", hash1);
+	hash2 = YHash("world");
+	hash3 = BernsteinHash("world");
+	ASSERT_EQ(hash1, hash2);
+	ASSERT_EQ(hash2, hash3);
+	ASSERT_EQ(hash3, hash1);
 }
 
 /*
@@ -132,3 +157,4 @@ xn--zkc6cc5bi7f6e.xn--hlcj6aya9esc7a 	http://உதாரணம்.பரிட�
 xn--6dbbec0c.xn--deba0ad 	http://דוגמה.טעסט 	Hebrew 	Hebrew
 xn--fdbk5d8ap9b8a8d.xn--deba0ad 	http://בײַשפּיל.טעסט 	Hebrew 	Yiddish
 */
+

@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -387,13 +388,13 @@ stock Format_Standardise(input[], output[], len = sizeof (output), pt = false)
 {
 	P:2("Format_Standardise called: %s, %d, %d", input, len, pt);
 	new
-		ch,
+		ch = 0,
 		iIn = 0,
 		iOut = 0, //1,
 		bool:fade = false,
-		colour,
-		tmp,
-		steps;//,
+		colour = 0,
+		tmp = 0,
+		steps = 0;//,
 		//lastChar = 0;
 	// Adjust len so we know we can fit the NULL.
 	--len;
@@ -1057,7 +1058,7 @@ static stock Format_GetSpecifier(input[], &iIn)
 	new
 		ch = input[iIn],
 		e_COMPRESS_FORMAT_DATA:ret = e_COMPRESS_FORMAT_DATA:0,
-		width,
+		width = 0,
 		prec = -1;
 	for ( ; ; )
 	{
@@ -1120,7 +1121,7 @@ static stock Format_GetSpecifier(input[], &iIn)
 				++iIn;
 				if (ret & e_COMPRESS_FORMAT_DATA_LIST)
 				{
-					printf("*** Internal Warning: Ignoring string list format specifier.");
+					print("*** Internal Warning: Ignoring string list format specifier.");
 					ret &= e_COMPRESS_FORMAT_DATA_LIST;
 				}
 				return ret | e_COMPRESS_FORMAT_DATA_STRING | (e_COMPRESS_FORMAT_DATA:((width & 0xFFF) | ((prec & 0xFFF) << 12)));

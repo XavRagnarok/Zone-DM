@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -103,14 +104,14 @@ Optional plugins:
 #define Y_REMOTE_stock()%8$ %8$stock PP_NULL<>
 #define Y_REMOTE_static()%8$ %8$static PP_NULL<>
 
-#define Y_REMOTE_END(%9)%8$%4(%1)%3(,%7)(,%2)(%0)(%6) %8$%4 _@%9(%1)return F@(J@,I@),D@(YREMOTE_END:#@@%9,%3i,%7);@@%9(%2,__m)(%7)(%0)(%6)
-#define Y_REMOTE_END_STR(%9)%8$%4(%1)%3(,%7)(,%2)(%0)(%6) %8$%4 _@%9(%1)return F@(J@,I@),C@(YREMOTE_STR:#@@%9,%3i,%7);@@%9(%2,__m)(%7)(%0)(%6)
-#define Y_REMOTE_END_VOD(%9)%8$%4(%1)%3(,%7)(,%2)(%0)(%6) %8$%4 _@%9(%1)F@(J@,I@),D@(YREMOTE_VOD:#@@%9,%3i,%7);@@%9(%2,__m)(%7)(%0)(%6)
-#define Y_REMOTE_END_TAG(%5,%9)%8$%4(%1)%3(,%7)(,%2)(%0)(%6) %8$%4%5 _@%9(%1)return F@(J@,I@),%5D@(YREMOTE_TAG:#@@%9,%3i,%7);@@%9(%2,__m)(%7)(%0)(%6)%5
-#define Y_REMOTE_NUL(%9)%8$%4(%1)%3(%7)(%2)(%0)(%6) %8$%4 _@%9()return F@(J@,I@),D@(YREMOTE_END:#@@%9,#i);@@%9(__m)()()()
-#define Y_REMOTE_NUL_STR(%9)%8$%4(%1)%3(%7)(%2)(%0)(%6) %8$%4 _@%9()return F@(J@,I@),C@(YREMOTE_STR:#@@%9,#i);@@%9(__m)()()()
-#define Y_REMOTE_NUL_VOD(%9)%8$%4(%1)%3(%7)(%2)(%0)(%6) %8$%4 _@%9()F@(J@,I@),D@(YREMOTE_VOD:#@@%9,#i);@@%9(__m)()()()
-#define Y_REMOTE_NUL_TAG(%5,%9)%8$%4(%1)%3(%7)(%2)(%0)(%6) %8$%4%5 _@%9()return F@(J@,I@),%5D@(YREMOTE_TAG:#@@%9,#i);@@%9(__m)()()()%5
+#define Y_REMOTE_END(%9)%8$%4(%1)%3(,%7)(,%2)(%0)(%6) %8$%4 _@%9(%1)return F@(J@,I@),D@(YREMOTE_END:#@@%9,%3i,%7,I@);@@%9(%2,__m)(%7)(%0)(%6)
+#define Y_REMOTE_END_STR(%9)%8$%4(%1)%3(,%7)(,%2)(%0)(%6) %8$%4 _@%9(%1)return F@(J@,I@),K@(YREMOTE_STR:#@@%9,%3i,%7,I@);@@%9(%2,__m)(%7)(%0)(%6)
+#define Y_REMOTE_END_VOD(%9)%8$%4(%1)%3(,%7)(,%2)(%0)(%6) %8$%4 _@%9(%1)F@(J@,I@),D@(YREMOTE_VOD:#@@%9,%3i,%7,I@);@@%9(%2,__m)(%7)(%0)(%6)
+#define Y_REMOTE_END_TAG(%5,%9)%8$%4(%1)%3(,%7)(,%2)(%0)(%6) %8$%4%5 _@%9(%1)return F@(J@,I@),%5D@(YREMOTE_TAG:#@@%9,%3i,%7,I@);@@%9(%2,__m)(%7)(%0)(%6)%5
+#define Y_REMOTE_NUL(%9)%8$%4(%1)%3(%7)(%2)(%0)(%6) %8$%4 _@%9()return F@(J@,I@),D@(YREMOTE_END:#@@%9,#i,I@);@@%9(__m)()()()
+#define Y_REMOTE_NUL_STR(%9)%8$%4(%1)%3(%7)(%2)(%0)(%6) %8$%4 _@%9()return F@(J@,I@),K@(YREMOTE_STR:#@@%9,#i,I@);@@%9(__m)()()()
+#define Y_REMOTE_NUL_VOD(%9)%8$%4(%1)%3(%7)(%2)(%0)(%6) %8$%4 _@%9()F@(J@,I@),D@(YREMOTE_VOD:#@@%9,#i,I@);@@%9(__m)()()()
+#define Y_REMOTE_NUL_TAG(%5,%9)%8$%4(%1)%3(%7)(%2)(%0)(%6) %8$%4%5 _@%9()return F@(J@,I@),%5D@(YREMOTE_TAG:#@@%9,#i,I@);@@%9(__m)()()()%5
 
 #define YREMOTE_END:%0);@@%1(%2)(%3)(%4)(%6) %0);I@R:@@%1(%2);I@R:@@%1(%2)return I@R:((__m&@_)&&L@(%1(%3)%4));%1(%6)
 #define YREMOTE_STR:%0);@@%1(%2)(%3)(%4)(%6) %0);I@R:@@%1(%2);I@R:@@%1(%2)return I@R:((__m&@_)&&T@(%1(%3)%4));%1(%6)
@@ -123,6 +124,6 @@ Optional plugins:
 //   
 // Assume that this is purely a forwarding declaration.  Make the function
 // uncallable.
-#define I@R:%9;%9;%9; static stock %9{}
-#define I@P:%9;%9;%9;%9; static stock %9{}
+#define I@R:%9;%9;%9;
+#define I@P:%9;%9;%9;%9;
 

@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -104,7 +105,7 @@ Optional plugins:
 
 // Define `cellbytes` as a symbol that really should exist already!
 #if !defined cellbytes
-	#define cellbytes (cellbits / 8)
+	#define cellbytes (cellbits / charbits)
 #endif
 
 // Define "volatile" as nothing.
@@ -116,13 +117,9 @@ Optional plugins:
 // used by literally any other include.
 #include "y_compilerdata"
 
-#if __COMPILER_sNAMEMAX != 31
-	#error YSI assumes `sNAMEMAX` is 31.
-#endif
-
-#if !defined HTTP
-	#tryinclude <a_http>
-#endif
+// The second include, because it sets up comments in all the others and has no
+// non-standard code.  Needs compiler pass information though.
+#include "y_pawndoc"
 
 // Avoid an error with `forward OnRuntimeError(code, &bool:suppress);` in here after already ALS
 // hooking it (#266).
@@ -131,25 +128,125 @@ Optional plugins:
 #tryinclude "..\..\..\crashdetect"
 #tryinclude "crashdetect"
 
+// `FIX_OnRconCommand` and `FIX_OnClientCheckResponse` might use `_FIXES_DEFAULT`.
+
+#if defined YSI_OPEN
+	#if 1 YSI_OPEN.MP == 1
+		#define YSI_OPENMP__
+	#endif
+#endif
+
+#if defined _INC_SAMP_Community_fixes
+	#if defined FIXES_DefaultDisabled
+		#if FIXES_DefaultDisabled == 1
+			#define _FIXES_DEFAULT (0)
+		#elseif FIXES_DefaultDisabled == 2
+			#define _FIXES_DEFAULT FIXES_EnableAll
+		#else
+			#define _FIXES_DEFAULT (1)
+		#endif
+	#else
+		#define _FIXES_DEFAULT (1)
+	#endif
+
+	#if FIX_OnRconCommand == 0 && FIX_OnClientCheckResponse == 0
+		#define YSI_FIX_CALLBACKS
+	#endif
+
+	#undef _FIXES_DEFAULT
+#elseif !defined YSI_OPENMP__
+	#define YSI_FIX_CALLBACKS
+#endif
+
+#if defined ENABLE_YSI_UNSAFE_STARTUP && defined @_I_KNOW_WHAT_IM_DOING_AND_KNOW && defined @_THAT_USING && defined @___ENABLE_YSI_UNSAFE_STARTUP__ && defined @_MAY_RESULT_IN_STARTUP_CRASHES && defined @_AND_OTHER_BROKEN_CODE && defined @_HEREBY_PROMISE_I_WONT_RELEASE && defined @_ANY_CODE_WITH_IT_ENABLED && defined @_THAT_ALL_RESULTING_ERRORS_AND && defined @_CRASHES_ARE_SOLEY_MY_OWN && defined @_RESPONSIBILITY_NOT_Y_Less && defined @_SIGNED
+	#if 1 @_THAT_USING: != 1
+		#error ENABLE_YSI_UNSAFE_STARTUP contract incomplete.  Please complete it!
+	#endif
+	#if 1 @_AND_OTHER_BROKEN_CODE.__I != 1
+		#error ENABLE_YSI_UNSAFE_STARTUP contract incomplete.  Please complete it!
+	#endif
+	#if 1 @_ANY_CODE_WITH_IT_ENABLED,_AND != 1
+		#error ENABLE_YSI_UNSAFE_STARTUP contract incomplete.  Please complete it!
+	#endif
+	#if 1 @_RESPONSIBILITY_NOT_Y_Less'. != 1
+		#error ENABLE_YSI_UNSAFE_STARTUP contract incomplete.  Please complete it!
+	#endif
+	
+	#define _YSI_SAFE_STARTUP 0
+	stock const
+		YSI_gcUnsafeStartupContract[] = #@_SIGNED;
+
+	#if sizeof (YSI_gcUnsafeStartupContract) == 1
+		#error ENABLE_YSI_UNSAFE_STARTUP contract unsigned.  Please sign it!
+	#endif
+#elseif defined ENABLE_YSI_UNSAFE_STARTUP || defined @_I_KNOW_WHAT_IM_DOING_AND_KNOW || defined @_THAT_USING || defined @___ENABLE_YSI_UNSAFE_STARTUP__ || defined @_MAY_RESULT_IN_STARTUP_CRASHES || defined @_AND_OTHER_BROKEN_CODE || defined @_HEREBY_PROMISE_I_WONT_RELEASE || defined @_ANY_CODE_WITH_IT_ENABLED || defined @_THAT_ALL_RESULTING_ERRORS_AND || defined @_CRASHES_ARE_SOLEY_MY_OWN || defined @_RESPONSIBILITY_NOT_Y_Less || defined @_SIGNED
+	#error ENABLE_YSI_UNSAFE_STARTUP contract incomplete.  Please complete it!
+#elseif defined _YSI_UNSAFE_STARTUP
+	#error _YSI_UNSAFE_STARTUP defined.
+#else
+	#define _YSI_SAFE_STARTUP 1
+#endif
+
+#if !defined YSI_TEMP_FILE_LENGTH
+	// Filename size.
+	#define YSI_TEMP_FILE_LENGTH (10)
+#endif
+
+#if !defined YSI_TEMP_FILE_AGE
+	// 1 month.
+	#define YSI_TEMP_FILE_AGE (60 * 60 * 24 * 30)
+#endif
+
+stock const
+	YSI_TEMP_FILE_NAME[] = ".tempfiles";
+
+#define YSI_DIR_LENGTH (12)
+
+#if !defined _DEBUG
+	#define _DEBUG 0
+#endif
+
+enum E_YSI_DIR
+{
+#if _DEBUG
+	E_YSI_DIR_DEBUG,
+#endif
+#if defined YSI_TESTS
+	E_YSI_DIR_TESTS,
+	E_YSI_DIR_YDBG,
+#endif
+	//E_YSI_DIR_TEXT,
+	//E_YSI_DIR_USERS,
+	E_YSI_DIR_FIXES,
+	E_YSI_DIR_TEMP
+}
+
+forward bool:DumpAMX_Write(const filename[]);
+forward GetYSIScriptfilesDir(E_YSI_DIR:dir);
+forward bool:DisasmWrite(const filename[]);
+
+// Public variable.  `-1` initially in case there is no master system.  So we respond to everything.
+#define Master_ID() (@_)
+#if !defined FIXES_ID
+	public
+		@_ = -1;
+#endif
+
 // These three includes are just defines.  They declare no code at all, only
 // variables.
 #include "y_globaltags"
-#include "y_pp"
 #include "y_prehook"
 #include "y_stripnumbers"
-
-// These should pretty much always exist, but are defined in "a_samp" in SA:MP,
-// when they should really be "core" functions.
-// 
-// TODO: Detect new line requirements.
-native YSIPrint(const string[]) = print;
-native YSIPrintF(const format[], GLOBAL_TAG_TYPES:...) = printf;
+#include "y_samp_natives"
 
 #include "y_shortvar"
+#include "y_pp"
 #include "y_als_impl"
 
 // A few nicely named short strings used for properties.
 #define YSIM_MASTER #M
+stock const YSIM_VERRET[] = "W";
+stock const YSIM_VERMAX[] = "X";
 #define YSIM_RETURN #R
 #define YSIM_CALLER #C
 #define YSIM_TEXT_D #T
@@ -165,19 +262,26 @@ native YSIPrintF(const format[], GLOBAL_TAG_TYPES:...) = printf;
 // The ever loved `y_version`.
 #include "y_version"
 
+#if defined YSI_TESTS
+	#define _Y_CORE_STATIC
+#else
+	#define _Y_CORE_STATIC static
+#endif
+
 // More common utilities and user-facing functions.
 #include "y_debug_impl"
+#include "y_cell_impl"
 #include "y_amx_impl"
 #include "y_shortfunc"
-#include "y_cell_impl"
+#include "..\..\YSI_Players\y_android\y_android_entry"
 #include "y_utils_impl"
 
 // Part of "y_scriptinit", but requires "y_amx".
 ScriptInit_PreInitFuncs_()
 {
 	new
-		idx,
-		ptr;
+		idx = 0,
+		ptr = 0;
 	while ((idx = AMX_GetPublicPointerPrefix(idx, ptr, _A<@yI_>)))
 	{
 		#emit PUSH.C     0
@@ -193,8 +297,8 @@ ScriptInit_PreInitFuncs_()
 ScriptInit_PostInitFuncs_()
 {
 	new
-		idx,
-		ptr;
+		idx = 0,
+		ptr = 0;
 	while ((idx = AMX_GetPublicPointerPrefix(idx, ptr, _A<@_yI>)))
 	{
 		#emit PUSH.C     0
@@ -210,8 +314,8 @@ ScriptInit_PostInitFuncs_()
 ScriptInit_PreExitFuncs_()
 {
 	new
-		idx,
-		ptr;
+		idx = 0,
+		ptr = 0;
 	while ((idx = AMX_GetPublicPointerPrefix(idx, ptr, _A<@Iy_>)))
 	{
 		#emit PUSH.C     0
@@ -227,8 +331,8 @@ ScriptInit_PreExitFuncs_()
 ScriptInit_PostExitFuncs_()
 {
 	new
-		idx,
-		ptr;
+		idx = 0,
+		ptr = 0;
 	while ((idx = AMX_GetPublicPointerPrefix(idx, ptr, _A<@_Iy>)))
 	{
 		#emit PUSH.C     0
@@ -245,12 +349,17 @@ ScriptInit_PostExitFuncs_()
 	#pragma warning push
 	#pragma warning disable 238
 #endif
+
 stock _YSI_ConstMod(const &var, const val)
 {
 	#pragma unused var, val
-	#emit LOAD.S.pri val
-	#emit SREF.S.pri var
+	#emit LREF.S.pri var
+	#emit LOAD.S.alt val
+	#emit SREF.S.alt var
+	#emit RETN
+	return 0;
 }
+
 #if __COMPILER_CONST_REF
 	#pragma warning pop
 #endif
@@ -271,4 +380,29 @@ stock _YSI_ConstMod(const &var, const val)
 #if defined YSI_TESTS
 	#include "..\y_testing"
 #endif
+
+#if defined YSI_YES_MODE_CACHE
+	#include "y_thirdpartyinclude"
+#endif
+
+//
+// I tried so many ways to fully break `SCM` for all cases:
+//
+//     `#define` to give a redefinition warning.
+//     Using a function to stop `#undef`.
+//     Mixing compiler passes to make it both function and macro together.
+//
+// Couldn't get it to work in all cases.  There's always a way around it.
+//
+#pragma deprecated It's just unreadable rubbish.
+stock DONT_USE_SCM(a, b, const c[])
+{
+	#pragma unused a, b, c
+}
+#if defined SCM
+	#undef SCM
+#endif
+#define SCM DONT_USE
+
+#define __COMPILER_EARLY_PASS
 

@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -86,7 +87,7 @@ static stock Jagged_MovePtr(array[][], maxSize, slot, shift)
 	new
 		//tmp0,
 		//tmp1,
-		ptr;
+		ptr = 0;
 	// Get the slot pointer.
 	#emit LOAD.S.alt            array
 	#emit LOAD.S.pri            slot
@@ -108,7 +109,7 @@ static stock Jagged_MovePtr(array[][], maxSize, slot, shift)
 	#emit SREF.S.pri            shift
 	//printf("%d %d %d %d", tmp0, tmp1, shift, ptr);
 	#if _DEBUG >= 7
-		printf("Jagged_MovePtr: Header:");
+		print("Jagged_MovePtr: Header:");
 		_Jagged_PrintHeader(array, 4, 0);
 	#endif
 }
@@ -170,21 +171,91 @@ stock bool:_Jagged_ResizeOne(array[][], size1, size2, slot, newSize)
 			if (shift > 0)
 			{
 				// Blank the remainder of the slot we are growing.
-				rawMemset(slotEnd, 0, shift);
+				RawMemSet(slotEnd, 0, shift);
 			}
 			else
 			{
 				// Blank the end of the array.
-				rawMemset(arrayEnd + shift, 0, -shift);
+				RawMemSet(arrayEnd + shift, 0, -shift);
 			}
 		}
 		// Do nothing if they're the same.
 		return true;
 	}
-	P:C(else if (slot == size1) printf("Cannot alter the last slot in an array."););
+	P:C(else if (slot == size1) print("Cannot alter the last slot in an array."););
 	return false;
 }
 #define Jagged_ResizeOne(%0,%1) _Jagged_ResizeOne(_Jagged(%0),%1)
+
+///*-------------------------------------------------------------------------*//**
+// * <param name="array">The array we want to relocate a slot in.</param>
+// * <param name="size1">The number of slots in the array.</param>
+// * <param name="size2">The ORIGINAL size of every slot.</param>
+// * <param name="slot">The slot to relocate.</param>
+// * <param name="newSlot">The new location of the slot.</param>
+// * <remarks>
+// *  Make a slot point to the data of an EARLIER slot.
+// * </remarks>
+// *//*------------------------------------------------------------------------**/
+//
+//stock bool:_Jagged_RelocateOne(array[][], size1, size2, slot, newSlot)
+//{
+//	if (slot <= newSlot)
+//	{
+//		return false;
+//	}
+//	// SLOT GETS INCREMENTED VERY FAST!
+//	if (0 < ++slot <= size1)
+//	{
+//		// Get the slot's current size and address.
+//		newSize *= 4;
+//		new
+//			newEnd = _Jagged_Address(array, slot - 1) + newSize,
+//			arrayEnd = _Jagged_End(array, size1, size2);
+//		if (newEnd > arrayEnd)
+//		{
+//			P:1("Insufficient space to grow jagged array.");
+//			return false;
+//		}
+//		new
+//			slotEnd = _Jagged_Address(array, slot),
+//			//oldSize = slotEnd - slotStart,
+//			shift = newEnd - slotEnd; //newSize - oldSize;
+//		P:5("Jagged_ResizeOne: Resizing slot %d from %d to %d", slot - 1, _Jagged_SizeOf(array, size1, size2, slot - 1), newSize);
+//		if (shift != 0)
+//		{
+//			new
+//				remain = arrayEnd - newEnd;
+//			// Grow the slot.  This has to be done largely in assembly to remove
+//			// the "BOUNDS" OpCodes that would otherwise be inserted.  Actually,
+//			// we can't have "BOUNDS" here because there's no way for the
+//			// compiler to know the array's size in advance.  This works even
+//			// when "shift" is negative.
+//			memcpy(array[slot][shift / 4], array[slot], 0, remain, remain / 4);
+//			// Now shift all the subsequent slots.
+//			size2 = size2 * size1 * 4;
+//			while (slot < size1)
+//			{
+//				Jagged_MovePtr(array, size2 + (size1 - slot) * 4, slot, shift);
+//				++slot;
+//			}
+//			if (shift > 0)
+//			{
+//				// Blank the remainder of the slot we are growing.
+//				RawMemSet(slotEnd, 0, shift);
+//			}
+//			else
+//			{
+//				// Blank the end of the array.
+//				RawMemSet(arrayEnd + shift, 0, -shift);
+//			}
+//		}
+//		// Do nothing if they're the same.
+//		return true;
+//	}
+//	return false;
+//}
+//#define Jagged_ResizeOne(%0,%1) _Jagged_ResizeOne(_Jagged(%0),%1)
 
 /*-------------------------------------------------------------------------*//**
  * <param name="array">The array we want to resize a slot in.</param>
@@ -290,7 +361,7 @@ stock bool:Jagged_MoveOne(array[][], size1, size2, slot, newSize)
 		// Do nothing if they're the same.
 		return true;
 	}
-	P:C(else if (slot == size1) printf("Cannot alter the last slot in an array."););
+	P:C(else if (slot == size1) print("Cannot alter the last slot in an array."););
 	return false;
 }
 
@@ -336,7 +407,7 @@ stock bool:_Jagged_Move(array[][], size1, size2, ...)
 stock _Jagged_Empty(array[][], size1, size2)
 {
 	// The size of the main storage area, including the header.
-	size2 = (size1 + size1 * size2) * cellbytes;
+	size2 = (size1 * size2 + size1) << __COMPILER_CELL_SHIFT;
 	while (--size1)
 	{
 		#emit LOAD.S.pri array
@@ -391,7 +462,7 @@ stock Jagged_UnsafeResizeOne(array[][], slot, newSize)
 	#emit POP.pri
 	#emit RETN
 	
-	__COMPILER_NAKED
+	__pragma("naked");
 }
 
 //#define Jagged_UnsafeResizeOne(%0,%1) _Jagged_UnsafeResizeOne(_Jagged(%0),%1)
@@ -463,8 +534,6 @@ stock _Jagged_SizeOf(array[][], size1, size2, slot)
 
 /*-------------------------------------------------------------------------*//**
  * <param name="array">The array we want to get the address of a slot in.</param>
- * <param name="size1">The number of slots in the array.</param>
- * <param name="size2">The ORIGINAL size of every slot.</param>
  * <param name="slot">The slot to get the address of.</param>
  * <returns>
  *  The absolute address of this slot.
@@ -485,7 +554,7 @@ stock _Jagged_SizeOf(array[][], size1, size2, slot)
 			#emit ADD
 			#emit RETN
 			
-			__COMPILER_NAKED
+			__pragma("naked");
 		}
 
 /*-------------------------------------------------------------------------*//**
@@ -510,13 +579,13 @@ stock _Jagged_SizeOf(array[][], size1, size2, slot)
 			#emit IDXADDR
 			#emit RETN
 			
-			__COMPILER_NAKED
+			__pragma("naked");
 		}
 
 stock _Jagged_PrintHeader(array[][], size1, size2)
 {
 	#pragma unused size2
-	for (new ptr, slot = 0; slot != size1; ++slot)
+	for (new ptr = 0, slot = 0; slot != size1; ++slot)
 	{
 		// Get the slot pointer.
 		#emit LOAD.S.alt                array

@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -180,6 +181,22 @@ P:D(mget(Alloc:slot, index));
 #endif
 
 /*-------------------------------------------------------------------------*//**
+ * <param name="slot">The allocation unit to get float data from.</param>
+ * <param name="index">The location in the unit to get.</param>
+ * <returns>
+ *  The data
+ * </returns>
+ * <remarks>
+ *  Shorthand for <symbolref name="Malloc_GetFloat" />.
+ * </remarks>
+ *//*------------------------------------------------------------------------**/
+P:D(mgetf(Alloc:slot, index));
+#if !defined YSI_MALLOC_NO_SHORT
+	#define mgetf(%1) \
+		Malloc_GetFloat(%1)
+#endif
+
+/*-------------------------------------------------------------------------*//**
  * <param name="slot">The allocation unit to set in.</param>
  * <param name="index">Where in the unit to set.</param>
  * <param name="value">The value to save.</param>
@@ -192,6 +209,21 @@ P:D(mset(Alloc:slot, index, value));
 #if !defined YSI_MALLOC_NO_SHORT
 	#define mset(%1) \
 		Malloc_Set(%1)
+#endif
+
+/*-------------------------------------------------------------------------*//**
+ * <param name="slot">The allocation unit to set in.</param>
+ * <param name="index">Where in the unit to set.</param>
+ * <param name="value">The float value to save.</param>
+ * <remarks>
+ *  Shorthand for <symbolref name="Malloc_SetFloat" />.
+ * </remarks>
+ *//*------------------------------------------------------------------------**/
+
+P:D(msetf(Alloc:slot, index, value));
+#if !defined YSI_MALLOC_NO_SHORT
+	#define msetf(%1) \
+		Malloc_SetFloat(%1)
 #endif
 
 /*-------------------------------------------------------------------------*//**
@@ -341,6 +373,57 @@ P:D(Malloc_NextSlot(slot));
 #endif
 
 /*-------------------------------------------------------------------------*//**
+ * <param name="array">Data unit to put information in.</param>
+ * <param name="index">Index in the unit.</param>
+ * <param name="value">Float value to insert</param>
+ * <remarks>
+ *  Displays errors in secure mode.
+ * </remarks>
+ *//*------------------------------------------------------------------------**/
+
+#if defined YSI_MALLOC_SECURE
+
+	Float:Malloc_GetFloat(Alloc:array, index) {
+		P:3("Malloc_GetFloat: array = %d, index = %d.", _:array, index);
+		return Float:Malloc_Get(_:array, index);
+	}
+    
+#else 
+
+	P:D(Float:Malloc_GetFloat(Alloc:array, index));
+	#define Malloc_GetFloat(%1,%2) \
+		Float:Malloc_Get(%1,%2)
+
+#endif
+
+
+/*-------------------------------------------------------------------------*//**
+ * <param name="array">Data unit to put information in.</param>
+ * <param name="index">Index in the unit.</param>
+ * <param name="value">Float value to insert</param>
+ * <remarks>
+ *  Displays errors in secure mode.
+ * </remarks>
+ *//*------------------------------------------------------------------------**/
+
+
+#if defined YSI_MALLOC_SECURE
+
+	Malloc_SetFloat(Alloc:array, index, Float:value) {
+		P:3("Malloc_SetFloat called: %d, %d, %f", _:array, index, _:value);
+        Malloc_Set(_:array, index, _:value);
+        return 1;
+	}
+
+#else 
+
+	P:D(Malloc_SetFloat(Alloc:array, index, Float:value));
+	#define Malloc_SetFloat(%1,%2,%3) \
+		Malloc_Set(%1,%2,%3)
+
+#endif
+
+/*-------------------------------------------------------------------------*//**
  * <param name="target">Target for the string.</param>
  * <param name="length">Length of the target.</param>
  * <param name="array">Data unit to put information in.</param>
@@ -351,7 +434,7 @@ P:D(Malloc_NextSlot(slot));
  * </remarks>
  *//*------------------------------------------------------------------------**/
 
-stock Malloc_GetS(target[], length, Alloc:array, const index, const bool:pack = false)
+stock Malloc_GetS(target[], length = sizeof (target), Alloc:array, const index, const bool:pack = false)
 {
 	P:3("Malloc_GetS: array = %d, index = %d.", _:array, index);
 	if (0 <= index < Malloc_GetSlotSize(_:array))
@@ -419,7 +502,7 @@ stock Malloc_SetVAS(Alloc:array, index, arg)
 {
 	P:3("Malloc_SetVAS called: %d, %d, %d", _:array, index, arg);
 	new
-		len;
+		len = 0;
 	#emit LOAD.S.pri arg
 	#emit SMUL.C     4
 	#emit LOAD.S.alt 0
@@ -467,7 +550,7 @@ stock Malloc_SetVAS(Alloc:array, index, arg)
 }
 
 /*-------------------------------------------------------------------------*//**
- * <param name="target">Target for the array.</param>
+ * <param name="dest">Target for the array.</param>
  * <param name="length">Length of the target.</param>
  * <param name="array">Data unit to put information in.</param>
  * <param name="index">Index in the unit.</param>
@@ -476,15 +559,15 @@ stock Malloc_SetVAS(Alloc:array, index, arg)
  * </remarks>
  *//*------------------------------------------------------------------------**/
 
-stock Malloc_GetA(target[], length, Alloc:array, index)
+stock Malloc_GetA(dest[], length, Alloc:array, index)
 {
-	P:3("Malloc_GetA called: array = %d, index = %d.", _:array, index);
+	P:3("Malloc_GetA called: array = %d, index = %d, length = %d.", _:array, index, length);
 	if (index >= 0)
 	{
 		new
 			size = Malloc_GetSlotSize(_:array);
-		P:5("Malloc_GetA: size = %d.", size);
-		memcpy(target, YSI_gMallocMemory, index + _:array, size * 4, length);
+		P:5("Malloc_GetA: size = %d, %d.", size, size - index);
+		memcpy(dest, YSI_gMallocMemory[index + _:array], 0, min(size - index, length) * 4, length);
 		#if defined YSI_MALLOC_SECURE
 			P:C(if(length > size)P:E("Out of buffer space."););
 		#endif
@@ -496,14 +579,14 @@ stock Malloc_GetA(target[], length, Alloc:array, index)
 /*-------------------------------------------------------------------------*//**
  * <param name="array">Data unit to put information in.</param>
  * <param name="index">Index in the unit.</param>
- * <param name="str">Array to insert.</param>
- * <param name="len">Length of the array.</param>
+ * <param name="source">Array to insert.</param>
+ * <param name="length">Length of the array.</param>
  * <remarks>
  *  Displays errors in secure mode.  Inserts an array.
  * </remarks>
  *//*------------------------------------------------------------------------**/
 
-stock Malloc_SetA(Alloc:array, index, const str[], len)
+stock Malloc_SetA(Alloc:array, index, const source[], length)
 {
 	P:3("Malloc_SetA: array = %d, index = %d.", _:array, index);
 	if (index >= 0)
@@ -511,9 +594,9 @@ stock Malloc_SetA(Alloc:array, index, const str[], len)
 		new
 			size = Malloc_GetSlotSize(_:array);
 		P:5("Malloc_SetA: size = %d.", size);
-		memcpy(YSI_gMallocMemory[index + _:array], str, 0, len * 4, size - index);
+		memcpy(YSI_gMallocMemory[index + _:array], source, 0, min(size - index, length) * 4, size - index);
 		#if defined YSI_MALLOC_SECURE
-			P:C(if(len > size - index)P:E("Out of buffer space."););
+			P:C(if(length > size - index)P:E("Out of buffer space."););
 		#endif
 	}
 }
@@ -531,7 +614,7 @@ stock Malloc_SetVAA(Alloc:array, index, arg)
 {
 	P:3("Malloc_SetVAA called: %d, %d, %d", _:array, index, arg);
 	new
-		len;
+		len = 0;
 	#emit LOAD.S.pri arg
 	#emit ADD.C      1
 	#emit SMUL.C     4
@@ -740,6 +823,7 @@ stock Alloc:realloc(Alloc:slot, size, const bool:clear = false)
 			while (slot)
 			{
 				cs = Malloc_GetSlotSize(slot);
+				P:7("Malloc_Allocate: slot %d %d", slot, cs);
 				if (!cs)
 				{
 					return NO_ALLOC;
@@ -751,12 +835,13 @@ stock Alloc:realloc(Alloc:slot, size, const bool:clear = false)
 				p = slot;
 				slot = Malloc_NextSlot(slot);
 			}
+			P:7("Malloc_Allocate: found: %d", slot, cs);
 			if (slot)
 			{
 				nextSlot = Malloc_NextSlot(slot);
 				if (clear)
 				{
-					memset(Malloc_GetData(Alloc:slot, 0), 0, size);
+					MemSet(Malloc_GetData(Alloc:slot, 0), 0, size);
 				}
 				if (cs == size)
 				{

@@ -20,7 +20,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -174,10 +175,10 @@ static
 	BitArray:YSI_g_sPlayerProperties[MAX_PLAYERS]<MAX_PROPERTIES>,
 	YSI_g_sSpawnWeapons[MAX_PLAYERS][13],
 	YSI_g_sShopMenu[MAX_PLAYERS][E_PROP_AMMU],
-	YSI_g_sRebuyDelay,
+	YSI_g_sRebuyDelay = 0,
 	#if defined _YSI_VISUAL_PICKUPS
 		YSI_g_sPickupPointers[MAX_DYN_PICKUPS],
-		YSI_g_sPickupProps,
+		YSI_g_sPickupProps = 0,
 		YSI_g_sPickupTimer[MAX_PLAYERS] = {-1, ...},
 		YSI_g_sPlayerPickup[MAX_PLAYERS] = {NO_PICKUP, ...},
 	#endif
@@ -315,7 +316,7 @@ stock Property_GetType(property)
  * </remarks>
  *//*------------------------------------------------------------------------**/
 
-HOOK__ OnScriptInit()
+HOOK__ OnYSIInit()
 {
 	P:2("Property_Property() start");
 	P:5("Property_Property() 0");
@@ -398,14 +399,14 @@ stock CreateHouse(Float:extX, Float:extY, Float:extZ, Float:intX, Float:intY, Fl
 	P:2("CreateHouse() start 1");
 	P:2("CreateHouse() start 2");
 	new
-		i;
+		i = 0;
 	while (i < MAX_PROPERTIES && Property_IsActive(i))
 	{
 		i++;
 	}
 	if (i == MAX_PROPERTIES) return NO_PROPERTY;
 	new
-		cp;
+		cp = 0;
 	P:4("CreateHouse() Make");
 	#if defined _YSI_VISUAL_PICKUPS
 		if (!checkpoint)
@@ -470,14 +471,14 @@ stock CreateHouse(Float:extX, Float:extY, Float:extZ, Float:intX, Float:intY, Fl
 stock CreateProperty(name[], Float:x, Float:y, Float:z, price, reward, interval = 60000, sell = 0, multi = 0, reduce = 0, increase = 0, pickup = 0)
 {
 	new
-		i;
+		i = 0;
 	while (i < MAX_PROPERTIES && Property_IsActive(i))
 	{
 		i++;
 	}
 	if (i == MAX_PROPERTIES) return NO_PROPERTY;
 	new
-		cp;
+		cp = 0;
 	#if defined _YSI_VISUAL_PICKUPS
 		if (pickup)
 		{
@@ -495,7 +496,7 @@ stock CreateProperty(name[], Float:x, Float:y, Float:z, price, reward, interval 
 	YSI_g_sProperties[i][E_PROP_DATA_NAME][MAX_PROP_NAME - 1] = interval & 0xFFFFF;
 	YSI_g_sProperties[i][E_PROP_DATA_DATA_1] = (interval & 0xFFFFF) | ((price & 0x00000FFF) << 20);
 	YSI_g_sProperties[i][E_PROP_DATA_DATA_2] = (reward & 0x3FFFF) | ((price & 0x03FFF000) << 6);
-	if (!isnull(name)) strcpy(YSI_g_sProperties[i][E_PROP_DATA_NAME], name, MAX_PROP_NAME - 1);
+	if (!IsNull(name)) StrCpy(YSI_g_sProperties[i][E_PROP_DATA_NAME], name, MAX_PROP_NAME - 1);
 	else YSI_g_sProperties[i][E_PROP_DATA_NAME][0] = '\0';
 	#if defined _YSI_VISUAL_PICKUPS
 		if (pickup)
@@ -520,7 +521,7 @@ stock CreateProperty(name[], Float:x, Float:y, Float:z, price, reward, interval 
 stock CreateBank(Float:x, Float:y, Float:z, name[] = "")
 {
 	new
-		i;
+		i = 0;
 	while (i < MAX_PROPERTIES)
 	{
 		if (!Property_IsActive(i)) break;
@@ -531,7 +532,7 @@ stock CreateBank(Float:x, Float:y, Float:z, name[] = "")
 		cp = CreateCheckpoint(x, y, z, 3.0);
 	if (cp == NO_CHECKPOINT) return NO_PROPERTY;
 	YSI_g_sProperties[i][E_PROP_DATA_FLAGS] = e_PROP_FLAGS_TYPE_BANK | e_PROP_FLAGS_ACTIVE | e_PROP_FLAGS:cp;
-	if (!isnull(name)) strcpy(YSI_g_sProperties[i][E_PROP_DATA_NAME], name, MAX_PROP_NAME);
+	if (!IsNull(name)) StrCpy(YSI_g_sProperties[i][E_PROP_DATA_NAME], name, MAX_PROP_NAME);
 	else YSI_g_sProperties[i][E_PROP_DATA_NAME][0] = '\0';
 	YSI_g_sCheckpointPointers[cp] = i;
 	return i;
@@ -561,7 +562,7 @@ stock CreateAmmunation(Float:x, Float:y, Float:z, spawn, instant, ...)
 		num = numargs();
 	if (((num) <= 5) || (((num - 5) / 3) * 3 != (num - 5))) return NO_PROPERTY;
 	new
-		i;
+		i = 0;
 	while (i < MAX_PROPERTIES)
 	{
 		if (!Property_IsActive(i)) break;
@@ -574,7 +575,7 @@ stock CreateAmmunation(Float:x, Float:y, Float:z, spawn, instant, ...)
 	YSI_g_sProperties[i][E_PROP_DATA_FLAGS] = e_PROP_FLAGS_TYPE_AMMU | e_PROP_FLAGS_ACTIVE | e_PROP_FLAGS:cp | Property_SetOption(1, spawn) | Property_SetOption(2, instant);
 	new
 		pos = 5,
-		count;
+		count = 0;
 	while (pos < num)
 	{
 		switch (getarg(pos++))
@@ -742,7 +743,7 @@ stock CreateMoneyArea(area, money = 100, interval = 10000)
 {
 	if (area == NO_AREA) return NO_PROPERTY;
 	new
-		i;
+		i = 0;
 	while (i < MAX_PROPERTIES)
 	{
 		if (!Property_IsActive(i)) break;
@@ -772,7 +773,7 @@ stock CreateMoneyArea(area, money = 100, interval = 10000)
 stock CreateMoneyPoint(Float:x, Float:y, Float:z, Float:s, money = 100, interval = 10000)
 {
 	new
-		i;
+		i = 0;
 	while (i < MAX_PROPERTIES)
 	{
 		if (!Property_IsActive(i)) break;
@@ -807,7 +808,7 @@ stock CreateMoneyPoint(Float:x, Float:y, Float:z, Float:s, money = 100, interval
 stock CreateTeleport(Float:sx, Float:sy, Float:sz, Float:tx, Float:ty, Float:tz, cost = 0, name[] = "")
 {
 	new
-		i;
+		i = 0;
 	while (i < MAX_PROPERTIES)
 	{
 		if (!Property_IsActive(i)) break;
@@ -822,7 +823,7 @@ stock CreateTeleport(Float:sx, Float:sy, Float:sz, Float:tx, Float:ty, Float:tz,
 	YSI_g_sProperties[i][E_PROP_DATA_DATA_2] = _:tx;
 	YSI_g_sProperties[i][E_PROP_DATA_PLAYERS][0] = Bit:ty;
 	YSI_g_sProperties[i][E_PROP_DATA_PLAYERS][1] = Bit:tz;
-	if (!isnull(name)) strcpy(YSI_g_sProperties[i][E_PROP_DATA_NAME], name, MAX_PROP_NAME);
+	if (!IsNull(name)) StrCpy(YSI_g_sProperties[i][E_PROP_DATA_NAME], name, MAX_PROP_NAME);
 	else YSI_g_sProperties[i][E_PROP_DATA_NAME][0] = '\0';
 	YSI_g_sCheckpointPointers[cp] = i;
 	return i;
@@ -844,7 +845,7 @@ stock CreateForbiddenArea(area, kick = 0, health = 1000, invert = 0, name[] = ""
 {
 	if (area == NO_AREA) return NO_PROPERTY;
 	new
-		i;
+		i = 0;
 	while (i < MAX_PROPERTIES)
 	{
 		if (!Property_IsActive(i)) break;
@@ -853,7 +854,7 @@ stock CreateForbiddenArea(area, kick = 0, health = 1000, invert = 0, name[] = ""
 	if (i == MAX_PROPERTIES) return NO_PROPERTY;
 	YSI_g_sProperties[i][E_PROP_DATA_FLAGS] = e_PROP_FLAGS_TYPE_RSRC | e_PROP_FLAGS_ACTIVE | e_PROP_FLAGS:area | Property_SetOption(1, kick) | Property_SetOption(2, invert);
 	YSI_g_sProperties[i][E_PROP_DATA_DATA_2] = health;
-	if (!isnull(name)) strcpy(YSI_g_sProperties[i][E_PROP_DATA_NAME], name, MAX_PROP_NAME);
+	if (!IsNull(name)) StrCpy(YSI_g_sProperties[i][E_PROP_DATA_NAME], name, MAX_PROP_NAME);
 	else YSI_g_sProperties[i][E_PROP_DATA_NAME][0] = '\0';
 	YSI_g_sAreaPointers[area] = i;
 	return i;
@@ -1084,7 +1085,7 @@ HOOK__ OnPlayerLeaveCPEx(playerid, cpid)
 					else Text_SendFormat(playerid, "YSI_PROP_HOUSE_OWNED", ReturnPlayerName(owner));
 				}
 			}
-			YSI_g_sPickupTimer[playerid] = SetTimerEx("Property_PickupTimeCheck", 500, 1, "ii", playerid, pickupid);
+			YSI_g_sPickupTimer[playerid] = YSI_SetTimerEx("Property_PickupTimeCheck", 500, true, "ii", playerid, pickupid);
 		}
 		P:2("Property_OnPlayerPickUpPickup() end");
 		return 1;
@@ -1221,7 +1222,7 @@ Property_OnPlayerEnterCheckpointEx(playerid, cpid)
 static stock Property_GetWeapon(ammu, slot, &page = 0)
 {
 	new
-		weapon;
+		weapon = 0;
 	while (page < 40)
 	{
 		if (!page)
@@ -1360,8 +1361,8 @@ static stock Property_GetWeaponFromSlot(slot)
 stock Property_SavePlayerWeapon(playerid, weaponslot, ammo)
 {
 	new
-		slot,
-		weapon;
+		slot = 0,
+		weapon = 0;
 	switch (weaponslot)
 	{
 		case 0: slot = 0, weapon = WEAPON(WEAPON_BRASSKNUCKLE);
@@ -1526,9 +1527,9 @@ Property_OnPlayerSelectedMenuRow(playerid, row)
 		if (data & 0x01)
 		{
 			new
-				weapon,
+				weapon = 0,
 				flags = _:YSI_g_sProperties[ammu][E_PROP_DATA_FLAGS],
-				wdat;
+				wdat = 0;
 			wdat = Property_GetWeapon(ammu, slot, weapon);
 			if (GetPlayerMoney(playerid) >= Property_WeaponCost(wdat))
 			{
@@ -1581,7 +1582,7 @@ static stock Property_GenerateAmmuMenu(playerid, ammu, stage, page)
 	if (stage)
 	{
 		new
-			start,
+			start = 0,
 			weapon = Property_GetWeapon(ammu, page, start);
 		if (weapon)
 		{
@@ -1592,9 +1593,9 @@ static stock Property_GenerateAmmuMenu(playerid, ammu, stage, page)
 	else
 	{
 		new
-			weapon,
-			start,
-			row,
+			weapon = 0,
+			start = 0,
+			row = 0,
 			end = page + 12,
 			next = page,
 			money = GetPlayerMoney(playerid);
@@ -1603,7 +1604,7 @@ static stock Property_GenerateAmmuMenu(playerid, ammu, stage, page)
 		{
 			end--;
 			AddMenuItem(menu, 0, "Back...");
-			AddMenuItem(menu, 1, " ");
+			AddMenuItem(menu, 1, YSI_SPACE);
 		}
 		while (slot < end && (weapon = Property_GetWeapon(ammu, next, start)))
 		{
@@ -1620,7 +1621,7 @@ static stock Property_GenerateAmmuMenu(playerid, ammu, stage, page)
 		if (end != 12 && Property_GetWeapon(ammu, 0, start))
 		{
 			AddMenuItem(menu, 0, "Next...");
-			AddMenuItem(menu, 1, " ");
+			AddMenuItem(menu, 1, YSI_SPACE);
 		}
 	}
 	YSI_g_sShopMenu[playerid][E_PROP_AMMU_MENU] = menu;
@@ -1856,7 +1857,7 @@ YCMD:buy(playerid, params[], help)
 	{
 		P:3("ycmd_buy() Not help");
 		new
-			cpid,
+			cpid = 0,
 			prop = NO_PROPERTY;
 		if (IsPlayerInCheckpoint(playerid))
 		{
@@ -1934,7 +1935,7 @@ YCMD:buy(playerid, params[], help)
 							}
 							else if (YSI_g_sRebuyDelay)
 							{
-								SetTimerEx("Property_ResetRebuy", YSI_g_sRebuyDelay, 0, "i", prop);
+								YSI_SetTimerEx("Property_ResetRebuy", YSI_g_sRebuyDelay, false, "i", prop);
 								#if defined _YSI_VISUAL_PICKUPS
 									if (Property_GetOption(5, flag))
 										Pickup_Show(cpid, 0);
@@ -2068,14 +2069,14 @@ ptask Property_Loop[500](i)
 	{*/
 	P:3("Property_Loop() foreach start");
 	new
-		money,
-		bad;
+		money = 0,
+		bad = 0;
 	for (new j = 0; j < GROUP_PROPERTY_BITS; j++)
 	{
 		new
 			props = _:YSI_g_sPlayerProperties[i][j],
 			slot = 1,
-			bit;
+			bit = 0;
 		while (props)
 		{
 			if (props & slot)
@@ -2102,7 +2103,7 @@ ptask Property_Loop[500](i)
 							}
 							else
 							{
-								new Float:health;
+								new Float:health = 0.0;
 								GetPlayerHealth(i, health);
 								SetPlayerHealth(i, health - YSI_g_sProperties[property][E_PROP_DATA_DATA_2]);
 							}
@@ -2145,7 +2146,7 @@ P:D(bool:Property_IsPlayerProperty(e_PROP_FLAGS:flags,playerid));
 stock Property_GetPlayerPropCount(playerid)
 {
 	new
-		count;
+		count = 0;
 	for (new i = 0; i < MAX_PROPERTIES; i++)
 	{
 		new
@@ -2283,7 +2284,7 @@ YCMD:enter(playerid, params[], help)
 	{
 		P:3("ycmd_enter() Not help");
 		new
-			cpid,
+			cpid = 0,
 			prop = NO_PROPERTY;
 		if (IsPlayerInCheckpoint(playerid))
 		{

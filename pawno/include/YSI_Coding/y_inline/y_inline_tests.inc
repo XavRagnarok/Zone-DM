@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -75,9 +76,101 @@ static stock bool:y_inline_Get(callback:c, ret[E_CALLBACK_DATA], const f[] = "")
 	return Callback_Get(c, ret, f);
 }
 
+static stock y_inline_GetX(Func:c<>, &Func:d<>)
+{
+	d = c;
+	Indirect_Claim(c);
+}
+
+static stock y_inline_GetS(Func:c<s>, &Func:d<s>)
+{
+	d = c;
+	Indirect_Claim(c);
+}
+
 static stock bool:y_inline_Restore(ret[E_CALLBACK_DATA])
 {
 	Callback_Restore(ret);
+}
+
+TEST__ y_inline0a()
+{
+	new Func:cc<>;
+	inline const func()
+	{
+	}
+	y_inline_GetX(using inline func, cc);
+	@.cc();
+}
+
+TEST__ y_inline0b()
+{
+	new Func:cc<>;
+	inline const func()
+	{
+		//print("1");
+		@return 42;
+	}
+	y_inline_GetX(using inline func, cc);
+	@.cc();
+}
+
+TEST__ y_inline0c()
+{
+	new Func:cc<>;
+	inline const func()
+	{
+		//print("1");
+		@return 42;
+	}
+	y_inline_GetX(using inline func, cc);
+	ASSERT_EQ(@.cc(), 42);
+}
+
+TEST__ y_inline0d()
+{
+	new Func:cc<>;
+	inline const func()
+	{
+		//print("1");
+		@return 42;
+	}
+	y_inline_GetX(using inline func, cc);
+	new
+		dd[E_CALLBACK_DATA];
+	dd[0] = _:cc;
+	ASSERT_EQ(Callback_Call(dd, 42), 42);
+}
+
+TEST__ y_inline0e()
+{
+	new Func:cc<>;
+	inline func()
+	{
+		//print("1");
+		@return 42;
+	}
+	y_inline_GetX(using inline func, cc);
+	new
+		dd[E_CALLBACK_DATA];
+	dd[0] = _:cc;
+	ASSERT_EQ(Callback_Call(dd, 42), 42);
+}
+
+TEST__ y_inline0f()
+{
+	new Func:cc<>;
+	inline func()
+	{
+		//print("1");
+		@return 42;
+	}
+	y_inline_GetX(using inline func, cc);
+	new
+		dd[E_CALLBACK_DATA];
+	dd[0] = _:cc;
+	ASSERT_EQ(Callback_Call(dd, 42), 42);
+	Callback_Restore(cc);
 }
 
 TEST__ y_inline1()
@@ -177,6 +270,7 @@ public y_inline7a()
 	inline func7a()
 	{
 	}
+	#pragma unused func7a
 }
 
 TEST__ y_inline7b()
@@ -186,6 +280,7 @@ TEST__ y_inline7b()
 	inline func7b()
 	{
 	}
+	#pragma unused func7b
 	ASSERT_EQ(y_inline_Get(using func7a, cc), false);
 	ASSERT(y_inline_Get(using func7b, cc));
 	Callback_Release(cc);
@@ -302,7 +397,7 @@ TEST__ y_inline12()
 }
 
 static stock
-	YSI_g_sRemoteTestVar;
+	YSI_g_sRemoteTestVar = 0;
 
 TEST__ y_inline13()
 {
@@ -436,9 +531,9 @@ TEST__ Callback_Array1()
 		pars[3];
 	Callback_Call(cc, a, str, c);
 	ASSERT_EQ(a, 7);
-	pars[0] = ref(a);
-	pars[1] = ref(str);
-	pars[2] = ref(c);
+	pars[0] = AMX_Ref(a);
+	pars[1] = AMX_Ref(str[0]);
+	pars[2] = AMX_Ref(c);
 	// Test more parameters.
 	a = 2;
 	Callback_Array(cc, pars, 3);
@@ -471,7 +566,7 @@ public y_inline_Remote1(v)
 TEST__ y_inline_Remote1()
 {
 	new
-		ret;
+		ret = 0;
 	
 	ret = strcmp("hello", "hello");
 	ASSERT(!ret);
@@ -537,7 +632,7 @@ TEST__ CallStoredFunction0()
 // Test inline functions inside hooks, in which the parameter counts are mangled
 // so can't be used to allocate memory.
 static
-	YSI_g_sInlineTestVar0;
+	YSI_g_sInlineTestVar0 = 0;
 
 HOOK__ y_inline_InHook0@0()
 {
@@ -679,8 +774,8 @@ TEST__ y_inline_InHook2()
 }
 
 static stock
-	YSI_g_sInlineTestVar2,
-	YSI_g_sInlineTestVar3,
+	YSI_g_sInlineTestVar2 = 0,
+	YSI_g_sInlineTestVar3 = 0,
 	YSI_g_sInlineTestCB[E_CALLBACK_DATA];
 
 static stock y_inline_Getter(callback:cb)
@@ -860,7 +955,7 @@ static stock y_inline_TestFunc_8(const string:svar0[])
 {
 	new
 		svar0b[20];
-	strcpy(svar0b, svar0);
+	StrCpy(svar0b, svar0);
 	inline TestCallback1()
 	{
 		YSI_g_sInlineTestVar2 = strval(svar0b);
@@ -887,7 +982,7 @@ static stock y_inline_TestFunc_10(const string:svar0[])
 {
 	new
 		svar0b[20];
-	strcpy(svar0b, svar0);
+	StrCpy(svar0b, svar0);
 	inline TestCallback1(string:svar1[])
 	{
 		YSI_g_sInlineTestVar2 = strval(svar0b) * strval(svar1);
@@ -1114,6 +1209,22 @@ TEST__ nu_y_inline6()
 	y_inline_Get(USING_INLINE__ func, cc);
 	Callback_Call(cc, "hello");
 	Callback_Release(cc);
+}
+
+TEST__ nu_y_inline6b()
+{
+	new Func:cc<s>;
+	INLINE_CONST__ func(string:g[])
+	{
+		#if !(sizeof (g) == YSI_MAX_STRING))
+			#error sizeof (g) != YSI_MAX_STRING
+		#endif
+		ASSERT_SAME(g, "hello");
+	}
+	y_inline_GetS(USING_INLINE__ func, cc);
+	new hash[61] = "hello";
+	@.cc(hash);
+	Indirect_Release(cc);
 }
 
 TEST__ nu_y_inline7b()
@@ -1356,9 +1467,9 @@ TEST__ nu_Callback_Array1()
 		pars[3];
 	Callback_Call(cc, a, str, c);
 	ASSERT_EQ(a, 7);
-	pars[0] = ref(a);
-	pars[1] = ref(str);
-	pars[2] = ref(c);
+	pars[0] = AMX_Ref(a);
+	pars[1] = AMX_Ref(str[0]);
+	pars[2] = AMX_Ref(c);
 	// Test more parameters.
 	a = 2;
 	Callback_Array(cc, pars, 3);
@@ -1521,5 +1632,63 @@ TEST__ y_inline_DeeplyNested()
 		}
 	}
 	ASSERT_EQ(k, 8);
+}
+
+TEST__ y_inline_timer()
+{
+	// This is tricky to test, because we need to test it instantly, but the timer (by definition)
+	// is called in the future.  So we just test that a timer was probably started for now.
+	inline const X()
+	{
+	}
+	new timer = Timer_CreateCallback(using inline X, 100);
+	ASSERT_NE(timer, 0);
+	ASSERT_NE(Indirect_GetMeta(timer), 0);
+	Timer_KillCallback(timer);
+}
+
+TEST__ y_inline_repeating()
+{
+	inline const X()
+	{
+	}
+	new timer = Timer_CreateCallback(using inline X, 10, 1000);
+}
+
+static stock
+	YSI_gsStarts[1000],
+	YSI_gsCounts[sizeof (YSI_gsStarts)],
+	YSI_gsCount = 0;
+
+TEST__ y_inline1000timers()
+{
+	//print("y_inline1000timers");
+	inline const Total()
+	{
+		//for (new i = 0; i != sizeof (YSI_gsCounts); ++i)
+		//{
+		//	printf("Count %d = %d", i, YSI_gsCounts[i]);
+		//	printf("Time %d = %d", i, YSI_gsStarts[i]);
+		//}
+		new str[32];
+		format(str, sizeof (str), "Count = %d", YSI_gsCount);
+		Server_PrintIntroMessage(str);
+	}
+	for (new i = 0; i != sizeof (YSI_gsStarts); ++i)
+	{
+		inline X()
+		{
+			//printf("Call %d = %d", i, callCount);
+			if (++YSI_gsCounts[i] == 50)
+			{
+				//printf("Diff %d = %d", i, GetTickCount() - YSI_gsStarts[i]);
+				YSI_gsStarts[i] = GetTickCount() - YSI_gsStarts[i];
+			}
+			++YSI_gsCount;
+		}
+		YSI_gsStarts[i] = GetTickCount();
+		Timer_CreateCallback(using inline X, 100, 50);
+	}
+	Timer_CreateCallback(using inline Total, 100 * 51, 1);
 }
 

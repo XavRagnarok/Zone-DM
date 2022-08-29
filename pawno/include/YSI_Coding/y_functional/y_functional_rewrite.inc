@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -72,10 +73,10 @@ Optional plugins:
 
 static stock
 	YSI_g_sFunctionalLastEnd = cellmin,
-	YSI_g_sFunctionalExpectedDepth,
-	YSI_g_sFunctionalStartPos,
-	YSI_g_sFunctionalEndPos,
-	YSI_g_sFunctionalAfterPos;
+	YSI_g_sFunctionalExpectedDepth = 0,
+	YSI_g_sFunctionalStartPos = 0,
+	YSI_g_sFunctionalEndPos = 0,
+	YSI_g_sFunctionalAfterPos = 0;
 
 //static stock Functional_AddToStack()
 //{
@@ -324,12 +325,12 @@ static stock Functional_FoundCall(const scanner[CodeScanner], nestingLevel)
 	AsmInitPtr(ctx, callPos, 16);
 	// The relative jumps are all `+ 8` internally, since they add on the size of the `JUMP` OP.
 	@emit JUMP.rel         (YSI_g_sFunctionalStartPos - callPos)
-	@emit LOAD.pri         ref(I@)
+	@emit LOAD.pri         AMX_Ref(I@)
 	//@emit PUSH.C           -YSI_g_sFunctionalExpectedDepth
 	//@emit CALL             0
 	
 	AsmInitPtr(ctx, YSI_g_sFunctionalEndPos, 8);
-	@emit STOR.pri         ref(I@)
+	@emit STOR.pri         AMX_Ref(I@)
 	
 	AsmInitPtr(ctx, YSI_g_sFunctionalStartPos, 40);
 	if (excess)

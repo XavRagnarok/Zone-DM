@@ -20,7 +20,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -82,13 +83,15 @@ Optional plugins:
 // Some versions use "-1" or "cellmax", the RFC uses "PUNY_BASE".
 #define PUNY_INVL PUNY_BASE
 
-static stock const
+__COMPILER_CONST_STATIC
 	PUNY_TMIN = 1,
 	PUNY_TMAX = 26,
 	PUNY_SKEW = 38,
 	PUNY_BIAS = 72,
 	PUNY_INIT = 128,
-	PUNY_DAMP = 700,
+	PUNY_DAMP = 700;
+
+static stock const
 	YSI_gscDecoder[128] =
 		{
 			PP_LOOP<48>(PUNY_INVL)(,),
@@ -173,6 +176,14 @@ stock Puny_Decode(string:dst[], const string:src[], wlen = sizeof (dst), const d
 	return 1;
 }
 
+stock Puny_DecodeHash(string:dst[], const string:src[], &hash, wlen = sizeof (dst), const delimiter = PUNY_CHAR)
+{
+	Puny_Decode(dst, src, wlen, delimiter);
+	// This can't be easily done inline
+	hash = BernsteinHash(dst);
+	return 1;
+}
+
 /*-------------------------------------------------------------------------*//**
  * <param name="dst">Where to store the converted string.</param>
  * <param name="src">The string to convert.</param>
@@ -186,7 +197,7 @@ stock Puny_Decode(string:dst[], const string:src[], wlen = sizeof (dst), const d
 stock Puny_Encode(string:dst[], const string:src[], wlen = sizeof (dst), const delimiter = PUNY_CHAR)
 {
 	new
-		widx,
+		widx = 0,
 		rlen = strlen(src);
 	--wlen;
 	for (new ridx = 0; ridx != rlen; ++ridx)
@@ -265,18 +276,18 @@ stock Puny_Encode(string:dst[], const string:src[], wlen = sizeof (dst), const d
 stock Puny_EncodeHash(string:dst[], const string:src[], &hash, wlen = sizeof (dst), const delimiter = PUNY_CHAR)
 {
 	new
-		ch,
-		widx,
-		rlen,
+		ch = 0,
+		widx = 0,
+		rlen = 0,
 		sSrc[YSI_MAX_STRING],
 		bPacked = ispacked(src);
 	--wlen,
-	hash = -1;
+	hash = 5381;
 
 	if (bPacked) {
 		strunpack(sSrc, src);
 	} else {
-		strcpy(sSrc, src);
+		StrCpy(sSrc, src);
 	}
 
 	for (new bool:bb = true; ; ++rlen)
@@ -295,14 +306,14 @@ stock Puny_EncodeHash(string:dst[], const string:src[], &hash, wlen = sizeof (ds
 			}
 			ch = tolower(ch),
 			dst[widx++] = ch,
-			hash = hash * 33 + ch;
+			hash = hash * 33 ^ ch;
 		}
 		else bb = false;
 	}
 	// Wrote out all the characters.
 	if (widx >= wlen) return (bPacked ? strpack(dst, dst, wlen) : 0), (dst[widx] = '\0'), rlen;
 	dst[widx++] = delimiter,
-	hash = hash * 33 + delimiter;
+	hash = hash * 33 ^ delimiter;
 	// Set up punycode variables.
 	for (
 		new
@@ -378,7 +389,7 @@ static stock Puny_EncodeVarHash(bias, delta, dst[], wlen, &hash)
 	new
 		i = 0,
 		k = PUNY_BASE,
-		t;
+		t = 0;
 	while (i < wlen)
 	{
 		if (k <= bias) t = PUNY_TMIN;
@@ -389,14 +400,14 @@ static stock Puny_EncodeVarHash(bias, delta, dst[], wlen, &hash)
 		new
 			c = t + (delta - t) % (PUNY_BASE - t);
 		dst[i] = _Puny_Basic(c),
-		hash = hash * 33 + dst[i++],
+		hash = hash * 33 ^ dst[i++],
 		delta = (delta - t) / (PUNY_BASE - t),
 		k += PUNY_BASE;
 	}
 	if (i < wlen)
 	{
 		dst[i] = _Puny_Basic(delta),
-		hash = hash * 33 + dst[i++];
+		hash = hash * 33 ^ dst[i++];
 	}
 	return i;
 }
@@ -417,7 +428,7 @@ static stock Puny_EncodeVar(bias, delta, dst[], wlen)
 	new
 		i = 0,
 		k = PUNY_BASE,
-		t;
+		t = 0;
 	while (i < wlen)
 	{
 		if (k <= bias) t = PUNY_TMIN;
@@ -497,10 +508,9 @@ static stock Puny_Adapt(delta, length, bool:firstTime)
 			// Only encode the domain part.
 			if (!(-1 < idx < end)) idx = end;
 			static
-				ch;
+				ch = 0;
 			// There's no length parameter for "Puny_Encode", so we need a limit.
-			ch = url[idx],
-			_YSI_ConstMod(url[idx], '\0'),
+			ch = _YSI_ConstMod(url[idx], '\0'),
 			sPart[0] = '\0';
 			switch (Puny_Encode(sPart, url[prev]))
 			{
@@ -536,7 +546,7 @@ static stock Puny_Adapt(delta, length, bool:firstTime)
 			P:2("Puny_HTTP Domain: \"%s\" -> \"%s\"", url, sEncoded);
 		#endif
 		// Call the original "HTTP".
-		return HTTP(index, type, sEncoded, data, callback);
+		return YSI_HTTP(index, type, sEncoded, data, callback);
 	}
 	
 	#if defined _ALS_HTTP
@@ -547,7 +557,7 @@ static stock Puny_Adapt(delta, length, bool:firstTime)
 		
 		#define _ALS_HTTP
 	#endif
-	#define HTTP Puny_HTTP
+	#define HTTP( Puny_HTTP(
 #endif
 
 #undef _Puny_Basic

@@ -20,7 +20,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -93,8 +94,8 @@ enum e_FLOOD_ACTION
 static
 	YSI_g_sPlayerIPs[MAX_PLAYERS],
 	YSI_g_sMaxConnections = -1,
-	e_FLOOD_ACTION:YSI_g_sConnectionAction,
-	YSI_g_sOnIncomingConnection;
+	e_FLOOD_ACTION:YSI_g_sConnectionAction = e_FLOOD_ACTION_NOTHING,
+	YSI_g_sOnIncomingConnection = 0;
 
 forward OnFloodLimitExceeded(ip[16], count);
 
@@ -234,7 +235,7 @@ static Flooding_CheckIP(playerid, ip[])
 						cmd[22] = "banip ";
 					strcat(cmd, ip);
 					SendRconCommand(cmd);
-					SetTimerEx("Flooding_UnbanIP", 10000, false, "i", ip32);
+					YSI_SetTimerEx("Flooding_UnbanIP", 10000, false, "i", ip32);
 				}
 				case e_FLOOD_ACTION_OTHER:
 				{
@@ -242,6 +243,10 @@ static Flooding_CheckIP(playerid, ip[])
 						ret = CallLocalFunction("OnFloodLimitExceeded", "si", ip, Iter_Count(FloodingPlayer));
 					Iter_Clear(FloodingPlayer);
 					return ret;
+				}
+				case e_FLOOD_ACTION_NOTHING:
+				{
+					// Do nothing but shut up the compiler.
 				}
 			}
 		}

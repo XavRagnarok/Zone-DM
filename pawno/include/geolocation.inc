@@ -1,5 +1,4 @@
 /*
-
 	GeoIP Include by Whitetiger
 	-> SQLite GeoIP Include
 	
@@ -32,12 +31,7 @@
 	#define GeoIP_MainFile      "geoip.db"
 #endif
 
-#if !defined GeoIP_CityFile
-	#define GeoIP_CityFile      "geoip_city.db"
-#endif
-
 new DB:geoip_db;
-new DB:geoip_city;
 
 new stock g_iBackwardsCompat = -1;
 
@@ -53,9 +47,6 @@ new DBResult:_result;
 /*
 	native GetPlayerCountry(playerid, string[], const len = sizeof(string));
 	native GetPlayerISP(playerid, string[], const len = sizeof(string));
-	native GetPlayerCity(playerid, string[], const len = sizeof(string));
-	native GetPlayerGMT(playerid);
-	native GetPlayerProxy(playerid);
 */
 
 stock GetPlayerCountry(playerid, string[], const len = sizeof(string)) {
@@ -78,42 +69,14 @@ stock GetPlayerISP(playerid, string[], const len = sizeof(string)) {
     return true;
 }
 
-stock GetPlayerCity(playerid, string[], const len = sizeof(string)) {
-	new ip[24];
-	GetPlayerIp(playerid, ip, sizeof(ip));
-
-	GetIPCity(ip, string, len);
-
-	return true;
-}
-
-stock GetPlayerGMT(playerid) {
-	new ip[24];
-	GetPlayerIp(playerid, ip, sizeof(ip));
-
-	return GetIPGMT(ip);
-}
-
-stock GetPlayerProxy(playerid) {
-	new ip[24];
-	GetPlayerIp(playerid, ip, sizeof(ip));
-	
-	return GetIPProxy(ip);
-}
-
 /*
-
 	---------------------------------------------------------------------------------------
 	INTERNAL FUNCTIONS
 	---------------------------------------------------------------------------------------
-
 	- stock GetIPCountry(ip[], dest[], len = sizeof(dest))
 	- stock GetIPISP(ip[], dest[], len = sizeof(dest))
 	- stock GetIPCity(ip[], dest[], len = sizeof(dest))
-	- stock GetIPGMT(ip[])
-	- stock GetIPProxy(ip[])
 	- stock ip2long(ip[])
-
 */
 
 stock GetIPCountry(ip[], dest[], const len = sizeof(dest)) {
@@ -178,98 +141,8 @@ stock GetIPISP(ip[], dest[], const len = sizeof(dest)) {
 	return true;
 }
 
-stock GetIPCity(ip[], dest[], const len = sizeof(dest)) {
-	new tmp[90];
-	tmp = ip2long(ip);
-	
-	new string[500];
-	format(string, sizeof(string), "SELECT loc.*\n FROM geolocation loc,\n geoblocks blk\n WHERE blk.idx = (%s-(%s %% 65536))\n AND blk.startIpNum < %s\n AND blk.endIpNum > %s\n AND loc.locId = blk.locId LIMIT 1;", tmp, tmp, tmp, tmp);
-
-	geoip_city = db_open(GeoIP_CityFile);
-    _result = db_query(geoip_city, string);
-    if(db_num_rows(_result) >= 1)
-    {
-        db_get_field_assoc(_result,"city",dest,len);
-    }
-    db_free_result(_result);
-	db_close(geoip_city);
-	
-	if(!strlen(dest)) format(dest, len, "Unknown");
-	
-	return true;
-}
-
-stock GetIPGMT(ip[]) {
-	new tmp[90];
-	tmp = ip2long(ip);
-	
-	new dest[50];
-	
-	new string[500];
-	format(string, sizeof(string), "SELECT blk.*, loc.longitude\n FROM geolocation loc,\n geoblocks blk\n WHERE blk.idx = (%s-(%s %% 65536))\n AND blk.startIpNum < %s\n AND blk.endIpNum > %s\n AND loc.locId = blk.locId LIMIT 1;", tmp, tmp, tmp, tmp);
-
-	geoip_city = db_open(GeoIP_CityFile);
-    _result = db_query(geoip_city, string);
-    if(db_num_rows(_result) >= 1)
-    {
-        db_get_field_assoc(_result, "longitude", dest, sizeof(dest));
-    }
-    db_free_result(_result);
-	db_close(geoip_city);
-	
-	if(!strlen(dest)) format(dest, sizeof(dest), "Unknown");
-	
-	return floatround( strval( dest ) / 15 );
-}
-
-stock GetIPProxy(ip[]) {
-
-    /*if(g_iBackwardsCompat == -1) {
-	    _result = db_query(geoip_db, "SELECT name FROM sqlite_master WHERE type='table' AND name='ip_country'");
-	    if(db_num_rows(_result) >= 1)
-        {
-            g_iBackwardsCompat = 1;
-        }
-        else
-        {
-            g_iBackwardsCompat = 0;
-		}
-	}
-	
-	if(g_iBackwardsCompat == 1) {
-	    printf("Error: GetIPProxy cannot work on old GeoIP Database files, please update your database files!");
-	    printf("http://forum.sa-mp.com/showthread.php?t=296171");
-	    return false;
-	}
-	if(strlen(ip) > 0) {
-	
-		new tmp[90];
-		tmp = ip2long(ip);
-
-		new dest[50];
-
-		new string[500];
-		format(string, sizeof(string), "SELECT blk.*\n FROM geolocation loc,\n geoblocks blk\n WHERE blk.idx = (%s-(%s %% 65536))\n AND blk.startIpNum < %s\n AND blk.endIpNum > %s\n AND loc.locId = blk.locId LIMIT 1;", tmp, tmp, tmp, tmp);
-
-		geoip_city = db_open(GeoIP_CityFile);
-		_result = db_query(geoip_city, string);
-		if(db_num_rows(_result) >= 1)
-		{
-			db_get_field_assoc(_result, "is_anonymous_proxy", dest, sizeof(dest));
-		}
-		db_free_result(_result);
-		db_close(geoip_city);
-		
-		return strval(dest);
-	}*/
-	
-	#pragma unused ip
-	return false;
-}
-
 /*forward OnProxyRecieved(index, response_code, data[]);
 public OnProxyRecieved(index, response_code, data[]) {
-
 	if(IsPlayerConnected(index)) {
 	
 		new ip[MAX_PLAYER_NAME];
@@ -292,13 +165,11 @@ stock ip2long(ip[]) {
 }
 
 /*
-
 	---------------------------------------------------------------------------------------
 	SECONDARY FUNCTIONS
 	---------------------------------------------------------------------------------------
 	
 	- stock sscanf_(string[], format[], {Float,_}:...)
-
 */
 
 stock sscanf_(string[], format[], {Float,_}:...) // by Y_Less

@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -639,7 +640,7 @@ TEST__ y_groups_SetBalancedSingle()
 {
 	new
 		Group:g1 = Group_Create("Group 1"),
-		Group:result;
+		Group:result = Group:0;
 	call OnPlayerConnect(0);
 	
 	result = Group_SetBalanced(0, g1, Group:11);
@@ -652,7 +653,7 @@ TEST__ y_groups_SetBalancedSingle()
 TEST__ y_groups_SetBalancedInvalid()
 {
 	new
-		Group:result;
+		Group:result = Group:0;
 	call OnPlayerConnect(0);
 	
 	result = Group_SetBalanced(0, Group:99, Group:88);
@@ -671,9 +672,9 @@ TEST__ y_groups_SetBalancedInvalid()
 #include "..\..\YSI_Core\y_master"
 
 static
-	gPl,
-	gEl,
-	bool:gS;
+	gPl = 0,
+	gEl = 0,
+	bool:gS = false;
 
 Test_SetPlayer(el, playerid, bool:s)
 {
@@ -719,6 +720,282 @@ TEST__ 0_y_groups_Connect1()
 	ASSERT_EQ(gEl, 8);
 	ASSERT_EQ(gS, true);
 	call OnPlayerDisconnect(43, 0);
+}
+
+TEST__ y_groups_Allow()
+{
+	// Initialise.
+	new Group:g = Group_Create();
+	new Group:h = Group_Create();
+	//Group_SetTestDefault(g, UNDEF);
+	//Group_SetTestDefault(h, UNDEF);
+	Group_SetGlobalTestDefault(UNDEF);
+	Test_InitialiseFromGroups(9);
+	call OnPlayerConnect(47);
+	Group_SetPlayer(g, 47, true);
+	Group_SetPlayer(h, 47, true);
+	
+	// Tests
+	gPl = 0;
+	gEl = 0;
+	gS = false;
+	Group_SetTest(g, 9, ALLOW);
+	ASSERT_EQ(gPl, 47);
+	ASSERT_EQ(gEl, 9);
+	ASSERT_EQ(gS, true);
+	
+	gPl = 1;
+	gEl = 1;
+	gS = false;
+	Group_SetTest(h, 9, ALLOW);
+	ASSERT_EQ(gPl, 1);
+	ASSERT_EQ(gEl, 1);
+	ASSERT_EQ(gS, false);
+	
+	gPl = 2;
+	gEl = 2;
+	gS = false;
+	Group_SetTest(g, 9, UNDEF);
+	ASSERT_EQ(gPl, 2);
+	ASSERT_EQ(gEl, 2);
+	ASSERT_EQ(gS, false);
+	
+	gPl = 3;
+	gEl = 3;
+	gS = false;
+	Group_SetTest(h, 9, UNDEF);
+	ASSERT_EQ(gPl, 47);
+	ASSERT_EQ(gEl, 9);
+	ASSERT_EQ(gS, false);
+	
+	// Clean up.
+	call OnPlayerDisconnect(43, 0);
+	Group_Destroy(g);
+	Group_Destroy(h);
+}
+
+TEST__ y_groups_Deny1()
+{
+	// Initialise.
+	new Group:g = Group_Create();
+	new Group:h = Group_Create();
+	//Group_SetTestDefault(g, UNDEF);
+	//Group_SetTestDefault(h, UNDEF);
+	Group_SetGlobalTestDefault(UNDEF);
+	Test_InitialiseFromGroups(9);
+	call OnPlayerConnect(47);
+	Group_SetPlayer(g, 47, true);
+	Group_SetPlayer(h, 47, true);
+	
+	// Tests
+	gPl = 0;
+	gEl = 0;
+	gS = false;
+	Group_SetTest(g, 9, ALLOW);
+	ASSERT_EQ(gPl, 47);
+	ASSERT_EQ(gEl, 9);
+	ASSERT_EQ(gS, true);
+	
+	gPl = 1;
+	gEl = 1;
+	gS = false;
+	Group_SetTest(h, 9, DENY);
+	ASSERT_EQ(gPl, 47);
+	ASSERT_EQ(gEl, 9);
+	ASSERT_EQ(gS, false);
+	
+	gPl = 2;
+	gEl = 2;
+	gS = false;
+	Group_SetTest(h, 9, UNDEF);
+	ASSERT_EQ(gPl, 47);
+	ASSERT_EQ(gEl, 9);
+	ASSERT_EQ(gS, true);
+	
+	gPl = 3;
+	gEl = 3;
+	gS = false;
+	Group_SetTest(g, 9, UNDEF);
+	ASSERT_EQ(gPl, 47);
+	ASSERT_EQ(gEl, 9);
+	ASSERT_EQ(gS, false);
+	
+	// Clean up.
+	call OnPlayerDisconnect(43, 0);
+	Group_Destroy(g);
+	Group_Destroy(h);
+}
+
+TEST__ y_groups_Deny2()
+{
+	// Initialise.
+	new Group:g = Group_Create();
+	new Group:h = Group_Create();
+	//Group_SetTestDefault(g, UNDEF);
+	//Group_SetTestDefault(h, UNDEF);
+	Group_SetGlobalTestDefault(UNDEF);
+	Test_InitialiseFromGroups(9);
+	call OnPlayerConnect(47);
+	Group_SetPlayer(g, 47, true);
+	Group_SetPlayer(h, 47, true);
+	
+	// Tests
+	gPl = 0;
+	gEl = 0;
+	gS = false;
+	Group_SetTest(g, 9, ALLOW);
+	ASSERT_EQ(gPl, 47);
+	ASSERT_EQ(gEl, 9);
+	ASSERT_EQ(gS, true);
+	
+	gPl = 1;
+	gEl = 1;
+	gS = false;
+	Group_SetTest(h, 9, DENY);
+	ASSERT_EQ(gPl, 47);
+	ASSERT_EQ(gEl, 9);
+	ASSERT_EQ(gS, false);
+	
+	gPl = 3;
+	gEl = 3;
+	gS = false;
+	Group_SetTest(g, 9, UNDEF);
+	ASSERT_EQ(gPl, 3);
+	ASSERT_EQ(gEl, 3);
+	ASSERT_EQ(gS, false);
+	
+	gPl = 2;
+	gEl = 2;
+	gS = false;
+	Group_SetTest(h, 9, UNDEF);
+	ASSERT_EQ(gPl, 2);
+	ASSERT_EQ(gEl, 2);
+	ASSERT_EQ(gS, false);
+	
+	// Clean up.
+	call OnPlayerDisconnect(43, 0);
+	Group_Destroy(g);
+	Group_Destroy(h);
+}
+
+TEST__ y_groups_Deny3()
+{
+	// Initialise.
+	new Group:g = Group_Create();
+	new Group:h = Group_Create();
+	//Group_SetTestDefault(g, UNDEF);
+	//Group_SetTestDefault(h, UNDEF);
+	Group_SetGlobalTestDefault(UNDEF);
+	Test_InitialiseFromGroups(9);
+	call OnPlayerConnect(47);
+	Group_SetPlayer(g, 47, true);
+	Group_SetPlayer(h, 47, true);
+	
+	// Tests
+	gPl = 0;
+	gEl = 0;
+	gS = false;
+	Group_SetTest(g, 9, ALLOW);
+	ASSERT_EQ(gPl, 47);
+	ASSERT_EQ(gEl, 9);
+	ASSERT_EQ(gS, true);
+	
+	gPl = 1;
+	gEl = 1;
+	gS = false;
+	Group_SetTest(h, 9, DENY);
+	ASSERT_EQ(gPl, 47);
+	ASSERT_EQ(gEl, 9);
+	ASSERT_EQ(gS, false);
+	
+	gPl = 3;
+	gEl = 3;
+	gS = false;
+	Group_SetTest(g, 9, UNDEF);
+	ASSERT_EQ(gPl, 3);
+	ASSERT_EQ(gEl, 3);
+	ASSERT_EQ(gS, false);
+	
+	gPl = 2;
+	gEl = 2;
+	gS = false;
+	Group_SetTest(h, 9, ALLOW);
+	ASSERT_EQ(gPl, 47);
+	ASSERT_EQ(gEl, 9);
+	ASSERT_EQ(gS, true);
+	
+	gPl = 4;
+	gEl = 4;
+	gS = false;
+	Group_SetTest(h, 9, UNDEF);
+	ASSERT_EQ(gPl, 47);
+	ASSERT_EQ(gEl, 9);
+	ASSERT_EQ(gS, false);
+	
+	// Clean up.
+	call OnPlayerDisconnect(43, 0);
+	Group_Destroy(g);
+	Group_Destroy(h);
+}
+
+TEST__ y_groups_DenyGlobal()
+{
+	// Initialise.
+	new Group:g = Group_Create();
+	new Group:h = Group_Create();
+	//Group_SetTestDefault(g, UNDEF);
+	//Group_SetTestDefault(h, UNDEF);
+	Group_SetGlobalTestDefault(DENY);
+	Test_InitialiseFromGroups(9);
+	call OnPlayerConnect(47);
+	Group_SetPlayer(g, 47, true);
+	Group_SetPlayer(h, 47, true);
+	
+	// Tests
+	gPl = 0;
+	gEl = 0;
+	gS = false;
+	Group_SetTest(g, 9, ALLOW);
+	ASSERT_EQ(gPl, 0);
+	ASSERT_EQ(gEl, 0);
+	ASSERT_EQ(gS, false);
+	
+	gPl = 1;
+	gEl = 1;
+	gS = false;
+	Group_SetTest(h, 9, ALLOW);
+	ASSERT_EQ(gPl, 1);
+	ASSERT_EQ(gEl, 1);
+	ASSERT_EQ(gS, false);
+	
+	gPl = 2;
+	gEl = 2;
+	gS = false;
+	Group_SetGlobalTest(9, UNDEF);
+	ASSERT_EQ(gPl, 47);
+	ASSERT_EQ(gEl, 9);
+	ASSERT_EQ(gS, true);
+	
+	gPl = 3;
+	gEl = 3;
+	gS = false;
+	Group_SetTest(g, 9, UNDEF);
+	ASSERT_EQ(gPl, 3);
+	ASSERT_EQ(gEl, 3);
+	ASSERT_EQ(gS, false);
+	
+	gPl = 4;
+	gEl = 4;
+	gS = false;
+	Group_SetTest(h, 9, UNDEF);
+	ASSERT_EQ(gPl, 47);
+	ASSERT_EQ(gEl, 9);
+	ASSERT_EQ(gS, false);
+	
+	// Clean up.
+	call OnPlayerDisconnect(43, 0);
+	Group_Destroy(g);
+	Group_Destroy(h);
 }
 
 TEST__ y_groups_Chains()

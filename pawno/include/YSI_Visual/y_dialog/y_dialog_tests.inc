@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -72,4 +73,25 @@ Optional plugins:
 
 // Using "y_testing" in here isn't actually possible, because it needs dialogs
 // to ask players for feedback...
+
+TEST__ y_dialog_Compile()
+{
+	if (FALSE)
+	{
+		Dialog_Get(0);
+		inline const A(arg0, arg1, string:arg2[])
+		{
+			#pragma unused arg0, arg1, arg2
+		}
+		inline const B(arg0, arg1, arg2, arg3, string:arg4[])
+		{
+			#pragma unused arg0, arg1, arg2, arg3, arg4
+		}
+		Dialog_ShowCallback(0, using inline A, 0, "", "", "");
+		Dialog_ShowCallback(0, using inline B, 0, "", "", "");
+		Dialog_Show(0, 0, "", "", "");
+		Dialog_Hide(0);
+		Dialog_ShowPlayerDialog(0, 0, 0, "", "", "", "");
+	}
+}
 

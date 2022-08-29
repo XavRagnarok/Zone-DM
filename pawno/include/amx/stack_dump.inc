@@ -23,11 +23,26 @@
 #endif
 #define STACK_DUMP_INC
 
-#tryinclude <console>
+/**
+ * <library name="amx_assembly stack_dump" summary="AMX Assembly Library: Stack dumps.">
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
+ * </library>
+ */
 
-/////////////////////////////////////////////////
+/// <p/>
+
+#if !defined _samp_included
+	#tryinclude <console>
+#endif
+
+//-----------------------------------------------
 //                  Stack layout
-/////////////////////////////////////////////////
+//-----------------------------------------------
 //          what       |   stack pointer (STK)
 //-----------------------------------------------
 //       <STACK TOP>   |        STP
@@ -56,9 +71,10 @@
 
 #include "amx_memory"
 
+/// <library>amx_assembly stack_dump</library>
 stock DumpStack()
 {
-	new stp, stk;
+	new stp = 0, stk = 0;
 
 	#emit lctrl 3
 	#emit stor.s.pri stp

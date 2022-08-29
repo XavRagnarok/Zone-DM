@@ -14,7 +14,7 @@
 	The Original Code is the code-parse.inc code analyser.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright (C) 2016
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 */
 
@@ -23,10 +23,28 @@
 #endif
 #define _INC_code_parse_inc
 
-// This include provides a handy set of macros for advanced compile-time code
-// analysis and generation.  With this, one can do things like analyse the
-// parameter types for a function, auto-generate call specifiers, and otherwise
-// create code-dependent macros.
+/**
+ * <library
+ *   name="code-parse"
+ *   summary="Compile-time code analysis and generation"
+ *   license="Copyright (c) 2022 Alex &quot;Y_Less&quot; Cole.  Licensed under MPL 1.1"
+ * >
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
+ *   <remarks>
+ *     This include provides a handy set of macros for advanced compile-time
+ *     code analysis and generation.  With this, one can do things like analyse
+ *     the parameter types for a function, auto-generate call specifiers, and
+ *     otherwise create code-dependent macros.
+ *   </remarks>
+ * </library>
+ */
+
+/// <p/>
 
 // Remove this tag from any final output after all other parsing is done.
 #define string:
@@ -34,7 +52,17 @@
 
 // A very generic entry point.  This can be used by any other system to put
 // arbitrary macros at the top level of the file without compiler errors.
-#define u@$ 0]);
+#if defined __CodeParse_UndefU
+	// Defined earlier by an old version of YSI.
+	#undef u@
+	forward __CodeParse_UndefU();
+#elseif defined u@ && !defined __script_init_u@_1 && !defined __foreach_u@_1 && !defined __CodeParse_FirstPass
+	// Defined earlier by an old version of YSI.
+	#undef u@
+	forward __CodeParse_UndefU();
+#endif
+#define __code_parse_u@_1
+#define u@$ 1]);
 #define PARSER@FUNC:%0$ u@(u[_:%0 u@$
 
 // This is the "global" entry point.  It takes a list of parser types, followed
@@ -131,14 +159,14 @@
 #define p@:A@[%8]%9.%0(%5)%3(%1|||%7) %8%5_NUM(,,%1)%0(%5)%3(|||%7)
 
 // Detect none.
-#define z@:%0[%9]%0(%5)%3(|||,%7) %9%5_NUL(%3)n@DROP[%5]%7
+#define z@:%0[%9]%0(%5)%3(|||,%7)%4$ %9%5_NUL(%3)n@DROP[%5]%7%4$
 
 // Detect out of parameters.
-#define n@[%9]%0(%5)%3(%6|||%7) %9%5_END(%3)n@DROP[%5]%7
+#define n@[%9]%0(%5)%3(%6|||%7)%4$ %9%5_END(%3)n@DROP[%5]%7%4$
 #define n@DROP[%5]
 
 // Not none, thus many parameters.  Used to recurse through multiple parameters.
-#define m@:n@[%9]%0(%5)%3(%6|||%7,%8) %0.m@:n@[%9]%0(%5)%3(%7|||%8)
+#define m@:n@[%9]%0(%5)%3(%6|||%7,%8)%4$ %0.m@:n@[%9]%0(%5)%3(%7|||%8)%4$
 
 // Detect possible return types.
 #define g@:%9~~%5(%9void:%3) %5_VOD(%3)
@@ -175,7 +203,7 @@
 #define timere@[%5]        %5_timer()
 #define ptaske@[%5]        %5_ptask()
 #define taske@[%5]         %5_task()
-#define remoterunce@[%5]   %5_remoterunc()
+#define remotefunce@[%5]   %5_remotefunc()
 #define hooke@[%5]         %5_hook()
 #define inlinee@[%5]       %5_inline()
 #define group_hooke@[%5]   %5_group_hook()
@@ -683,4 +711,6 @@
 #define PARSE@ARRAY_MULTI_TAGGROUP_CONST PARSE@ARR_CST_GRP_MUL
 #define PARSE@MULTI_ARRAY_TAGGROUP_CONST PARSE@ARR_CST_GRP_MUL
 #define PARSE@MULTI_TAGGROUP_ARRAY_CONST PARSE@ARR_CST_GRP_MUL
+
+forward __CodeParse_FirstPass();
 

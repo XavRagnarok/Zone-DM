@@ -23,6 +23,20 @@
 #endif
 #define AMX_JIT_INC
 
+/**
+ * <library name="amx_assembly amx_jit" summary="AMX Assembly Library: JIT plugin address relocations.">
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
+ * </library>
+ */
+
+/// <p/>
+
+/// <library>amx_assembly amx_jit</library>
 stock GetJITGeneratorVersion() {
 	#emit zero.pri
 	#emit lctrl 7
@@ -30,6 +44,7 @@ stock GetJITGeneratorVersion() {
 	return 0;
 }
 
+/// <library>amx_assembly amx_jit</library>
 stock GetAmxJITBaseAddress() {
 	// Only works when the jit is installed, otherwise returns 0.  The code is
 	// so short, checking if it had been done before would have been longer than
@@ -40,6 +55,7 @@ stock GetAmxJITBaseAddress() {
 	return 0;
 }
 
+/// <library>amx_assembly amx_jit</library>
 stock ResolveJITAddress(addr) {
 	// Converts an address to a JIT address, if there is a JIT.  Otherwise does
 	// nothing.  Could make it try detect if this is already JIT resolved, i.e.

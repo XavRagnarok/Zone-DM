@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -70,7 +71,7 @@ Optional plugins:
 	Me - sscanf2, fixes2, Whirlpool.
 */
 
-#define HOOK_STOCK__%0(%1) FUNC_PARSER(YHNPS,ARR_MUL_CST:STR_CST_DEF:NUM_CST_DEF:REF_DEF:EXT_TAG:)(%0(%1))()()(1,0)
+#define HOOK_STOCK__%0(%1) FUNC_PARSER(YHNPS,ARR_MUL_CST:STR_CST_DEF:NUM_CST_DEF:REF_DEF:EXT_TAG:RET_TAG:)(%0(%1))()()(1,0)
 #define HOOK_NATIVE__ HOOK_STOCK__
 #define HOOK_native__ HOOK_STOCK__
 #define HOOK_stock__ HOOK_STOCK__
@@ -154,7 +155,9 @@ Optional plugins:
 // %4  = Existing values
 // %7  = Prefix0
 // %1  = Prefix1
+#define YHNPS_END_TAG(%7,%0)%8$(,%5)(,%6)(%9,%4) %8$forward %7YHNPS_U0<%0>(%5);%7YHNPS_U1<%0>(%5);%7YHNPS_U1<%0>(%5)_yH@(%4),%0(%6),_@yH();%7YHNPS_U0<%0>(%5)
 #define YHNPS_END(%0)%8$(,%5)(,%6)(%9,%4) %8$forward YHNPS_U0<%0>(%5);YHNPS_U1<%0>(%5);YHNPS_U1<%0>(%5)_yH@(%4),%0(%6),_@yH();YHNPS_U0<%0>(%5)
+#define YHNPS_NUL_TAG(%7,%0)%8$()() YHNPS_END_TAG(%7,%0)%8$(,)(,)
 #define YHNPS_NUL(%0)%8$()() YHNPS_END(%0)%8$(,)(,)
 
 // Helper macro to generate the unique function name without bloating the
@@ -165,7 +168,7 @@ Optional plugins:
 // Doing `hook native` instead of `HOOK_NATIVE__` attaches the `forward` and
 // unique value earlier.  This just does all the same code, but with a reduced
 // ending name generation.
-#define HOOK_REDO__%0(%1) FUNC_PARSER(YHNPS2,ARR_MUL_CST:STR_CST_DEF:NUM_CST_DEF:REF_DEF:EXT_TAG:)(%0(%1))()()(1,0)
+#define HOOK_REDO__%0(%1) FUNC_PARSER(YHNPS2,ARR_MUL_CST:STR_CST_DEF:NUM_CST_DEF:REF_DEF:EXT_TAG:RET_TAG:)(%0(%1))()()(1,0)
 #define YHNPS2_ARR YHNPS_ARR
 #define YHNPS2_ARR_ARR YHNPS_ARR_ARR
 #define YHNPS2_ARR_ARR_ARR YHNPS_ARR_ARR_ARR
@@ -178,26 +181,28 @@ Optional plugins:
 #define YHNPS2_NUM_DEF YHNPS_NUM_DEF
 #define YHNPS2_BYREF YHNPS_BYREF
 #define YHNPS2_BYVAL YHNPS_BYVAL
+#define YHNPS2_END_TAG(%7,%0)%8$(,%5)(,%6)(%9,%4) %8$%7@Hy_%0(%5);%7@_Hy%0(%5);%7@_Hy%0(%5)_yH@(%4),%0(%6),_@yH();%7@Hy_%0(%5)
 #define YHNPS2_END(%0)%8$(,%5)(,%6)(%9,%4) %8$@Hy_%0(%5);@_Hy%0(%5);@_Hy%0(%5)_yH@(%4),%0(%6),_@yH();@Hy_%0(%5)
+#define YHNPS2_NUL_TAG(%7,%0)%8$()() YHNPS2_END_TAG(%7,%0)%8$(,)(,)
 #define YHNPS2_NUL(%0)%8$()() YHNPS2_END(%0)%8$(,)(,)
 
 // Remove specified priorities from the original call.
 #define _yH@(%0),%1@%2(%3),_@yH(); _yH@(%0),%1(%3),_@yH();
 
 new
-	YSI_g_sNPSBaseCall,
-	YSI_g_sNPSTrampoline,
-	YSI_g_sNPSReplace,
-	YSI_g_sNPSStack;
+	YSI_g_sNPSBaseCall = 0,
+	YSI_g_sNPSTrampoline = 0,
+	YSI_g_sNPSReplace = 0,
+	YSI_g_sNPSStack = 0;
 
 static
-	YSI_g_sTempRet;
+	YSI_g_sTempRet = 0;
 
 static stock YHNPS_Find(heap, end, value)
 {
 	new
 		start = 0,
-		mid;
+		mid = 0;
 	--end;
 	while (start <= end)
 	{
@@ -224,7 +229,7 @@ static stock YHNPS_Insert(heap, count, value, ptr)
 {
 	new
 		start = 0,
-		mid,
+		mid = 0,
 		end = count - 1;
 	while (start <= end)
 	{
@@ -253,7 +258,7 @@ static stock YHNPS_Insert(heap, count, value, ptr)
 	else
 	{
 		// Shift all the greater values up.
-		rawMemcpy(heap + mid * 8 + 8, heap + mid * 8, (count - mid) * 8);
+		RawMemCpy(heap + mid * 8 + 8, heap + mid * 8, (count - mid) * 8);
 		AMX_Write(heap + mid * 8, value);
 		AMX_Write(heap + mid * 8 + 4, ptr);
 	}
@@ -273,11 +278,11 @@ static stock YHNPS_Push(heap, &allocated, &nativeCount, &stockCount, base, find,
 		// Move the arrays up in memory.
 		if (nativeCount)
 		{
-			rawMemcpy(heap + allocated * 16 + 32 * 16, heap + allocated * 16, nativeCount * 8);
+			RawMemCpy(heap + allocated * 16 + 32 * 16, heap + allocated * 16, nativeCount * 8);
 		}
 		if (stockCount)
 		{
-			rawMemcpy(heap + allocated * 8 + 32 * 8, heap + allocated * 8, stockCount * 8);
+			RawMemCpy(heap + allocated * 8 + 32 * 8, heap + allocated * 8, stockCount * 8);
 		}
 		allocated += 32;
 	}
@@ -318,9 +323,9 @@ public OnCodeInit()
 		allocated = 0,
 		nativeCount = 0,
 		stockCount = 0,
-		idx1,
-		idx2,
-		base;
+		idx1 = 0,
+		idx2 = 0,
+		base = 0;
 	{
 		new hdr[AMX_HDR];
 		GetAmxHeader(hdr);
@@ -357,62 +362,135 @@ public OnCodeInit()
 		Opcode:call = RelocateOpcode(OP_CALL),
 		Opcode:nop = RelocateOpcode(OP_NOP),
 		Opcode:proc = RelocateOpcode(OP_PROC),
-		dctx[DisasmContext];
-	DisasmInit(dctx);
-	for ( ; ; )
+		Opcode:o,
+		reloc = (AMX_HEADER_COD - AMX_BASE_ADDRESS) + AMX_REAL_ADDRESS;
+	if (IsOpcodeRelocationRequired())
 	{
-		switch (DisasmNextInsn(dctx))
+		for (new addr = AMX_HEADER_COD; addr < 0;)
 		{
-		case OP_NONE:
-		{
-			break;
-		}
-		case OP_SYSREQ_C:
-		{
-			// Check that the previous OP is `PUSH.C`.  That reqpresents a real native call, not our
-			// wrapper.
-			if (Opcode:AMX_Read(DisasmGetCurIp(dctx) - 8) == proc)
+			switch ((o = UnrelocateOpcode(Opcode:ReadAmxMemory(addr))))
 			{
-				continue;
+				case OP_SYSREQ_C:
+				{
+					// Check that the previous OP is `PUSH.C`.  That represents a real native call,
+					// not our wrapper.
+					if (Opcode:AMX_Read(addr - 8) == proc)
+					{
+						addr += 8;
+						continue;
+					}
+					idx1 = YHNPS_Find(heap, nativeCount, ReadAmxMemory(addr + 4));
+				}
+				case OP_SYSREQ_D:
+				{
+					if (Opcode:AMX_Read(addr - 8) == proc)
+					{
+						addr += 8;
+						continue;
+					}
+					idx1 = YHNPS_Find(heap + allocated * 16, nativeCount, ReadAmxMemory(addr + 4));
+				}
+				case OP_CALL:
+				{
+					idx1 = YHNPS_Find(heap + allocated * 8, stockCount, ReadAmxMemory(addr + 4) - reloc);
+					if (idx1 != cellmin)
+					{
+						// Write a different target address.
+						AMX_Write(addr + 4, idx1);
+					}
+					addr += 8;
+					continue;
+				}
+				default:
+				{
+					addr += (0 <= _:o < sizeof (gAMXOpcodeBaseSizes)) ? (gAMXOpcodeBaseSizes[_:o]) : (4);
+					continue;
+				}
 			}
-			idx1 = YHNPS_Find(heap, nativeCount, DisasmGetOperand(dctx));
-		}
-		case OP_SYSREQ_D:
-		{
-			if (Opcode:AMX_Read(DisasmGetCurIp(dctx) - 8) == proc)
+			// `SYSREQ.C` is always followed by `STACK`, except with `#emit` usage.
+			// We need to change the pair in to a single `CALL`.  Don't forget
+			// `SYSREQ.D`.
+			if (idx1 == cellmin)
 			{
-				continue;
+				addr += 8;
 			}
-			idx1 = YHNPS_Find(heap + allocated * 16, nativeCount, DisasmGetOperand(dctx));
-		}
-		case OP_CALL:
-		{
-			idx1 = YHNPS_Find(heap + allocated * 8, stockCount, DisasmGetOperandReloc(dctx));
-			if (idx1 != cellmin)
+			else
 			{
 				// Write a different target address.
-				AMX_Write(DisasmGetCurIp(dctx) + 4, idx1);
+				AMX_Write(addr, _:call),
+				AMX_Write(addr + 4, idx1),
+				addr += 8;
+				if (UnrelocateOpcode(Opcode:ReadAmxMemory(addr)) == OP_STACK)
+				{
+					AMX_Write(addr, _:nop),
+					AMX_Write(addr + 4, _:nop),
+					addr += 8;
+				}
 			}
-			continue;
 		}
-		default:
+	}
+	else
+	{
+		for (new addr = AMX_HEADER_COD; addr < 0;)
 		{
-			continue;
-		}
-		}
-		// `SYSREQ.C` is always followed by `STACK`, except with `#emit` usage.
-		// We need to change the pair in to a single `CALL`.  Don't forget
-		// `SYSREQ.D`.
-		if (idx1 != cellmin)
-		{
-			// Write a different target address.
-			base = DisasmGetCurIp(dctx);
-			AMX_Write(base, _:call);
-			AMX_Write(base + 4, idx1);
-			if (DisasmNextInsn(dctx) == OP_STACK)
+			switch ((o = Opcode:ReadAmxMemory(addr)))
 			{
-				AMX_Write(base + 8, _:nop);
-				AMX_Write(base + 12, _:nop);
+				case OP_SYSREQ_C:
+				{
+					// Check that the previous OP is `PUSH.C`.  That represents a real native call,
+					// not our wrapper.
+					if (Opcode:AMX_Read(addr - 8) == proc)
+					{
+						addr += 8;
+						continue;
+					}
+					idx1 = YHNPS_Find(heap, nativeCount, ReadAmxMemory(addr + 4));
+				}
+				case OP_SYSREQ_D:
+				{
+					if (Opcode:AMX_Read(addr - 8) == proc)
+					{
+						addr += 8;
+						continue;
+					}
+					idx1 = YHNPS_Find(heap + allocated * 16, nativeCount, ReadAmxMemory(addr + 4));
+				}
+				case OP_CALL:
+				{
+					idx1 = YHNPS_Find(heap + allocated * 8, stockCount, ReadAmxMemory(addr + 4) - reloc);
+					if (idx1 != cellmin)
+					{
+						// Write a different target address.
+						AMX_Write(addr + 4, idx1);
+					}
+					addr += 8;
+					continue;
+				}
+				default:
+				{
+					addr += (0 <= _:o < sizeof (gAMXOpcodeBaseSizes)) ? (gAMXOpcodeBaseSizes[_:o]) : (4);
+					continue;
+				}
+			}
+			// `SYSREQ.C` is always followed by `STACK`, except with `#emit` usage.
+			// We need to change the pair in to a single `CALL`.  Don't forget
+			// `SYSREQ.D`.
+			if (idx1 == cellmin)
+			{
+				addr += 8;
+			}
+			else
+			{
+				// Write a different target address.
+				AMX_Write(addr, _:call),
+				AMX_Write(addr + 4, idx1),
+				addr += 8;
+				if (Opcode:ReadAmxMemory(addr) == OP_STACK)
+				{
+					AMX_Write(addr, _:nop),
+					AMX_Write(addr + 4, _:nop),
+					addr += 8;
+				}
 			}
 		}
 	}
@@ -473,7 +551,7 @@ stock _yH@(compressedFormat)
 	new
 		dctx[DisasmContext],
 		ctx[AsmContext],
-		addr,
+		addr = 0,
 		type = 0;
 	DisasmInit(dctx, GetCurrentFrameReturn());
 	while (DisasmNext(dctx))
@@ -534,13 +612,13 @@ stock _yH@(compressedFormat)
 
 	@emit PUSH.C       8                                                        // 7
 	@emit PUSH.pri     // Save the return address again.                        // 8
-	@emit PUSH         ref(YSI_g_sNPSStack)                                     // 10
+	@emit PUSH         AMX_Ref(YSI_g_sNPSStack)                                 // 10
 
 	// Copy 20 bytes over (includes the return address and fake param count).
 	@emit HEAP         20                                                       // 12
 	@emit LCTRL        4                                                        // 14
 	@emit MOVS         20                                                       // 16
-	@emit STOR.alt     ref(YSI_g_sNPSStack)                                     // 18
+	@emit STOR.alt     AMX_Ref(YSI_g_sNPSStack)                                 // 18
 
 	// Call, and return to here to clean up the heap.
 	@emit STACK        20                                                       // 20
@@ -552,13 +630,13 @@ stock _yH@(compressedFormat)
 	@emit PUSH.pri                                                              // 27
 
 	// Copy from the heap.
-	@emit LOAD.pri     ref(YSI_g_sNPSStack)                                     // 29
+	@emit LOAD.pri     AMX_Ref(YSI_g_sNPSStack)                                 // 29
 	@emit MOVS         20                                                       // 31
 
 	// Restore the return address and `continue` stack.
 	@emit POP.pri                                                               // 32
 	@emit POP.alt                                                               // 33
-	@emit STOR.alt     ref(YSI_g_sNPSStack)                                     // 35
+	@emit STOR.alt     AMX_Ref(YSI_g_sNPSStack)                                 // 35
 	@emit HEAP         -20                                                      // 37
 
 	// Return from this "function", with our fake parameters and return address.
@@ -575,7 +653,7 @@ stock _yH@(compressedFormat)
 
 		// Returns to here.
 		@emit PUSH.alt
-		@emit PUSH         ref(YSI_g_sTempRet)
+		@emit PUSH         AMX_Ref(YSI_g_sTempRet)
 		@emit RETN
 	}
 
@@ -609,11 +687,13 @@ static stock Hooks_GenerateContinue(GLOBAL_TAG_TYPES:...)
 	@emit ADDR.pri     8
 	@emit PUSH.pri
 
-	@emit LOAD.pri     ref(YSI_g_sNPSStack)
+	// Load the bitmap of parameter types.
+	@emit LOAD.pri     AMX_Ref(YSI_g_sNPSStack)
 	@emit ADD.C        16
 	@emit LOAD.I
 	@emit MOVE.alt
 
+	// Loop over it and dereference regular numbers.
 	@emit Hooks_Continue_loop:
 
 	@emit POP.pri
@@ -637,7 +717,7 @@ static stock Hooks_GenerateContinue(GLOBAL_TAG_TYPES:...)
 
 	@emit POP.pri
 
-	@emit LOAD.pri     ref(YSI_g_sNPSStack)
+	@emit LOAD.pri     AMX_Ref(YSI_g_sNPSStack)
 	@emit ADD.C        12
 	@emit LOAD.I
 
@@ -648,20 +728,19 @@ static stock Hooks_GenerateContinue(GLOBAL_TAG_TYPES:...)
 	@emit POP.pri
 	@emit SCTRL        5
 
-	// Jump to the function.
+	// Jump to the function that calls the original native.
 	@emit MOVE.pri
-	@emit LCTRL        8
 	@emit SCTRL        6
 
 	@emit Hooks_Continue_native:
 
 	// Save the bottom of the stack.
 	@emit POP.alt
-	@emit STOR.alt     ref(YSI_g_sTempRet)
+	@emit STOR.alt     AMX_Ref(YSI_g_sTempRet)
 	@emit POP.alt
 
+	// Jump to the next function in the chain.
 	@emit NEG
-	@emit LCTRL        8
 	@emit SCTRL        6
 
 	//// Missed this one apparently...
@@ -670,7 +749,7 @@ static stock Hooks_GenerateContinue(GLOBAL_TAG_TYPES:...)
     //
 	//// Returns to here.
 	//@emit PUSH.alt
-	//@emit PUSH         ref(YSI_g_sTempRet)
+	//@emit PUSH         AMX_Ref(YSI_g_sTempRet)
 	//@emit RETN
 
 	AsmEmitPadding(ctx);

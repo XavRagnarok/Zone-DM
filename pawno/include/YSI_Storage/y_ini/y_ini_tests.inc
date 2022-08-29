@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -75,147 +76,199 @@ Optional plugins:
 	#pragma warning disable 239
 #endif
 
+static stock MakeYINITestPath(const file[])
+{
+	new ret[48];
+	return
+		strcat(ret, GetYSIScriptfilesDir(E_YSI_DIR_TESTS)),
+		strcat(ret, "y_ini/"),
+		strcat(ret, file),
+		ret;
+}
+
+static e_INI_LINE_TYPE:INI_IDENTIFY_LINE_TYPE(str[MAX_INI_LINE], &p0s, &p0e, &p1s, &p1e, &p2s, &p2e)
+{
+	YSI_g_sExtendedName[0] = '\0';
+	if (YSI_g_sExtendedLine)
+	{
+		free(YSI_g_sExtendedLine);
+		YSI_g_sExtendedLine = NO_ALLOC;
+	}
+	return INI_IdentifyLineType(str, p0s, p0e, p1s, p1e, p2s, p2e);
+}
+
 TEST__ INI_IdentifyLineType1()
 {
 	// Comment lines and blank lines may as well be treated as the same thing,
 	// except when rewriting the file.
-	new p0s, p0e, p1s, p1e, p2s, p2e;
+	new p0s = 0, p0e = 0, p1s = 0, p1e = 0, p2s = 0, p2e = 0;
 	// Comment lines.
-	ASSERT_EQ(INI_IdentifyLineType("; Hello", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
-	ASSERT_EQ(INI_IdentifyLineType("   ; There", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
-	ASSERT_EQ(INI_IdentifyLineType("	; Hi", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
-	ASSERT_EQ(INI_IdentifyLineType(";", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
-	ASSERT_EQ(INI_IdentifyLineType(";\r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
-	ASSERT_NE(INI_IdentifyLineType("\\;\r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
-	ASSERT_NE(INI_IdentifyLineType("hi ; there", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("; Hello", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("   ; There", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("	; Hi", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE(";", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE(";\r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
+	ASSERT_NE(INI_IDENTIFY_LINE_TYPE("\\;\r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
+	ASSERT_NE(INI_IDENTIFY_LINE_TYPE("hi ; there", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
 	// Blank lines.
-	ASSERT_EQ(INI_IdentifyLineType("", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
-	ASSERT_EQ(INI_IdentifyLineType("    ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
-	ASSERT_EQ(INI_IdentifyLineType("	\r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
-	ASSERT_EQ(INI_IdentifyLineType("\r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("    ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("	\r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("\r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_DATALESS);
 }
 
 TEST__ INI_IdentifyLineType2()
 {
-	new p0s, p0e, p1s, p1e, p2s, p2e;
+	new p0s = 0, p0e = 0, p1s = 0, p1e = 0, p2s = 0, p2e = 0;
 	// Invalid lines.
 	new
 		e_INI_LINE_TYPE:result;
-	result = INI_IdentifyLineType("[badtag", p0s, p0e, p1s, p1e, p2s, p2e);
+	result = INI_IDENTIFY_LINE_TYPE("[badtag", p0s, p0e, p1s, p1e, p2s, p2e);
 	ASSERT_EQ(result, e_INI_LINE_TYPE_INVALID);
-	result = INI_IdentifyLineType("   [tag", p0s, p0e, p1s, p1e, p2s, p2e);
+	result = INI_IDENTIFY_LINE_TYPE("   [tag", p0s, p0e, p1s, p1e, p2s, p2e);
 	ASSERT_EQ(result, e_INI_LINE_TYPE_INVALID);
-	result = INI_IdentifyLineType("   [   ]", p0s, p0e, p1s, p1e, p2s, p2e);
+	result = INI_IDENTIFY_LINE_TYPE("   [   ]", p0s, p0e, p1s, p1e, p2s, p2e);
 	ASSERT_EQ(result, e_INI_LINE_TYPE_INVALID);
-	result = INI_IdentifyLineType("[tag;end]", p0s, p0e, p1s, p1e, p2s, p2e);
+	result = INI_IDENTIFY_LINE_TYPE("[tag;end]", p0s, p0e, p1s, p1e, p2s, p2e);
 	ASSERT_EQ(result, e_INI_LINE_TYPE_INVALID);
-	result = INI_IdentifyLineType("[tag\\;end]", p0s, p0e, p1s, p1e, p2s, p2e);
+	result = INI_IDENTIFY_LINE_TYPE("[tag\\;end]", p0s, p0e, p1s, p1e, p2s, p2e);
 	ASSERT_NE(result, e_INI_LINE_TYPE_INVALID);
-	result = INI_IdentifyLineType(" [tag\\]", p0s, p0e, p1s, p1e, p2s, p2e);
+	result = INI_IDENTIFY_LINE_TYPE(" [tag\\]", p0s, p0e, p1s, p1e, p2s, p2e);
 	ASSERT_EQ(result, e_INI_LINE_TYPE_INVALID);
-	result = INI_IdentifyLineType(" [tag\\\\]", p0s, p0e, p1s, p1e, p2s, p2e);
+	result = INI_IDENTIFY_LINE_TYPE(" [tag\\\\]", p0s, p0e, p1s, p1e, p2s, p2e);
 	ASSERT_NE(result, e_INI_LINE_TYPE_INVALID);
-	result = INI_IdentifyLineType("key", p0s, p0e, p1s, p1e, p2s, p2e);
+	result = INI_IDENTIFY_LINE_TYPE("key", p0s, p0e, p1s, p1e, p2s, p2e);
 	ASSERT_EQ(result, e_INI_LINE_TYPE_INVALID);
-	result = INI_IdentifyLineType("key\\=", p0s, p0e, p1s, p1e, p2s, p2e);
+	result = INI_IDENTIFY_LINE_TYPE("key\\=", p0s, p0e, p1s, p1e, p2s, p2e);
 	ASSERT_EQ(result, e_INI_LINE_TYPE_INVALID);
-	result = INI_IdentifyLineType("key\\\\\\=value", p0s, p0e, p1s, p1e, p2s, p2e);
+	result = INI_IDENTIFY_LINE_TYPE("key\\\\\\=value", p0s, p0e, p1s, p1e, p2s, p2e);
 	ASSERT_EQ(result, e_INI_LINE_TYPE_INVALID);
-	result = INI_IdentifyLineType("\\;\r\n", p0s, p0e, p1s, p1e, p2s, p2e);
+	result = INI_IDENTIFY_LINE_TYPE("\\;\r\n", p0s, p0e, p1s, p1e, p2s, p2e);
 	ASSERT_EQ(result, e_INI_LINE_TYPE_INVALID);
-	result = INI_IdentifyLineType("key =  ", p0s, p0e, p1s, p1e, p2s, p2e);
-	ASSERT_EQ(result, e_INI_LINE_TYPE_ENTRY); // Now allowed again!
-	result = INI_IdentifyLineType(" = value", p0s, p0e, p1s, p1e, p2s, p2e);
+	result = INI_IDENTIFY_LINE_TYPE("key =  ", p0s, p0e, p1s, p1e, p2s, p2e);
+	ASSERT_EQ(result, e_INI_LINE_TYPE_CONT); // Now allowed again!
+	result = INI_IDENTIFY_LINE_TYPE(" = value", p0s, p0e, p1s, p1e, p2s, p2e);
 	ASSERT_EQ(result, e_INI_LINE_TYPE_INVALID);
-	result = INI_IdentifyLineType("thing", p0s, p0e, p1s, p1e, p2s, p2e);
+	result = INI_IDENTIFY_LINE_TYPE("thing", p0s, p0e, p1s, p1e, p2s, p2e);
 	ASSERT_EQ(result, e_INI_LINE_TYPE_INVALID);
-	result = INI_IdentifyLineType("thing ; comment", p0s, p0e, p1s, p1e, p2s, p2e);
+	result = INI_IDENTIFY_LINE_TYPE("thing ; comment", p0s, p0e, p1s, p1e, p2s, p2e);
 	ASSERT_EQ(result, e_INI_LINE_TYPE_INVALID);
 }
 
 TEST__ INI_IdentifyLineType3()
 {
-	new p0s, p0e, p1s, p1e, p2s, p2e;
+	new p0s = 0, p0e = 0, p1s = 0, p1e = 0, p2s = 0, p2e = 0;
 	// Entry lines.
-	ASSERT_EQ(INI_IdentifyLineType("key = value", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("key = value", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_CONT);
 	ASSERT(p0s == 0 && p0e == 3 && p1s == 6 && p1e == 11 && p2s == p2e);
-	ASSERT_EQ(INI_IdentifyLineType("key=value", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("key=value", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_CONT);
 	ASSERT(p0s == 0 && p0e == 3 && p1s == 4 && p1e == 9 && p2s == p2e);
-	ASSERT_EQ(INI_IdentifyLineType("key = value ; comment", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("key = value ; comment", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
 	ASSERT(p0s == 0 && p0e == 3 && p1s == 6 && p1e == 11 && p2s == 14 && p2e == 21);
-	ASSERT_EQ(INI_IdentifyLineType("key = value ;   comment\r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("key = value ;   comment\r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
 	ASSERT(p0s == 0 && p0e == 3 && p1s == 6 && p1e == 11 && p2s == 16 && p2e == 23);
-	ASSERT_EQ(INI_IdentifyLineType("key =  value   ; com ment  \r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("key =  value   ; com ment  \r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
 	ASSERT(p0s == 0 && p0e == 3 && p1s == 7 && p1e == 12 && p2s == 17 && p2e == 25);
-	ASSERT_EQ(INI_IdentifyLineType("key = value\r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("key = value\r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
 	ASSERT(p0s == 0 && p0e == 3 && p1s == 6 && p1e == 11 && p2s == p2e);
-	ASSERT_EQ(INI_IdentifyLineType("key	=value", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("key	=value", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_CONT);
 	ASSERT(p0s == 0 && p0e == 3 && p1s == 5 && p1e == 10 && p2s == p2e);
-	ASSERT_EQ(INI_IdentifyLineType("   key=	value", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("   key=	value", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_CONT);
 	ASSERT(p0s == 3 && p0e == 6 && p1s == 8 && p1e == 13 && p2s == p2e);
-	ASSERT_EQ(INI_IdentifyLineType("   key=	value    ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("   key=	value    ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_CONT);
 	ASSERT(p0s == 3 && p0e == 6 && p1s == 8 && p1e == 13 && p2s == p2e);
-	ASSERT_EQ(INI_IdentifyLineType("	key   =value  ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("	key   =value  ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_CONT);
 	ASSERT(p0s == 1 && p0e == 4 && p1s == 8 && p1e == 13 && p2s == p2e);
+}
+
+TEST__ INI_IdentifyLineType3b()
+{
+	new p0s = 0, p0e = 0, p1s = 0, p1e = 0, p2s = 0, p2e = 0;
+	// Regressions from Discord.
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("k=value\r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(p0s, 0);
+	ASSERT_EQ(p0e, 1);
+	ASSERT_EQ(p1s, 2);
+	ASSERT_EQ(p1e, 7);
+	ASSERT_EQ(p2s, p2e);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("key=1\r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(p0s, 0);
+	ASSERT_EQ(p0e, 3);
+	ASSERT_EQ(p1s, 4);
+	ASSERT_EQ(p1e, 5);
+	ASSERT_EQ(p2s, p2e);
+	// Allow this as an entry of text `=`.
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("key==\r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(p0s, 0);
+	ASSERT_EQ(p0e, 3);
+	ASSERT_EQ(p1s, 4);
+	ASSERT_EQ(p1e, 5);
+	ASSERT_EQ(p2s, p2e);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("key = 1\r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(p0s, 0);
+	ASSERT_EQ(p0e, 3);
+	ASSERT_EQ(p1s, 6);
+	ASSERT_EQ(p1e, 7);
+	ASSERT_EQ(p2s, p2e);
 }
 
 TEST__ INI_IdentifyLineType4()
 {
-	new p0s, p0e, p1s, p1e, p2s, p2e;
+	new p0s = 0, p0e = 0, p1s = 0, p1e = 0, p2s = 0, p2e = 0;
 	// Tag lines.
-	ASSERT_EQ(INI_IdentifyLineType("[hello]", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("[hello]", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
 	ASSERT(p0s == 1 && p0e == 6 && p1s == p1e && p2s == p2e);
-	ASSERT_EQ(INI_IdentifyLineType(" [hello] ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE(" [hello] ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
 	ASSERT(p0s == 2 && p0e == 7 && p1s == p1e && p2s == p2e);
-	ASSERT_EQ(INI_IdentifyLineType(" [ hello] ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE(" [ hello] ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
 	ASSERT(p0s == 3 && p0e == 8 && p1s == p1e && p2s == p2e);
-	ASSERT_EQ(INI_IdentifyLineType(" [hello ] ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE(" [hello ] ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
 	ASSERT(p0s == 2 && p0e == 7 && p1s == p1e && p2s == p2e);
-	ASSERT_EQ(INI_IdentifyLineType("[ hello] ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("[ hello] ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
 	ASSERT(p0s == 2 && p0e == 7 && p1s == p1e && p2s == p2e);
-	ASSERT_EQ(INI_IdentifyLineType("[hello ]", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("[hello ]", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
 	ASSERT(p0s == 1 && p0e == 6 && p1s == p1e && p2s == p2e);
-	ASSERT_EQ(INI_IdentifyLineType("[hello   ]", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("[hello   ]", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
 	ASSERT(p0s == 1 && p0e == 6 && p1s == p1e && p2s == p2e);
-	ASSERT_EQ(INI_IdentifyLineType("[   hello ]", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("[   hello ]", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
 	ASSERT(p0s == 4 && p0e == 9 && p1s == p1e && p2s == p2e);
 }
 
 TEST__ INI_IdentifyLineType5()
 {
-	new p0s, p0e, p1s, p1e, p2s, p2e;
+	new p0s = 0, p0e = 0, p1s = 0, p1e = 0, p2s = 0, p2e = 0;
 	// Inheritance.
-	ASSERT_EQ(INI_IdentifyLineType("[hello] : ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_INVALID);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("[hello] : ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_INVALID);
 	ASSERT(p0s == 1 && p0e == 6 && p1s == p1e && p2s == p2e);
-	ASSERT_EQ(INI_IdentifyLineType("[hello] : first", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("[hello] : first", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
 	ASSERT(p0s == 1 && p0e == 6 && p1s == 10 && p1e == 15 && p2s == p2e);
-	// ASSERT_EQ(INI_IdentifyLineType("[hello] : first, second", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
+	// ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("[hello] : first, second", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
 	// ASSERT(p0s == 1 && p0e == 6 && p1s == 10 && p1e == 23 && p2s == p2e);
-	// ASSERT_EQ(INI_IdentifyLineType("[hello]   : first, second     ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
+	// ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("[hello]   : first, second     ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
 	// ASSERT(p0s == 1 && p0e == 6 && p1s == 12 && p1e == 25 && p2s == p2e);
-	// ASSERT_EQ(INI_IdentifyLineType("[hello] :    first, second   ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
+	// ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("[hello] :    first, second   ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
 	// ASSERT(p0s == 1 && p0e == 6 && p1s == 13 && p1e == 26 && p2s == p2e);
 	// These used to work, now they don't.
-	ASSERT_EQ(INI_IdentifyLineType("[hello] : first, second", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_INVALID);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("[hello] : first, second", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_INVALID);
 	// ASSERT(p0s == 1 && p0e == 6 && p1s == 10 && p1e == 23 && p2s == p2e);
-	ASSERT_EQ(INI_IdentifyLineType("[hello]   : first, second     ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_INVALID);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("[hello]   : first, second     ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_INVALID);
 	// ASSERT(p0s == 1 && p0e == 6 && p1s == 12 && p1e == 25 && p2s == p2e);
-	ASSERT_EQ(INI_IdentifyLineType("[hello] :    first, second   ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_INVALID);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("[hello] :    first, second   ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_INVALID);
 	// ASSERT(p0s == 1 && p0e == 6 && p1s == 13 && p1e == 26 && p2s == p2e);
 	// Commented out.
-	ASSERT_EQ(INI_IdentifyLineType("[hello] ;: ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("[hello] ;: ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
 	ASSERT(p0s == 1 && p0e == 6 && p1s == p1e && p2s == 9 && p2e == 10);
-	ASSERT_EQ(INI_IdentifyLineType("[hello] ; : first, second ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE("[hello] ; : first, second ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
 	ASSERT(p0s == 1 && p0e == 6 && p1s == p1e && p2s == 10 && p2e == 25);
 	// Both.
-	ASSERT_EQ(INI_IdentifyLineType(" [ hello ]  :  inheritance  ;  : first, second ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
+	ASSERT_EQ(INI_IDENTIFY_LINE_TYPE(" [ hello ]  :  inheritance  ;  : first, second ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_TAG);
 	ASSERT(p0s == 3 && p0e == 8 && p1s == 15 && p1e == 26 && p2s == 31 && p2e == 46);
 }
 
 TEST__ INI_IdentifyLineType6a()
 {
 	state y_ini:y_ini_writing_fast;
-	new p0s, p0e, p1s, p1e, p2s, p2e;
+	new p0s = 0, p0e = 0, p1s = 0, p1e = 0, p2s = 0, p2e = 0;
 	// Continuation.
 	new
 		e_INI_LINE_TYPE:result;
@@ -239,7 +292,7 @@ TEST__ INI_IdentifyLineType6a()
 	ASSERT(p0s == 0 && p0e == 2);
 	ASSERT(p1s == 8 && p1e == 8);
 	YSI_g_sExtendedName[0] = '\0', free(YSI_g_sExtendedLine), YSI_g_sExtendedLine = NO_ALLOC;
-	ASSERT_EQ(INI_IdentifyLineType("hi =    \\;  Hello  ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(INI_IdentifyLineType("hi =    \\;  Hello  \r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
 	ASSERT(p0s == 0 && p0e == 2);
 	ASSERT(p1s == 8 && p1e == 17);
 	ASSERT_EQ(INI_IdentifyLineType("hi =    \\ ; Hello  ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_CONT);
@@ -252,11 +305,11 @@ TEST__ INI_IdentifyLineType6a()
 	ASSERT_EQ(INI_IdentifyLineType("hi = hello\\   ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_CONT);
 	ASSERT(p0s == 0 && p0e == 2);
 	ASSERT(p1s == 5 && p1e == 10);
-	ASSERT_EQ(INI_IdentifyLineType("hi = hello     ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(INI_IdentifyLineType("hi = hello     \r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
 	ASSERT(p0s == 0 && p0e == 0);
 	ASSERT(p1s == 0 && p1e == 10);
 	YSI_g_sExtendedName[0] = '\0', free(YSI_g_sExtendedLine), YSI_g_sExtendedLine = NO_ALLOC;
-	ASSERT_EQ(INI_IdentifyLineType("hi = hello     ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(INI_IdentifyLineType("hi = hello     \r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
 	ASSERT(p0s == 0 && p0e == 2);
 	ASSERT(p1s == 5 && p1e == 10);
 }
@@ -264,7 +317,7 @@ TEST__ INI_IdentifyLineType6a()
 TEST__ INI_IdentifyLineType6b()
 {
 	state y_ini:y_ini_reading_yyyn;
-	new p0s, p0e, p1s, p1e, p2s, p2e;
+	new p0s = 0, p0e = 0, p1s = 0, p1e = 0, p2s = 0, p2e = 0;
 	// Continuation.
 	new
 		e_INI_LINE_TYPE:result;
@@ -288,13 +341,14 @@ TEST__ INI_IdentifyLineType6b()
 	ASSERT(p0s == 0 && p0e == 2);
 	ASSERT(p1s == 8 && p1e == 8);
 	YSI_g_sExtendedName[0] = '\0', free(YSI_g_sExtendedLine), YSI_g_sExtendedLine = NO_ALLOC;
-	ASSERT_EQ(INI_IdentifyLineType("hi =    \\;  Hello  ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(INI_IdentifyLineType("hi =    \\;  Hello  ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_CONT);
 	ASSERT(p0s == 0 && p0e == 2);
 #if defined Y_INI_NO_ESCAPES
 	ASSERT(p1s == 8 && p1e == 17);
 #else
 	ASSERT(p1s == 8 && p1e == 16);
 #endif
+	YSI_g_sExtendedName[0] = '\0', free(YSI_g_sExtendedLine), YSI_g_sExtendedLine = NO_ALLOC;
 	ASSERT_EQ(INI_IdentifyLineType("hi =    \\ ; Hello  ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_CONT);
 	ASSERT(p0s == 0 && p0e == 2);
 	ASSERT(p1s == 8 && p1e == 8);
@@ -305,21 +359,24 @@ TEST__ INI_IdentifyLineType6b()
 	ASSERT_EQ(INI_IdentifyLineType("hi = hello\\   ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_CONT);
 	ASSERT(p0s == 0 && p0e == 2);
 	ASSERT(p1s == 5 && p1e == 10);
-	ASSERT_EQ(INI_IdentifyLineType("hi = hello     ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(INI_IdentifyLineType("hi = hello     \r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
 	ASSERT(p0s == 0 && p0e == 0);
 	ASSERT(p1s == 0 && p1e == 10);
 	YSI_g_sExtendedName[0] = '\0', free(YSI_g_sExtendedLine), YSI_g_sExtendedLine = NO_ALLOC;
-	ASSERT_EQ(INI_IdentifyLineType("hi = hello     ", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
+	ASSERT_EQ(INI_IdentifyLineType("hi = hello     \r\n", p0s, p0e, p1s, p1e, p2s, p2e), e_INI_LINE_TYPE_ENTRY);
 	ASSERT(p0s == 0 && p0e == 2);
 	ASSERT(p1s == 5 && p1e == 10);
 }
 
 TEST__ INI_Continuation()
 {
-	new p0s, p0e, p1s, p1e, p2s, p2e;
+	new p0s = 0, p0e = 0, p1s = 0, p1e = 0, p2s = 0, p2e = 0;
 	INI_IdentifyLineType("hi = hello \\\r\n", p0s, p0e, p1s, p1e, p2s, p2e);
 	INI_IdentifyLineType("world = the \\ ; Ignore me", p0s, p0e, p1s, p1e, p2s, p2e);
 	INI_IdentifyLineType("\\ whole string     ", p0s, p0e, p1s, p1e, p2s, p2e);
+	//new str[256];
+	//mgets(str, _, YSI_g_sExtendedLine, 1);
+	//printf(str);
 	ASSERT_SAME(mget(YSI_g_sExtendedLine, 1), "hello world = the \\ whole string");
 	// Cleanup.
 	YSI_g_sExtendedName[0] = '\0', free(YSI_g_sExtendedLine), YSI_g_sExtendedLine = NO_ALLOC;
@@ -331,8 +388,7 @@ TEST__ INI_Continuation()
 
 TEST__ Trim1()
 {
-	new start, end;
-	start = 0, end = 9;
+	new start = 0, end = 9;
 	Trim("  hello  ", start, end);
 	ASSERT_EQ(start, 2);
 	ASSERT_EQ(end, 7);
@@ -351,7 +407,7 @@ TEST__ Trim1()
 }
 
 static stock
-	YSI_g_sINI_Parse0;
+	YSI_g_sINI_Parse0 = 0;
 
 forward TestINI_Parse0_test1(key[], value[]);
 
@@ -363,37 +419,37 @@ public TestINI_Parse0_test1(key[], value[])
 TEST__ INI_Parse0()
 {
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse0_%s", .bFileFirst = true);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse0_%s", .bFileFirst = true);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 10);
 	if (IsWindows())
 	{
 		YSI_g_sINI_Parse0 = 0;
-		INI_ParseFile("YSI\\test_ini\\test1.ini", "TestINI_Parse0_%s", .bFileFirst = true);
+		INI_ParseFile("YSI\\tests\\y_ini\\test1.ini", "TestINI_Parse0_%s", .bFileFirst = true);
 		ASSERT_EQ(YSI_g_sINI_Parse0, 10);
 	}
 //	YSI_g_sINI_Parse0 = 0;
-//	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse0_%s", .bFileFirst = true, .bFilter = true, .filter = "unf");
+//	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse0_%s", .bFileFirst = true, .bFilter = true, .filter = "unf");
 //	ASSERT_EQ(YSI_g_sINI_Parse0, 8);
 //	YSI_g_sINI_Parse0 = 0;
-//	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse0_%s", .bFileFirst = true, .bFilter = true, .filter = "filter");
+//	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse0_%s", .bFileFirst = true, .bFilter = true, .filter = "filter");
 //	ASSERT_EQ(YSI_g_sINI_Parse0, 10);
 //	YSI_g_sINI_Parse0 = 0;
-//	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse0_%s%s", .bFileFirst = true, .bFilter = true, .filter = "filter");
+//	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse0_%s%s", .bFileFirst = true, .bFilter = true, .filter = "filter");
 //	ASSERT_EQ(YSI_g_sINI_Parse0, 5);
 //	YSI_g_sINI_Parse0 = 0;
-//	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse0_%s%s", .bFileFirst = false, .bFilter = true, .filter = "filter");
+//	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse0_%s%s", .bFileFirst = false, .bFilter = true, .filter = "filter");
 //	ASSERT_EQ(YSI_g_sINI_Parse0, 5);
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse0_%s", .bFileFirst = true); //, .bFilter = false, .filter = "unf");
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse0_%s", .bFileFirst = true); //, .bFilter = false, .filter = "unf");
 	ASSERT_EQ(YSI_g_sINI_Parse0, 10);
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse0_%s", .bFileFirst = true); //, .bFilter = false, .filter = "filter");
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse0_%s", .bFileFirst = true); //, .bFilter = false, .filter = "filter");
 	ASSERT_EQ(YSI_g_sINI_Parse0, 10);
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse0_%s%s", .bFileFirst = true); //, .bFilter = false, .filter = "filter");
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse0_%s%s", .bFileFirst = true); //, .bFilter = false, .filter = "filter");
 	ASSERT_EQ(YSI_g_sINI_Parse0, 5);
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse0_%s%s", .bFileFirst = false); //, .bFilter = false, .filter = "filter");
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse0_%s%s", .bFileFirst = false); //, .bFilter = false, .filter = "filter");
 	ASSERT_EQ(YSI_g_sINI_Parse0, 5);
 }
 
@@ -407,7 +463,7 @@ public TestINI_Parse1_test1_(key[], value[])
 TEST__ INI_Parse1()
 {
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse1_%s_%s", .bFileFirst = true);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse1_%s_%s", .bFileFirst = true);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 5);
 }
 
@@ -428,7 +484,7 @@ public TestINI_Parse2_test1_tag2(key[], value[])
 TEST__ INI_Parse2()
 {
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse2_%s_%s", .bFileFirst = true);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse2_%s_%s", .bFileFirst = true);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 7);
 }
 
@@ -456,38 +512,38 @@ public TestINI_Parse3_tag2_test1(key[], value[])
 TEST__ INI_Parse3()
 {
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse3_%s_%s", .bFileFirst = false);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse3_%s_%s", .bFileFirst = false);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 10);
 //	YSI_g_sINI_Parse0 = 0;
-//	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse3_%s_%s", .bFileFirst = false, .bFilter = true, .filter = "filter");
+//	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse3_%s_%s", .bFileFirst = false, .bFilter = true, .filter = "filter");
 //	ASSERT_EQ(YSI_g_sINI_Parse0, 10);
 //	YSI_g_sINI_Parse0 = 0;
-//	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse3_%s_%s", .bFileFirst = false, .bFilter = true, .filter = "other");
+//	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse3_%s_%s", .bFileFirst = false, .bFilter = true, .filter = "other");
 //	ASSERT_EQ(YSI_g_sINI_Parse0, 8);
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse3_%s_%s", .bFileFirst = false); //, .bFilter = false, .filter = "filter");
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse3_%s_%s", .bFileFirst = false); //, .bFilter = false, .filter = "filter");
 	ASSERT_EQ(YSI_g_sINI_Parse0, 10);
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse3_%s_%s", .bFileFirst = false); //, .bFilter = false, .filter = "other");
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse3_%s_%s", .bFileFirst = false); //, .bFilter = false, .filter = "other");
 	ASSERT_EQ(YSI_g_sINI_Parse0, 10);
 }
 
 TEST__ INI_Parse4()
 {
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse3_%s_%s", .bFileFirst = false, .bLocal = false);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse3_%s_%s", .bFileFirst = false, .bLocal = false);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 10);
 //	YSI_g_sINI_Parse0 = 0;
-//	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse3_%s_%s", .bFileFirst = false, .bFilter = true, .filter = "filter", .bLocal = false);
+//	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse3_%s_%s", .bFileFirst = false, .bFilter = true, .filter = "filter", .bLocal = false);
 //	ASSERT_EQ(YSI_g_sINI_Parse0, 10);
 //	YSI_g_sINI_Parse0 = 0;
-//	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse3_%s_%s", .bFileFirst = false, .bFilter = true, .filter = "other", .bLocal = false);
+//	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse3_%s_%s", .bFileFirst = false, .bFilter = true, .filter = "other", .bLocal = false);
 //	ASSERT_EQ(YSI_g_sINI_Parse0, 8);
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse3_%s_%s", .bFileFirst = false/*, .bFilter = false, .filter = "filter"*/, .bLocal = false);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse3_%s_%s", .bFileFirst = false/*, .bFilter = false, .filter = "filter"*/, .bLocal = false);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 10);
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse3_%s_%s", .bFileFirst = false/*, .bFilter = false, .filter = "other"*/, .bLocal = false);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse3_%s_%s", .bFileFirst = false/*, .bFilter = false, .filter = "other"*/, .bLocal = false);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 10);
 }
 
@@ -498,50 +554,50 @@ forward TestINI_Parse5_test1(tag[], key[], value[]);
 public TestINI_Parse5_test1(tag[], key[], value[])
 {
 	printf("%s, %s, %s", tag, key, value);
-	if (isnull(tag)) ++YSI_g_sINI_Parse0;
+	if (IsNull(tag)) ++YSI_g_sINI_Parse0;
 }
 
 TEST__ INI_Parse5()
 {
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 5);
 //	YSI_g_sINI_Parse0 = 0;
-//	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true, .bFilter = true, .filter = "filter");
+//	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true, .bFilter = true, .filter = "filter");
 //	ASSERT_EQ(YSI_g_sINI_Parse0, 5);
 //	YSI_g_sINI_Parse0 = 0;
-//	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true, .bFilter = true, .filter = "other");
+//	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true, .bFilter = true, .filter = "other");
 //	ASSERT_EQ(YSI_g_sINI_Parse0, 5);
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true);//, .bFilter = false);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true);//, .bFilter = false);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 5);
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true);//, .bFilter = false);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true);//, .bFilter = false);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 5);
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse5_%s%s", .bFileFirst = true, .bPassTag = true);//, .bFilter = false);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse5_%s%s", .bFileFirst = true, .bPassTag = true);//, .bFilter = false);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 5);
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_%sParse5_%s", .bFileFirst = false, .bPassTag = true);//, .bFilter = false);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_%sParse5_%s", .bFileFirst = false, .bPassTag = true);//, .bFilter = false);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 5);
 }
 
 TEST__ INI_Parse6()
 {
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true, .bLocal = false);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true, .bLocal = false);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 5);
 //	YSI_g_sINI_Parse0 = 0;
-//	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true, .bFilter = true, .filter = "filter", .bLocal = false);
+//	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true, .bFilter = true, .filter = "filter", .bLocal = false);
 //	ASSERT_EQ(YSI_g_sINI_Parse0, 5);
 //	YSI_g_sINI_Parse0 = 0;
-//	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true, .bFilter = true, .filter = "other", .bLocal = false);
+//	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true, .bFilter = true, .filter = "other", .bLocal = false);
 //	ASSERT_EQ(YSI_g_sINI_Parse0, 5);
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true/*, .bFilter = false*/, .bLocal = false);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true/*, .bFilter = false*/, .bLocal = false);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 5);
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true/*, .bFilter = false*/, .bLocal = false);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "TestINI_Parse5_%s", .bFileFirst = true, .bPassTag = true/*, .bFilter = false*/, .bLocal = false);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 5);
 }
 
@@ -553,7 +609,7 @@ TEST__ INI_Parse7()
 		YSI_g_sINI_Parse0 += 1;
 	}
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "F_%s", .bFileFirst = true);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "F_%s", .bFileFirst = true);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 10);
 }
 
@@ -565,7 +621,7 @@ TEST__ INI_Parse8()
 		YSI_g_sINI_Parse0 += 2;
 	}
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "F_%s", .bFileFirst = true);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "F_%s", .bFileFirst = true);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 20);
 }
 
@@ -577,7 +633,7 @@ TEST__ INI_Parse9()
 		YSI_g_sINI_Parse0 += 3;
 	}
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "F_%s_%s");
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "F_%s_%s");
 	ASSERT_EQ(YSI_g_sINI_Parse0, 9);
 }
 
@@ -589,74 +645,74 @@ TEST__ INI_Parse10()
 		YSI_g_sINI_Parse0 += 4;
 	}
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "F_%s_%s");
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "F_%s_%s");
 	ASSERT_EQ(YSI_g_sINI_Parse0, 8);
 }
 
 TEST__ INI_Parse11()
 {
 	new
-		a;
+		a = 0;
 	inline const F_tag2_test1(string:key[], string:value[])
 	{
 		#pragma unused key, value
 		a += 4;
 	}
 	a = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "F_%s_%s");
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "F_%s_%s");
 	ASSERT_EQ(a, 0);
 }
 
 TEST__ INI_Parse12()
 {
 	static
-		a;
+		a = 0;
 	inline const F_tag2_test1(string:key[], string:value[])
 	{
 		#pragma unused key, value
 		a += 4;
 	}
 	a = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "F_%s_%s");
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "F_%s_%s");
 	ASSERT_EQ(a, 8);
 }
 
 TEST__ INI_Parse13()
 {
 	new
-		a;
+		a = 0;
 	inline F_tag2_test1(string:key[], string:value[])
 	{
 		#pragma unused key, value
 		a += 4;
 	}
 	a = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "F_%s_%s");
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "F_%s_%s");
 	ASSERT_EQ(a, 8);
 }
 
 TEST__ INI_ParseInline()
 {
 	new
-		num,
-		ret;
+		num = 0,
+		ret = 0;
 	inline Inline1(string:key[], string:value[])
 	{
 		#pragma unused key, value
 		++num;
 	}
 //	num = 0;
-//	INI_ParseFile("YSI/test_ini/test1.ini", "Inline1", .bFilter = true, .filter = "other");
+//	INI_ParseFile(MakeYINITestPath("test1.ini"), "Inline1", .bFilter = true, .filter = "other");
 //	ASSERT_EQ(num, 8);
 //	// This line also seems to have the -O1 -d0 bug.  It must be caused by the
 //	// extra "tag" parameter somehow...
 //	inline Inline2(string:tag[], string:key[], string:value[])
 //	{
 //		#pragma unused key, value
-//		if (isnull(tag)) ++num;
+//		if (IsNull(tag)) ++num;
 //	}
 //	num = 0;
-//	INI_ParseFile("YSI/test_ini/test1.ini", "Inline2", .bFilter = true, .filter = "other", .bPassTag = true);
+//	INI_ParseFile(MakeYINITestPath("test1.ini"), "Inline2", .bFilter = true, .filter = "other", .bPassTag = true);
 //	ASSERT_EQ(num, 5);
 	inline Inline3(extra, string:key[], string:value[])
 	{
@@ -664,17 +720,17 @@ TEST__ INI_ParseInline()
 		num += extra;
 	}
 	num = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "Inline3%s", .bExtra = true, .extra = 11);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "Inline3%s", .bExtra = true, .extra = 11);
 	ASSERT_EQ(num, 55);
 	inline Inline4(extra, string:tag[], string:key[], string:value[])
 	{
 		#pragma unused key, value
 		ret = extra;
-		if (!isnull(tag) && !strcmp(tag, "tag2")) ++num;
+		if (!IsNull(tag) && !strcmp(tag, "tag2")) ++num;
 	}
 	ret = 0;
 	num = 0;
-	INI_ParseFile("YSI/test_ini/test1.ini", "Inline4", .bPassTag = true, .bExtra = true, .extra = 42);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "Inline4", .bPassTag = true, .bExtra = true, .extra = 42);
 	ASSERT_EQ(num, 2);
 	ASSERT_EQ(ret, 42);
 }
@@ -687,11 +743,11 @@ TEST__ INI_Int0()
 static stock DoINI_Int0()
 {
 	new
-		k0,
-		k1,
-		k2,
-		k3,
-		k4;
+		k0 = 0,
+		k1 = 0,
+		k2 = 0,
+		k3 = 0,
+		k4 = 0;
 	inline Inl_(string:name[], string:value[])
 	{
 		INI_Int("key0", k0);
@@ -700,7 +756,7 @@ static stock DoINI_Int0()
 		INI_Int("key3", k3);
 		INI_Int("key4", k4);
 	}
-	INI_ParseFile("YSI/test_ini/test1.ini", "Inl_%s");
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "Inl_%s");
 	ASSERT_EQ(k0, 42);
 	ASSERT_EQ(k1, 43);
 	ASSERT_EQ(k2, 45);
@@ -717,11 +773,11 @@ TEST__ INI_Int2()
 static stock DoINI_Int2()
 {
 	new
-		k0,
-		k1,
-		k2,
-		k3,
-		k4;
+		k0 = 0,
+		k1 = 0,
+		k2 = 0,
+		k3 = 0,
+		k4 = 0;
 	inline const Inl_(string:name[], string:value[])
 	{
 		INI_Int("key0", k0);
@@ -730,7 +786,7 @@ static stock DoINI_Int2()
 		INI_Int("key3", k3);
 		INI_Int("key4", k4);
 	}
-	INI_ParseFile("YSI/test_ini/test1.ini", "Inl_%s");
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "Inl_%s");
 	ASSERT_ZE(k0);
 	ASSERT_ZE(k1);
 	ASSERT_ZE(k2);
@@ -747,14 +803,14 @@ TEST__ INI_Int3()
 static stock DoINI_Int3()
 {
 	new
-		k0,
-		k1,
-		k2,
-		k3,
-		k4;
+		k0 = 0,
+		k1 = 0,
+		k2 = 0,
+		k3 = 0,
+		k4 = 0;
 	new
 		sk0[8],
-		Float:sk1,
+		Float:sk1 = 0.0,
 		bool:sk2 = true;
 	new
 		tk0[8],
@@ -787,7 +843,7 @@ static stock DoINI_Int3()
 			}
 		}
 	}
-	INI_ParseFile("YSI/test_ini/test1.ini", "Inl_", .bPassTag = true);
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "Inl_", .bPassTag = true);
 	// First.
 	ASSERT_EQ(k0, 42);
 	ASSERT_EQ(k1, 43);
@@ -795,22 +851,56 @@ static stock DoINI_Int3()
 	ASSERT_EQ(k3, 47);
 	ASSERT_EQ(k4, 46);
 	// Second.
-	ASSERT(!isnull(sk0) && !strcmp(sk0, "hello"));
+	ASSERT(!IsNull(sk0) && !strcmp(sk0, "hello"));
 	ASSERT_EQ(sk1, 5.5);
 	ASSERT(!sk2);
 	// Third.
-	ASSERT(!isnull(tk0) && !strcmp(tk0, "yes"));
-	ASSERT(!isnull(tk1) && !strcmp(tk1, "no"));
+	ASSERT(!IsNull(tk0) && !strcmp(tk0, "yes"));
+	ASSERT(!IsNull(tk1) && !strcmp(tk1, "no"));
 	return 0;
 }
 
+
 static stock
-	gs_K0,
-	gs_K1,
-	gs_K2,
-	gs_K3,
-	gs_K4,
-	gs_K5;
+	gs_mFS[32],
+	gs_mName[32],
+	gs_mCreator[32],
+	gs_mMode,
+	gs_mWeather,
+	gs_mInterior;
+
+forward INI_ReadRegression_data(string:name[], string:value[]);
+
+public INI_ReadRegression_data(string:name[], string:value[])
+{
+	INI_String("mFS", gs_mFS);
+	INI_String("mName", gs_mName);
+	INI_String("mCreator", gs_mCreator);
+	INI_Int("mMode", gs_mMode);
+	INI_Int("mWeather", gs_mWeather);
+	INI_Int("mInterior", gs_mInterior);
+
+	return 0;
+}
+
+TEST__ INI_ReadRegression()
+{
+	INI_ParseFile(MakeYINITestPath("test0.ini"), "INI_ReadRegression_%s");
+	ASSERT_SAME(gs_mFS, "hayran");
+	ASSERT_SAME(gs_mName, "Warehouse");
+	ASSERT_SAME(gs_mCreator, "Hayran");
+	ASSERT_EQ(gs_mMode, 1);
+	ASSERT_EQ(gs_mWeather, 10);
+	ASSERT_EQ(gs_mInterior, 0);
+}
+
+static stock
+	gs_K0 = 0,
+	gs_K1 = 0,
+	gs_K2 = 0,
+	gs_K3 = 0,
+	gs_K4 = 0,
+	gs_K5 = 0;
 
 forward INI_PUB_Inl_(string:name[], string:value[]);
 
@@ -826,7 +916,7 @@ public INI_PUB_Inl_(string:name[], string:value[])
 
 TEST__ INI_Int1()
 {
-	INI_ParseFile("YSI/test_ini/test1.ini", "INI_PUB_Inl_%s");
+	INI_ParseFile(MakeYINITestPath("test1.ini"), "INI_PUB_Inl_%s");
 	ASSERT_EQ(gs_K0, 42);
 	ASSERT_EQ(gs_K1, 43);
 	ASSERT_EQ(gs_K2, 45);
@@ -836,15 +926,69 @@ TEST__ INI_Int1()
 
 TEST__ INI_WriteComments()
 {
-	new INI:i = INI_Open("YSI/test_ini/test10.ini");
+	new File:f;
+	new str[32];
+
+	f = fopen(MakeYINITestPath("test10.ini"), io_read);
+	ASSERT(!!f);
+	if (f)
+	{
+		fread(f, str);
+		StripNL(str);
+		ASSERT_SAME(str, "[tag_with_parent]");
+		fread(f, str);
+		StripNL(str);
+		ASSERT_SAME(str, "value_four=Some_semi_colons");
+		fread(f, str);
+		StripNL(str);
+		ASSERT_SAME(str, "value_three=Some\\;semi\\;colons");
+		fread(f, str);
+		StripNL(str);
+		ASSERT_SAME(str, "value=5");
+		ASSERT(!!fread(f, str));
+		StripNL(str);
+		ASSERT_SAME(str, "");
+		fclose(f);
+	}
+
+	new INI:i = INI_Open(MakeYINITestPath("test10.ini"));
 	INI_SetTag(i, "tag_with_parent");
 	INI_RemoveEntry(i, "value");
+	INI_Close(i);
+
+	f = fopen(MakeYINITestPath("test10.ini"), io_read);
+	ASSERT(!!f);
+	if (f)
+	{
+		fread(f, str);
+		StripNL(str);
+		ASSERT_SAME(str, "[tag_with_parent]");
+		fread(f, str);
+		StripNL(str);
+		ASSERT_SAME(str, "value_four=Some_semi_colons");
+		fread(f, str);
+		StripNL(str);
+		ASSERT_SAME(str, "value_three=Some\\;semi\\;colons");
+		fread(f, str);
+		StripNL(str);
+		ASSERT_SAME(str, "");
+		fclose(f);
+	}
+}
+
+TEST_INIT__ INI_WriteComments()
+{
+	new INI:i = INI_Open(MakeYINITestPath("test10.ini"));
+	INI_SetTag(i, "tag_with_parent");
+	INI_WriteInt(i, "value", 5);
+	INI_WriteString(i, "value_three", "Some;semi;colons");
+	INI_WriteString(i, "value_four", "Some_semi_colons");
 	INI_Close(i);
 }
 
 TEST_CLOSE__ INI_WriteComments()
 {
-	new INI:i = INI_Open("YSI/test_ini/test10.ini");
+	new INI:i = INI_Open(MakeYINITestPath("test10.ini"));
 	INI_SetTag(i, "tag_with_parent");
 	INI_WriteInt(i, "value", 5);
 	INI_WriteString(i, "value_three", "Some;semi;colons");
@@ -856,7 +1000,7 @@ forward INI_Inher0_tag0(string:tag[], string:name[], string:value[]);
 
 public INI_Inher0_tag0(string:tag[], string:name[], string:value[])
 {
-	ASSERT(!isnull(tag) && !strcmp(tag, "tag0"));
+	ASSERT(!IsNull(tag) && !strcmp(tag, "tag0"));
 	INI_Int("key0", gs_K0);
 	INI_Int("key1", gs_K1);
 	INI_Int("key2", gs_K2);
@@ -874,7 +1018,7 @@ TEST__ INI_Inherit0()
 	gs_K3 = 0;
 	gs_K4 = 0;
 	gs_K5 = 0;
-	INI_ParseFile("YSI/test_ini/test2.ini", "INI_Inher0_%s", .bPassTag = true);
+	INI_ParseFile(MakeYINITestPath("test2.ini"), "INI_Inher0_%s", .bPassTag = true);
 	ASSERT_EQ(gs_K0, 101);
 	ASSERT_EQ(gs_K1, 102);
 	ASSERT_EQ(gs_K2,   0);
@@ -887,7 +1031,7 @@ forward INI_Inher1_tag1(string:tag[], string:name[], string:value[]);
 
 public INI_Inher1_tag1(string:tag[], string:name[], string:value[])
 {
-	ASSERT(!isnull(tag) && !strcmp(tag, "tag1"));
+	ASSERT(!IsNull(tag) && !strcmp(tag, "tag1"));
 	INI_Int("key0", gs_K0);
 	INI_Int("key1", gs_K1);
 	INI_Int("key2", gs_K2);
@@ -905,7 +1049,7 @@ TEST__ INI_Inherit1()
 	gs_K3 = 0;
 	gs_K4 = 0;
 	gs_K5 = 0;
-	INI_ParseFile("YSI/test_ini/test2.ini", "INI_Inher1_%s", .bPassTag = true);
+	INI_ParseFile(MakeYINITestPath("test2.ini"), "INI_Inher1_%s", .bPassTag = true);
 	ASSERT_EQ(gs_K0, 101);
 	ASSERT_EQ(gs_K1, 102);
 	ASSERT_EQ(gs_K2, 103);
@@ -918,7 +1062,7 @@ forward INI_Inher2_tag2(string:tag[], string:name[], string:value[]);
 
 public INI_Inher2_tag2(string:tag[], string:name[], string:value[])
 {
-	ASSERT(!isnull(tag) && !strcmp(tag, "tag2"));
+	ASSERT(!IsNull(tag) && !strcmp(tag, "tag2"));
 	INI_Int("key0", gs_K0);
 	INI_Int("key1", gs_K1);
 	INI_Int("key2", gs_K2);
@@ -936,7 +1080,7 @@ TEST__ INI_Inherit2()
 	gs_K3 = 0;
 	gs_K4 = 0;
 	gs_K5 = 0;
-	INI_ParseFile("YSI/test_ini/test2.ini", "INI_Inher2_%s", .bPassTag = true);
+	INI_ParseFile(MakeYINITestPath("test2.ini"), "INI_Inher2_%s", .bPassTag = true);
 	ASSERT_EQ(gs_K0, 107);
 	ASSERT_EQ(gs_K1, 102);
 	ASSERT_EQ(gs_K2, 103);
@@ -950,7 +1094,22 @@ TEST__ INI_Inherit2()
 TEST__ INI_AddToBuffer0()
 {
 	new
-		INI:i = INI_Open("YSI/test_ini/test3.ini");
+		INI:i = INI_Open(MakeYINITestPath("test3.ini"));
+	ASSERT_NE(i, INI_NO_FILE);
+	ASSERT(!INI_AddToBuffer(i, "", "hi"));
+	ASSERT(!INI_AddToBuffer(INI_NO_FILE, "foo", "bar"));
+	ASSERT(INI_AddToBuffer(i, "key", "value"));
+	ASSERT(INI_AddToBuffer(i, "first", "second"));
+	ASSERT(INI_AddToBuffer(i, "first", "third"));
+	ASSERT(INI_AddToBuffer(i, "first", "fourth"));
+	ASSERT(INI_AddToBuffer(i, "first", "fifth"));
+	INI_Close(i);
+}
+
+TEST__ INI_AddToBuffer0a()
+{
+	new
+		INI:i = INI_Open(MakeYINITestPath("test3.ini"));
 	ASSERT_NE(i, INI_NO_FILE);
 	ASSERT(!INI_AddToBuffer(i, "", "hi"));
 	ASSERT(!INI_AddToBuffer(INI_NO_FILE, "foo", "bar"));
@@ -965,7 +1124,7 @@ TEST__ INI_AddToBuffer0()
 TEST__ INI_AddToBuffer1()
 {
 	new
-		INI:i = INI_Open("YSI/test_ini/test4.ini");
+		INI:i = INI_Open(MakeYINITestPath("test4.ini"));
 	ASSERT(INI_AddToBuffer(i, "key2", "value2"));
 	INI_SetTag(i, "tag0");
 	ASSERT(INI_AddToBuffer(i, "key2", "value3"));
@@ -998,9 +1157,9 @@ public INI_WriteOne(tag[], name[], value[])
 
 TEST__ INI_Write3()
 {
-	fremove("YSI/test_ini/test9.ini");
+	fremove(MakeYINITestPath("test9.ini"));
 	new
-		INI:i = INI_Open("YSI/test_ini/test9.ini");
+		INI:i = INI_Open(MakeYINITestPath("test9.ini"));
 	ASSERT_NE(i, INI_NO_FILE);
 	INI_WriteString(i, "hi", "there");
 	INI_SetTag(i, "tag");
@@ -1013,29 +1172,29 @@ TEST__ INI_Write3()
 	INI_WriteInt(i, "thing", 44);
 	INI_Close(i);
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test9.ini", "INI_WriteOne", .bPassTag = true);
+	INI_ParseFile(MakeYINITestPath("test9.ini"), "INI_WriteOne", .bPassTag = true);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 100 + 42 + 40 + 43 + 44 + 3);
-	i = INI_Open("YSI/test_ini/test9.ini");
+	i = INI_Open(MakeYINITestPath("test9.ini"));
 	INI_SetTag(i, "tag");
 	INI_WriteString(i, "another", "200");
 	INI_WriteInt(i, "you", 200);
 	INI_Close(i);
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test9.ini", "INI_WriteOne", .bPassTag = true);
+	INI_ParseFile(MakeYINITestPath("test9.ini"), "INI_WriteOne", .bPassTag = true);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 100 + 200 + 200 + 40 + 43 + 44 + 3);
-	i = INI_Open("YSI/test_ini/test9.ini");
+	i = INI_Open(MakeYINITestPath("test9.ini"));
 	INI_SetTag(i, "tag");
 	INI_RemoveEntry(i, "another");
 	INI_Close(i);
 	YSI_g_sINI_Parse0 = 0;
-	INI_ParseFile("YSI/test_ini/test9.ini", "INI_WriteOne", .bPassTag = true);
+	INI_ParseFile(MakeYINITestPath("test9.ini"), "INI_WriteOne", .bPassTag = true);
 	ASSERT_EQ(YSI_g_sINI_Parse0, 100 + 200 + 40 + 43 + 44 + 3);
 }
 
 //TEST__ INI_VariousWriting0()
 //{
 //	new
-//		INI:i = INI_Open("YSI/test_ini/test5.ini");
+//		INI:i = INI_Open(MakeYINITestPath("test5.ini"));
 //	new
 //		s = INI_AddToBuffer(i, "writing", "written");
 //	ASSERT_NE(s, -1);
@@ -1058,7 +1217,7 @@ TEST__ INI_Write3()
 //TEST__ INI_VariousWriting1()
 //{
 //	new
-//		INI:f = INI_Open("YSI/test_ini/test5.ini"),
+//		INI:f = INI_Open(MakeYINITestPath("test5.ini")),
 //		s;
 //	// String.
 //	s = INI_WriteString(f, "vvv", "yyy");
@@ -1117,7 +1276,7 @@ TEST__ INI_Write3()
 TEST__ INI_Write0()
 {
 	new
-		INI:f = INI_Open("YSI/test_ini/test6.ini"),
+		INI:f = INI_Open(MakeYINITestPath("test6.ini")),
 		str[32];
 	for (new i = 0; i != 12; ++i)
 	{
@@ -1142,7 +1301,7 @@ TEST__ INI_Write0()
 TEST__ INI_Write1()
 {
 	new
-		INI:f = INI_Open("YSI/test_ini/test6.ini"),
+		INI:f = INI_Open(MakeYINITestPath("test6.ini")),
 		str[32];
 	for (new i = 0; i != 16; ++i)
 	{
@@ -1167,7 +1326,7 @@ TEST__ INI_Write1()
 TEST__ INI_Write2()
 {
 	new
-		INI:f = INI_Open("YSI/test_ini/test6.ini");
+		INI:f = INI_Open(MakeYINITestPath("test6.ini"));
 	INI_DeleteTag(f, "woo");
 	INI_Close(f);
 }
@@ -1210,7 +1369,7 @@ public INI_Parents(extra, file[], tag[], name[], value[])
 TEST__ INI_Parents()
 {
 	INI_ParseFile(
-			"YSI/test_ini/test7.ini",
+			MakeYINITestPath("test7.ini"),
 			"INI_Parents",
 			.bExtra    = true,
 			.extra     = 3,
@@ -1265,7 +1424,7 @@ TEST__ INI_Parents()
 //TEST__ INI_BinaryData()
 //{
 //	INI_ParseFile(
-//			"YSI/test_ini/test8.ini",
+//			MakeYINITestPath("test8.ini"),
 //			"INI_BinaryData",
 //			.bExtra    = false,
 //			.bPassTag  = false,

@@ -1,4 +1,4 @@
-/*
+	/*
 Legal:
 	Version: MPL 1.1
 	
@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -142,10 +143,10 @@ stock PlayerGroups(a, b)
 
 static
 	// Function pointers for chaining.
-	YSI_g_sNextInitFunc,
-	YSI_g_sNextUpdFunc,
-	YSI_g_sNextAddFunc,
-	YSI_g_sGroupCount;
+	YSI_g_sNextInitFunc = 0,
+	YSI_g_sNextUpdFunc = 0,
+	YSI_g_sNextAddFunc = 0,
+	YSI_g_sGroupCount = 0;
 
 static stock const
 	YSI_g_scGlobalName[] = "__GLOBAL",
@@ -190,7 +191,7 @@ static stock
 //	(0 <= (%0) < _MAX_GROUPS && Group_IsActive(%0))
 
 #define _Group_IsValid(%0) \
-	((_:GROUP_MASK<=_:(%0)<=_:GROUP_GLOBAL)&&(_Group_IsActive(GROUP_TEMP_FIX(%0))))
+	((_:(%0)<=_:GROUP_GLOBAL)&&(_Group_IsActive(GROUP_TEMP_FIX(%0))))
 
 //#define Group_IsActive(%0) 
 //	(YSI_gGroupData[_:GROUP_FIX(%0)][E_GROUP_DATA_FLAGS] & e_GROUP_FLAGS_ACTIVE)
@@ -307,9 +308,9 @@ static stock Group_DefineStates_() <YSI_has_groups : other>
  * </remarks>
  *//*------------------------------------------------------------------------**/
 
-HOOK__ OnScriptInit()
+HOOK__ OnYSIInit()
 {
-	P:1("Group_OnScriptInit called");
+	P:1("Group_OnYSIInit called");
 	state YSI_has_groups : y;
 	// Set up the global groups.
 	#if !(YSIM_HAS_MASTER && (_YSIM_IS_STUB || _YSIM_IS_CLIENT))
@@ -317,7 +318,7 @@ HOOK__ OnScriptInit()
 			if (_YCM@y)
 		#endif
 			{
-				P:5("Group_OnScriptInit: Master");
+				P:5("Group_OnYSIInit: Master");
 				Iter_Init(GroupPlayers);
 				strpack(YSI_gGroupData[_MAX_GROUPS][E_GROUP_DATA_NAME], YSI_g_scGlobalName, MAX_GROUP_NAME char);
 				YSI_gGroupData[_MAX_GROUPS][E_GROUP_DATA_FLAGS] = e_GROUP_FLAGS_ACTIVE | e_GROUP_FLAGS_GLOBAL;
@@ -333,9 +334,9 @@ HOOK__ OnScriptInit()
 		ni = AMX_GetPublicPointerPrefix(0, YSI_g_sNextInitFunc, _A<_yGI>),
 		na = AMX_GetPublicPointerPrefix(0, YSI_g_sNextAddFunc, _A<_yGA>),
 		nu = AMX_GetPublicPointerPrefix(0, YSI_g_sNextUpdFunc, _A<_yGU>);
-	//printf("Group_OnScriptInit: %d, %d, %d", ni, na, nu);
-	P:4("Group_OnScriptInit: %d, %d, %d", ni, na, nu);
-	P:4("Group_OnScriptInit: %d, %d, %d", AMX_HEADER_COD - AMX_BASE_ADDRESS, YSI_g_sNextInitFunc, AMX_HEADER_DAT - AMX_BASE_ADDRESS);
+	//printf("Group_OnYSIInit: %d, %d, %d", ni, na, nu);
+	P:4("Group_OnYSIInit: %d, %d, %d", ni, na, nu);
+	P:4("Group_OnYSIInit: %d, %d, %d", AMX_HEADER_COD - AMX_BASE_ADDRESS, YSI_g_sNextInitFunc, AMX_HEADER_DAT - AMX_BASE_ADDRESS);
 	// So just below the call to `GROUP_CHAIN` is this code:
 	//   
 	//   heapspace(); // I'm sure there's a reason this is here.  But I forgot it!
@@ -343,12 +344,12 @@ HOOK__ OnScriptInit()
 	// I just spent another long debugging session tracking down another bug
 	// where the solution, in another totally unrelated file entirely, was
 	// adding this line here:
-	format(Q@, sizeof (Q@), "", AMX_HEADER_COD - AMX_BASE_ADDRESS);
+	format(Q@, sizeof (Q@), YSI_EMPTY, AMX_HEADER_COD - AMX_BASE_ADDRESS);
 	// WHY!?
 	GROUP_CHAIN?<YSI_g_sNextInitFunc>(ni, na, nu);
-	//CallLocalFunction("_Group_SpecialInit", "");
+	//CallLocalFunction("_Group_SpecialInit", YSI_EMPTY);
 	heapspace(); // I'm sure there's a reason this is here.  But I forgot it!
-	P:1("Group_OnScriptInit end");
+	P:1("Group_OnYSIInit end");
 	return 1;
 }
 
@@ -360,7 +361,7 @@ HOOK__ OnScriptInit()
  * </remarks>
  *//*------------------------------------------------------------------------**/
 
-public OnScriptExit()
+public OnYSIExit()
 {
 	#if defined _Group_SpecialExit
 		_Group_SpecialExit();
@@ -369,8 +370,8 @@ public OnScriptExit()
 	return 1;
 }
 
-#undef OnScriptExit
-#define OnScriptExit _Group_SpecialExit
+#undef OnYSIExit
+#define OnYSIExit _Group_SpecialExit
 #if defined _Group_SpecialExit
 	forward _Group_SpecialExit();
 #endif
@@ -396,11 +397,11 @@ remotefunc static void:_Group_Destroy(g, const Iterator@gp[MAX_PLAYERS + 1], s)
 		// Check it!  Local parameter iterator!
 		FOREACH__ (new p : gp)
 		{
-			YSI_gTempGroups = YSI_gGroupPlayers[p];
+			YSI_gTempAllowed_ = YSI_gGroupPlayers[p];
 			// If these parameters were the other way round I could do this:
 			//GROUP_CHAIN<YSI_g_sNextUpdFunc>(p, (YSI_gGroupPlayers[p], YSI_gGroupPlayers[p][ps] &= pm), YSI_gGroupPlayers[p]);
 			// But they're currently not so I can't.
-			GROUP_CHAIN<YSI_g_sNextUpdFunc>(p, YSI_gTempGroups, YSI_gGroupPlayers[p]);
+			GROUP_CHAIN<YSI_g_sNextUpdFunc>(p, YSI_gTempAllowed_, YSI_gGroupPlayers[p]);
 			YSI_gGroupPlayers[p][ps] &= pm;
 		}
 	}
@@ -458,7 +459,7 @@ GLOBAL__ void:_Group_TryRemove()
 		MASTER_REMOVE<i>
 		MASTER_EMPTY<i>
 		{
-			//printf("removing i");
+			//print("removing i");
 			broadcastfunc _Group_Destroy(i, Iter_TrueArray(GroupPlayers[i]), Iter_TrueSize(GroupPlayers[]));
 			YSI_gGroupData[i][E_GROUP_DATA_FLAGS] = e_GROUP_FLAGS:0;
 			YSI_gGroupData[i][E_GROUP_DATA_HASH] = 0;
@@ -527,12 +528,12 @@ HOOK__ OnPlayerConnect@9(playerid)
 			if (_YCM@y)
 		#endif
 			{
-				//printf("0");
+				//print("0");
 				P:6("Group_OnPlayerConnect: Master %d", playerid);
 				// Is master.  ALWAYS reset all players - if they start screwing
 				// around with loading orders then that's their own fault!
 				broadcastfunc _Group_FakePlayer(playerid, YSI_g_sDefaultGroups, bits<_MAX_GROUPS_G>);
-				//printf("1");
+				//print("1");
 			}
 		#if _YSIM_IS_CLOUD
 			else
@@ -594,8 +595,8 @@ static stock Bit:_Group_SetSome(playerid, group)
 	new
 		g = -1,
 		s = 0;
-	YSI_gTempGroups = YSI_gGroupPlayers[playerid];
-	Bit_Let(YSI_gTempGroups, group);
+	YSI_gTempAllowed_ = YSI_gGroupPlayers[playerid];
+	Bit_Let(YSI_gTempAllowed_, group);
 	for ( ; ; )
 	{
 		g = Iter_Func@Bits(g, YSI_g_sChildGroups[group], bits<_MAX_GROUPS_G>);
@@ -609,10 +610,10 @@ static stock Bit:_Group_SetSome(playerid, group)
 			}
 			else break;
 		}
-		else if (!Bit_Get(YSI_gTempGroups, g))
+		else if (!Bit_Get(YSI_gTempAllowed_, g))
 		{
 			// This player isn't in this group, add them.
-			Bit_Let(YSI_gTempGroups, g);
+			Bit_Let(YSI_gTempAllowed_, g);
 			YSI_g_sRecursionStack[s][0] = g;
 			YSI_g_sRecursionStack[s][1] = group;
 			++s;
@@ -620,7 +621,6 @@ static stock Bit:_Group_SetSome(playerid, group)
 			g = -1;
 		}
 	}
-	return YSI_gTempGroups;
 }
 
 /*-------------------------------------------------------------------------*//**
@@ -650,7 +650,8 @@ GLOBAL__ void:Group_SetPlayer(Group:g,p,bool:s)
 				// Added to a group they don't already have.  Make a new list of
 				// groups they're in, taking in to account the new groups
 				// hierarchy and pass that new array about.
-				broadcastfunc _Group_SetPlayer(p, _Group_SetSome(p, _:g), sizeof (YSI_gTempGroups));
+				_Group_SetSome(p, _:g);
+				broadcastfunc _Group_SetPlayer(p, YSI_gTempAllowed_, sizeof (YSI_gTempAllowed_));
 				return; //1;
 			}
 		}
@@ -658,9 +659,9 @@ GLOBAL__ void:Group_SetPlayer(Group:g,p,bool:s)
 		{
 			if (_Group_HasPlayer(g, p))
 			{
-				YSI_gTempGroups = YSI_gGroupPlayers[p];
-				Bit_Vet(YSI_gTempGroups, _:g);
-				broadcastfunc _Group_SetPlayer(p, YSI_gTempGroups, sizeof (YSI_gTempGroups));
+				YSI_gTempAllowed_ = YSI_gGroupPlayers[p];
+				Bit_Vet(YSI_gTempAllowed_, _:g);
+				broadcastfunc _Group_SetPlayer(p, YSI_gTempAllowed_, sizeof (YSI_gTempAllowed_));
 				return; //1;
 			}
 		}
@@ -690,10 +691,10 @@ remotefunc void:_Group_SetPlayer(p, Bit:g[sizeof RG@], s)
 				P:2("_Group_SetPlayer called: %i, %s, %s, %i", p, Bit_Display(YSI_gGroupPlayers[p]), Bit_Display(g), s);
 				// <a href="http://supertech.csail.mit.edu/papers/debruijn.pdf" />
 				new
-					Bit:cur,
-					Bit:exor,
-					Bit:bit,
-					group;
+					Bit:cur = Bit:0,
+					Bit:exor = Bit:0,
+					Bit:bit = Bit:0,
+					group = 0;
 				for (new i = 0; i != sizeof (g); ++i)
 				{
 					// Get the difference between the old and new groups.
@@ -720,6 +721,14 @@ remotefunc void:_Group_SetPlayer(p, Bit:g[sizeof RG@], s)
 					}
 				}
 			}
+		#if _YSIM_IS_CLOUD
+			else
+			{
+				P:4("_Group_SetPlayer called - not master");
+			}
+		#endif
+	#else
+		P:4("_Group_SetPlayer called - no master");
 	#endif
 	#pragma tabsize 4
 	GROUP_CHAIN?<YSI_g_sNextUpdFunc>(p, YSI_gGroupPlayers[p], g);
@@ -744,13 +753,14 @@ FOREIGN__ Group:_Group_SetBalancedInternal(p,const Group:gs[],c);
 
 GLOBAL__ Group:_Group_SetBalancedInternal(p,const Group:gs[],c)
 {
-	// Find which of the listed groups has the least players in.
+	// Find which of the listed groups has the fewest players in.
+	P:4("_Group_SetBalancedInternal called: %d, %d", p, c);
 	new
 		count = cellmax,
 		Group:id = INVALID_GROUP;
 	for (new i = 0; i != c; ++i)
 	{
-		// Find the group with the least players.
+		// Find the group with the fewest players.
 		new
 			gi = _:gs[i];
 		if (_Group_IsValid(Group:gi))
@@ -758,8 +768,10 @@ GLOBAL__ Group:_Group_SetBalancedInternal(p,const Group:gs[],c)
 			new
 				g2 = _:GROUP_TEMP_FIX(Group:gi),
 				cc = Iter_Count(GroupPlayers[g2]);
+			P:7("_Group_SetBalancedInternal: Group %d Count = %d", _:g2, cc);
 			if (_Group_HasPlayer(g2, p))
 			{
+				P:7("_Group_SetBalancedInternal: Has player");
 				// The player is already in this group - just return.
 				return Group:gi;
 			}
@@ -789,7 +801,7 @@ GLOBAL__ Group:_Group_SetBalancedInternal(p,const Group:gs[],c)
  *  The group they have been added to.
  * </returns>
  * <remarks>
- *  Puts a player in whichever of the given groups currently has the least
+ *  Puts a player in whichever of the given groups currently has the fewest
  *  players.
  *
  *  Now ONLY takes a list - arrays should use "Group_SetBalancedArray".  As a
@@ -807,7 +819,7 @@ stock Group:Group_SetBalancedArray(p, const Group:gs[], c = sizeof (gs))
  * <param name="playerid">Player to put in one of a number of groups</param>
  * <param name="">A list of groups.</param>
  * <remarks>
- *  Puts a player in whichever of the given groups currently has the least
+ *  Puts a player in whichever of the given groups currently has the fewest
  *  players.
  *
  *  Now ONLY takes a list - arrays should use "Group_SetBalancedArray".  As a
@@ -846,9 +858,7 @@ GLOBAL__ bool:Group_GetPlayer(Group:g,p)
 	P:2("bool:Group_GetPlayer called: %i, %i", _:g, p);
 	if (_Group_IsValid(g) && VALID_PLAYERID(p))
 	{
-		GROUP_FIX(g);
-		return Bit_Get(YSI_gGroupPlayers[p], _:g);
-		//Bit_Set(YSI_gGroupPlayers[g], p, s, bits<MAX_PLAYERS>);
+		return Bit_Get(YSI_gGroupPlayers[p], _:GROUP_TEMP_FIX(g));
 	}
 	return false;
 }
@@ -892,7 +902,7 @@ GLOBAL__ void:Group_SetName(Group:g,const string:n[])
 	if (_Group_IsValid(g))
 	{
 		GROUP_FIX(g);
-		if (isnull(n))
+		if (IsNull(n))
 		{
 			YSI_gGroupData[_:g][E_GROUP_DATA_NAME][0] = 0;
 			YSI_gGroupData[_:g][E_GROUP_DATA_HASH] = 0;
@@ -926,7 +936,7 @@ GLOBAL__ string:Group_GetName(Group:g)
 		ret[YSI_MAX_STRING];
 	if (_Group_IsValid(g))
 	{
-		//printf("Is Valid");
+		//print("Is Valid");
 		//return Bit_Get(YSI_gGroupPlayers[g], p);
 		//Bit_Set(YSI_gGroupPlayers[g], p, s, bits<MAX_PLAYERS>);
 		strunpack(ret, YSI_gGroupData[_:GROUP_TEMP_FIX(g)][E_GROUP_DATA_NAME], YSI_MAX_STRING);
@@ -948,7 +958,7 @@ GLOBAL__ Group:Group_GetID(const string:name[])
 {
 	P:2("Group_GetID called: %s", name);
 	new
-		i,
+		i = 0,
 		hash = YHash(name);
 	while (i != _MAX_GROUPS)
 	{
@@ -1088,6 +1098,28 @@ GLOBAL__ Group_GetCount(Group:g)
 }
 
 /*-------------------------------------------------------------------------*//**
+ * <returns>
+ *  The number of groups that exist.
+ * </returns>
+ *//*------------------------------------------------------------------------**/
+
+FOREIGN__ Group_Count(bool:g = false);
+
+GLOBAL__ Group_Count(bool:g = false)
+{
+	P:2("Group_Count called: %i", _:g);
+	new count = !!g;
+	for (new i = 0; i != _MAX_GROUPS; ++i)
+	{
+		if (_Group_IsActive(i))
+		{
+			++count;
+		}
+	}
+	return count;
+}
+
+/*-------------------------------------------------------------------------*//**
  * <param name="name">The optional name of the new group.</param>
  * <returns>
  *  The group ID with a tag of "Group:", or "INVALID_GROUP".
@@ -1112,8 +1144,8 @@ GLOBAL__ Group:_Group_Create(const string:name[])
 	P:2("Group:Group_Create called: \"%s\"", name);
 	P:2("Group_Create called in %d", Master_ID());
 	new
-		i;
-	if (!isnull(name))
+		i = 0;
+	if (!IsNull(name))
 	{
 		// Get a group of the same name if it already exists.
 		i = _:Group_GetID(name);
@@ -1129,7 +1161,7 @@ GLOBAL__ Group:_Group_Create(const string:name[])
 		++i;
 	}
 	if (i == _MAX_GROUPS) return INVALID_GROUP;
-	if (isnull(name))
+	if (IsNull(name))
 	{
 		YSI_gGroupData[i][E_GROUP_DATA_NAME][0] = 0;
 		YSI_gGroupData[i][E_GROUP_DATA_FLAGS] = e_GROUP_FLAGS_TEMP | e_GROUP_FLAGS_ACTIVE;
@@ -1295,11 +1327,13 @@ GLOBAL__ Group:Iter_Func@GroupChild(start, Group:parent)
  *  macro ("GROUP_CHAIN") one of these four functions are selected and called.
  *  Adding more is fairly trivial too, the parameters are just:
  *
- *  #emit PUSH.S     <16 + n * 4>
- *  #emit PUSH.S     ...
- *  #emit PUSH.S     20
- *  #emit PUSH.S     16
- *  #emit PUSH.C     <n * 4>
+ *  <code>
+ *      #emit PUSH.S     &lt;16 + n * 4&gt;   <br />
+ *      #emit PUSH.S     ...                  <br />
+ *      #emit PUSH.S     20                   <br />
+ *      #emit PUSH.S     16                   <br />
+ *      #emit PUSH.C     &lt;n * 4&gt;
+ *  </code>
  *
  * This code is now, of course, SERIOUSLY outdated - function pointers have
  * advanced way beyond this (see indirection.inc), but this code works, and
@@ -1400,7 +1434,8 @@ GLOBAL__ void:Group_SetGroup(Group:g,Group:el,bool:s)
 			{
 				if (!_Group_HasPlayer(el, p))
 				{
-					broadcastfunc _Group_SetPlayer(p, _Group_SetSome(p, _:el), bits<_MAX_GROUPS_G>);
+					_Group_SetSome(p, _:el);
+					broadcastfunc _Group_SetPlayer(p, YSI_gTempAllowed_, bits<_MAX_GROUPS_G>);
 				}
 			}
 		}
@@ -1452,7 +1487,7 @@ FOREIGN__ bool:Group_GetGroup(Group:g,Group:el);
 GLOBAL__ bool:Group_GetGroup(Group:g,Group:el)
 {
 	P:2(#Group_GetGroup " called: %i, %i", _:g, _:el);
-	return (GROUP_MASK <= el <= GROUP_GLOBAL && GROUP_MASK <= g <= GROUP_GLOBAL && Bit_Get(YSI_g_sChildGroups[_:GROUP_TEMP_FIX(g)], _:GROUP_TEMP_FIX(el)));
+	return (el <= GROUP_GLOBAL && g <= GROUP_GLOBAL && Bit_Get(YSI_g_sChildGroups[_:GROUP_TEMP_FIX(g)], _:GROUP_TEMP_FIX(el)));
 }
 
 /*-------------------------------------------------------------------------*//**

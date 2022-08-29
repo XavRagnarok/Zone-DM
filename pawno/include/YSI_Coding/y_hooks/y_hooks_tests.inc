@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -71,7 +72,7 @@ Optional plugins:
 */
 
 static
-	YSI_g_sValue;
+	YSI_g_sValue = 0;
 
 #if !defined CHAIN_ORDER
 	#define CHAIN_ORDER() 0
@@ -134,6 +135,7 @@ static
 
 HOOK__ OnScriptInit()
 {
+	print("hi");
 	y_hooks_OnScriptInit_called = true;
 }
 
@@ -443,7 +445,7 @@ forward Ony_hooksTest3(cmd[]);
 HOOK__ Ony_hooksTest3@000(cmd[])
 {
 	++YSI_g_sValue;
-	//printf("a");
+	//print("a");
 	return 1;
 }
 
@@ -451,7 +453,7 @@ HOOK__ Ony_hooksTest3@001(cmd[])
 {
 	// Called second due to forced orderings.
 	++YSI_g_sValue;
-	//printf("b");
+	//print("b");
 	return 1;
 }
 
@@ -539,9 +541,9 @@ TEST__ y_hooks_Ony_hooksTest5()
 static stock y_hooks_funcidx2(const str[])
 {
 	new
-		func[32],
-		buf,
-		idx;
+		func[FUNCTION_LENGTH],
+		buf = 0,
+		idx = 0;
 	while ((idx = AMX_GetPublicName(idx, func, str)))
 	{
 		if (!strcmp(func, str))
@@ -573,8 +575,8 @@ public y_hooks_Invalidate3() {}
 TEST__ y_hooks_Invalidate23()
 {
 	new
-		base0,
-		count0;
+		base0 = 0,
+		count0 = 0;
 	AMX_GetBaseCount(AMX_TABLE_PUBLICS, base0, count0);
 	ASSERT_NE(funcidx("y_hooks_Invalidate2"), -1);
 	ASSERT_NE(funcidx("y_hooks_Invalidate3"), -1);
@@ -584,8 +586,8 @@ TEST__ y_hooks_Invalidate23()
 	ASSERT_EQ(funcidx("y_hooks_Invalidate2"), -1);
 	ASSERT_EQ(funcidx("y_hooks_Invalidate3"), -1);
 	new
-		base1,
-		count1;
+		base1 = 0,
+		count1 = 0;
 	AMX_GetBaseCount(AMX_TABLE_PUBLICS, base1, count1);
 	ASSERT(base1 > base0);
 	ASSERT(count1 < count0);
@@ -594,7 +596,7 @@ TEST__ y_hooks_Invalidate23()
 TEST__ y_hooks_IsolateName1()
 {
 	new
-		name[32];
+		name[FUNCTION_LENGTH];
 	name = "@yH_Hello@Other";
 	Hooks_IsolateName(name);
 	ASSERT_FALSE(strcmp(name, "Hello"));
@@ -612,7 +614,7 @@ TEST__ y_hooks_IsolateName1()
 TEST__ y_hooks_IsolateName2()
 {
 	new
-		func[32];
+		func[FUNCTION_LENGTH];
 	#define FUNC:%0; func = "_yH@"#%0"@";Hooks_IsolateName(func);ASSERT(!strcmp(func, #%0));
 	FUNC:A;
 	FUNC:AAA;
@@ -625,7 +627,7 @@ TEST__ y_hooks_IsolateName2()
 	#undef FUNC
 }
 
-static g_y_hooksVar;
+static g_y_hooksVar = 0;
 
 TEST__ y_hooks_Customs()
 {
@@ -909,6 +911,7 @@ hook y_hooks_State1(string:c[]) <y_hooks_state : y_hooks_state_4>
 
 TEST__ y_hooks_State1()
 {
+	g_y_hooksVar = 0;
 	state y_hooks_state : y_hooks_state_1;
 	CallLocalFunction("y_hooks_State1", "s", "1000 2000");
 	ASSERT_EQ(g_y_hooksVar, 1000);
@@ -946,7 +949,14 @@ HOOK__ y_hooks_Crash@4()
 
 TEST__ y_hooks_Crash()
 {
-	CallLocalFunction("y_hooks_Crash", "");
-	Testing_SurpressOneFail();
+	if (Server_CrashDetectExists())
+	{
+		CallLocalFunction("y_hooks_Crash", "");
+		Testing_SurpressOneFail();
+	}
+	else
+	{
+		ASSERT(Server_CrashDetectExists());
+	}
 }
 

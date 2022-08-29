@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -243,19 +244,127 @@ const static _YSIM_STORED_SETTINGS = YSIM_STORED_SETTINGS;
 
 #if !_YSIM_IS_SERVER && !_YSIM_IS_CLOUD
 	#if YSIM_HAS_MASTER
+		// Client or stub - never master.
 		stock
 			_E_YCM:_YCM@ = _E_YCM@n;
 	#else
+		// No master system - always master.
 		stock
 			_E_YCM:_YCM@ = _E_YCM@y;
 	#endif
-	// THERES A `#endinput` HERE, because we don't need to co-ordinate.
+
+	// There's a `#endinput` here because we don't need to co-ordinate.
 	#endinput
 #endif
 
 // Variable to hold the current master state for ease of access.
 stock
 	_E_YCM:_YCM@ = _E_YCM@u;
+
+#if _YSIM_IS_SERVER
+	forward MAKE_YCM<YSIM_VERSION...>();
+
+	public MAKE_YCM<YSIM_VERSION...>() <_YCM:y, _YCM:u>
+	{
+		P:3(#MAKE_YCM<YSIM_VERSION...> "() <y,u> called");
+		// For making sure the latest version of a library is the one used.
+		if (YSI_gModuleShutdown)
+		{
+			return cellmin;
+		}
+		
+		setproperty(8, YSIM_VERRET, cellmax);
+		setproperty(8, YSIM_VERMAX, cellmax);
+		return cellmax;
+	}
+
+	public MAKE_YCM<YSIM_VERSION...>() <_YCM:n>
+	{
+		P:3(#MAKE_YCM<YSIM_VERSION...> "() <n> called");
+		if (YSI_gModuleShutdown)
+		{
+			return cellmin;
+		}
+		
+		// For making sure the latest version of a library is the one used.
+		setproperty(8, YSIM_VERMAX, cellmax);
+		return cellmax;
+	}
+
+	public MAKE_YCM<YSIM_VERSION...>() <>
+	{
+		// Called if this script is ending.
+		P:3(#MAKE_YCM<YSIM_VERSION...> "() <> called");
+		if (YSI_gModuleShutdown)
+		{
+			return cellmin;
+		}
+
+		return cellmax;
+	}
+#elseif _YSIM_IS_CLOUD
+		forward MAKE_YCM<YSIM_VERSION...>();
+
+		public MAKE_YCM<YSIM_VERSION...>() <>
+		{
+			// Return here for local (current version) gets.
+			P:3(#MAKE_YCM<YSIM_VERSION...> "() <> called");
+			if (YSI_gModuleShutdown)
+			{
+				return cellmin;
+			}
+
+	#if defined YSIM_VERSION
+			return YSIM_VERSION;
+		}
+		
+		public MAKE_YCM<YSIM_VERSION...>() <_YCM:y>
+		{
+			P:3(#MAKE_YCM<YSIM_VERSION...> "() <y> called");
+			if (YSI_gModuleShutdown)
+			{
+				return cellmin;
+			}
+			
+			// For making sure the latest version of a library is the one used.
+			setproperty(8, YSIM_VERRET, YSIM_VERSION);
+			setproperty(8, YSIM_VERMAX, max(getproperty(8, YSIM_VERMAX), YSIM_VERSION));
+			return YSIM_VERSION;
+		}
+
+		public MAKE_YCM<YSIM_VERSION...>() <_YCM:n>
+		{
+			P:3(#MAKE_YCM<YSIM_VERSION...> "() <n> called");
+			if (YSI_gModuleShutdown)
+			{
+				return cellmin;
+			}
+			
+			// For making sure the latest version of a library is the one used.
+			setproperty(8, YSIM_VERMAX, max(getproperty(8, YSIM_VERMAX), YSIM_VERSION));
+			return YSIM_VERSION;
+		}
+
+		#undef YSIM_VERSION
+	#else
+			return 0;
+		}
+	#endif
+		
+		public MAKE_YCM<YSIM_VERSION...>() <_YCM:u>
+		{
+			if (YSI_gModuleShutdown)
+			{
+				return cellmin;
+			}
+			
+			P:3(#MAKE_YCM<YSIM_VERSION...> "() <u> called");
+			// This script already claimed the master, we can't reverse that.
+			setproperty(8, YSIM_VERRET, cellmax);
+			setproperty(8, YSIM_VERMAX, cellmax);
+			return cellmax;
+		}
+#endif
 
 forward _YCM();
 
@@ -266,47 +375,77 @@ forward _YCM();
  * <transition keep="true" target="_YCM : n" />
  *//*----------------------------------------------------------------**/
 
-static stock Master_GetCurrentMaster()
+static stock Master_GetCurrentMaster(installState)
 {
 	// THIS CODE IS COPIED IN y_classes (mostly).
 	#if _YSIM_IS_SERVER
 		// Steal the master.
-		if (_Master_Get(#_YCM, true))
-		{
-			// Nothing changed, or we took it without force.
-			state _YCM:y;
-			_YCM@ = _E_YCM@y;
-		}
-		else
-		{
-			// Something changed, tell other scripts.
-			state _YCM:u;
-			_YCM@ = _E_YCM@u;
-			// Determine the next unique name.
-			CallRemoteFunction(#_YCM, "");
-			// Servers always get all data, so it doesn't matter that
-			// for now this is state "u".
-		}
+		switch (_Master_Get(#_YCM, true))
 	#else //if _YSIM_IS_CLOUD
 		// See if this script should be master.
-		if (_Master_Get(#_YCM, false))
-		{
-			P:2("Got master " #_YCM);
-			state _YCM:y;
-			_YCM@ = _E_YCM@y;
-		}
-		else
-		{
-			state _YCM:n;
-			_YCM@ = _E_YCM@n;
-		}
+		switch (_Master_Get(#_YCM, false))
 	#endif
+		{
+			case e_YSIM_GET_TYPE_NO_CONTEST:
+			{
+				// Nothing changed, or we took it without force.
+				P:2("Master_GetCurrentMaster: Got master " #_YCM);
+				state _YCM:y;
+				_YCM@ = _E_YCM@y;
+				// Already installed = 1 + 1, does nothing.
+				// Not installed = 0 + 1, installs.
+				++installState;
+			}
+			case e_YSIM_GET_TYPE_STOLE:
+			{
+				P:2("Master_GetCurrentMaster: Stole master " #_YCM);
+				// Something changed, tell other scripts.  Set the state here to `:u` not `:y` so that
+				// the only call to a `:y` function does relinquishing.  We don't want to be set as
+				// master here then instantly relinquish everything.
+				state _YCM:u;
+				_YCM@ = _E_YCM@u;
+				// Determine the next unique name.
+				CallRemoteFunction(#_YCM, YSI_EMPTY);
+				// Servers always get all data, so it doesn't matter that
+				// for now this is state "u".
+				++installState;
+			}
+			case e_YSIM_GET_TYPE_NOT_GOT:
+			{
+				P:2("Master_GetCurrentMaster: Not master " #_YCM);
+				state _YCM:n;
+				_YCM@ = _E_YCM@n;
+				// Already installed = 1 - 1, uninstalls.
+				// Not installed = 0 - 1, does nothing.
+				--installState;
+			}
+			default:
+			{
+				P:E("Master_GetCurrentMaster: Unknown return " #_YCM);
+				state _YCM:n;
+				_YCM@ = _E_YCM@n;
+				--installState;
+			}
+		}
+		// We are now in charge of `_MASTER`.  Rename relevant functions.
+		if (installState == 1)
+		{
+			P:6("Master_GetCurrentMaster: Installing %d", _MASTER);
+			_Master_RenameAll(_MASTER);
+		}
+		else if (installState == 0)
+		{
+			P:6("Master_GetCurrentMaster: Uninstalling %d", _MASTER);
+			_Master_UnnameAll(_MASTER);
+		}
+		P:C(else { P:6("Master_GetCurrentMaster: Neither %d", _MASTER); });
 }
 
 public OnMasterSystemInit(id)
 {
 	P:1(#_YCM "_OGM");
-	Master_GetCurrentMaster();
+	deleteproperty(8, YSIM_VERMAX);
+	Master_GetCurrentMaster(1);
 	#if defined _ALS_OnMasterSystemInit
 		#undef OnMasterSystemInit
 	#else
@@ -315,331 +454,331 @@ public OnMasterSystemInit(id)
 	// FINALLY call the new next one.
 	#if _MASTER < 16
 		#if _MASTER == 0
-			#if defined @aOnScriptInit
-				@aOnScriptInit(id);
+			#if defined @aOnYSIInit
+				@aOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @aOnScriptInit
+			#define OnMasterSystemInit @aOnYSIInit
 		#elseif _MASTER == 1
-			#if defined @bOnScriptInit
-				@bOnScriptInit(id);
+			#if defined @bOnYSIInit
+				@bOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @bOnScriptInit
+			#define OnMasterSystemInit @bOnYSIInit
 		#elseif _MASTER == 2
-			#if defined @cOnScriptInit
-				@cOnScriptInit(id);
+			#if defined @cOnYSIInit
+				@cOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @cOnScriptInit
+			#define OnMasterSystemInit @cOnYSIInit
 		#elseif _MASTER == 3
-			#if defined @dOnScriptInit
-				@dOnScriptInit(id);
+			#if defined @dOnYSIInit
+				@dOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @dOnScriptInit
+			#define OnMasterSystemInit @dOnYSIInit
 		#elseif _MASTER == 4
-			#if defined @eOnScriptInit
-				@eOnScriptInit(id);
+			#if defined @eOnYSIInit
+				@eOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @eOnScriptInit
+			#define OnMasterSystemInit @eOnYSIInit
 		#elseif _MASTER == 5
-			#if defined @fOnScriptInit
-				@fOnScriptInit(id);
+			#if defined @fOnYSIInit
+				@fOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @fOnScriptInit
+			#define OnMasterSystemInit @fOnYSIInit
 		#elseif _MASTER == 6
-			#if defined @gOnScriptInit
-				@gOnScriptInit(id);
+			#if defined @gOnYSIInit
+				@gOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @gOnScriptInit
+			#define OnMasterSystemInit @gOnYSIInit
 		#elseif _MASTER == 7
-			#if defined @hOnScriptInit
-				@hOnScriptInit(id);
+			#if defined @hOnYSIInit
+				@hOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @hOnScriptInit
+			#define OnMasterSystemInit @hOnYSIInit
 		#elseif _MASTER == 8
-			#if defined @iOnScriptInit
-				@iOnScriptInit(id);
+			#if defined @iOnYSIInit
+				@iOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @iOnScriptInit
+			#define OnMasterSystemInit @iOnYSIInit
 		#elseif _MASTER == 9
-			#if defined @jOnScriptInit
-				@jOnScriptInit(id);
+			#if defined @jOnYSIInit
+				@jOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @jOnScriptInit
+			#define OnMasterSystemInit @jOnYSIInit
 		#elseif _MASTER == 10
-			#if defined @kOnScriptInit
-				@kOnScriptInit(id);
+			#if defined @kOnYSIInit
+				@kOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @kOnScriptInit
+			#define OnMasterSystemInit @kOnYSIInit
 		#elseif _MASTER == 11
-			#if defined @lOnScriptInit
-				@lOnScriptInit(id);
+			#if defined @lOnYSIInit
+				@lOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @lOnScriptInit
+			#define OnMasterSystemInit @lOnYSIInit
 		#elseif _MASTER == 12
-			#if defined @mOnScriptInit
-				@mOnScriptInit(id);
+			#if defined @mOnYSIInit
+				@mOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @mOnScriptInit
+			#define OnMasterSystemInit @mOnYSIInit
 		#elseif _MASTER == 13
-			#if defined @nOnScriptInit
-				@nOnScriptInit(id);
+			#if defined @nOnYSIInit
+				@nOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @nOnScriptInit
+			#define OnMasterSystemInit @nOnYSIInit
 		#elseif _MASTER == 14
-			#if defined @oOnScriptInit
-				@oOnScriptInit(id);
+			#if defined @oOnYSIInit
+				@oOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @oOnScriptInit
+			#define OnMasterSystemInit @oOnYSIInit
 		#elseif _MASTER == 15
-			#if defined @pOnScriptInit
-				@pOnScriptInit(id);
+			#if defined @pOnYSIInit
+				@pOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @pOnScriptInit
+			#define OnMasterSystemInit @pOnYSIInit
 		#endif
 	#elseif _MASTER < 32
 		#if _MASTER == 16
-			#if defined @qOnScriptInit
-				@qOnScriptInit(id);
+			#if defined @qOnYSIInit
+				@qOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @qOnScriptInit
+			#define OnMasterSystemInit @qOnYSIInit
 		#elseif _MASTER == 17
-			#if defined @rOnScriptInit
-				@rOnScriptInit(id);
+			#if defined @rOnYSIInit
+				@rOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @rOnScriptInit
+			#define OnMasterSystemInit @rOnYSIInit
 		#elseif _MASTER == 18
-			#if defined @sOnScriptInit
-				@sOnScriptInit(id);
+			#if defined @sOnYSIInit
+				@sOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @sOnScriptInit
+			#define OnMasterSystemInit @sOnYSIInit
 		#elseif _MASTER == 19
-			#if defined @tOnScriptInit
-				@tOnScriptInit(id);
+			#if defined @tOnYSIInit
+				@tOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @tOnScriptInit
+			#define OnMasterSystemInit @tOnYSIInit
 		#elseif _MASTER == 20
-			#if defined @uOnScriptInit
-				@uOnScriptInit(id);
+			#if defined @uOnYSIInit
+				@uOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @uOnScriptInit
+			#define OnMasterSystemInit @uOnYSIInit
 		#elseif _MASTER == 21
-			#if defined @vOnScriptInit
-				@vOnScriptInit(id);
+			#if defined @vOnYSIInit
+				@vOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @vOnScriptInit
+			#define OnMasterSystemInit @vOnYSIInit
 		#elseif _MASTER == 22
-			#if defined @wOnScriptInit
-				@wOnScriptInit(id);
+			#if defined @wOnYSIInit
+				@wOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @wOnScriptInit
+			#define OnMasterSystemInit @wOnYSIInit
 		#elseif _MASTER == 23
-			#if defined @xOnScriptInit
-				@xOnScriptInit(id);
+			#if defined @xOnYSIInit
+				@xOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @xOnScriptInit
+			#define OnMasterSystemInit @xOnYSIInit
 		#elseif _MASTER == 24
-			#if defined @yOnScriptInit
-				@yOnScriptInit(id);
+			#if defined @yOnYSIInit
+				@yOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @yOnScriptInit
+			#define OnMasterSystemInit @yOnYSIInit
 		#elseif _MASTER == 25
-			#if defined @zOnScriptInit
-				@zOnScriptInit(id);
+			#if defined @zOnYSIInit
+				@zOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @zOnScriptInit
+			#define OnMasterSystemInit @zOnYSIInit
 		#elseif _MASTER == 26
-			#if defined @AOnScriptInit
-				@AOnScriptInit(id);
+			#if defined @AOnYSIInit
+				@AOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @AOnScriptInit
+			#define OnMasterSystemInit @AOnYSIInit
 		#elseif _MASTER == 27
-			#if defined @BOnScriptInit
-				@BOnScriptInit(id);
+			#if defined @BOnYSIInit
+				@BOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @BOnScriptInit
+			#define OnMasterSystemInit @BOnYSIInit
 		#elseif _MASTER == 28
-			#if defined @COnScriptInit
-				@COnScriptInit(id);
+			#if defined @COnYSIInit
+				@COnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @COnScriptInit
+			#define OnMasterSystemInit @COnYSIInit
 		#elseif _MASTER == 29
-			#if defined @DOnScriptInit
-				@DOnScriptInit(id);
+			#if defined @DOnYSIInit
+				@DOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @DOnScriptInit
+			#define OnMasterSystemInit @DOnYSIInit
 		#elseif _MASTER == 30
-			#if defined @EOnScriptInit
-				@EOnScriptInit(id);
+			#if defined @EOnYSIInit
+				@EOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @EOnScriptInit
+			#define OnMasterSystemInit @EOnYSIInit
 		#elseif _MASTER == 31
-			#if defined @FOnScriptInit
-				@FOnScriptInit(id);
+			#if defined @FOnYSIInit
+				@FOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @FOnScriptInit
+			#define OnMasterSystemInit @FOnYSIInit
 		#endif
 	#elseif _MASTER < 48
 		#if _MASTER == 32
-			#if defined @GOnScriptInit
-				@GOnScriptInit(id);
+			#if defined @GOnYSIInit
+				@GOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @GOnScriptInit
+			#define OnMasterSystemInit @GOnYSIInit
 		#elseif _MASTER == 33
-			#if defined @HOnScriptInit
-				@HOnScriptInit(id);
+			#if defined @HOnYSIInit
+				@HOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @HOnScriptInit
+			#define OnMasterSystemInit @HOnYSIInit
 		#elseif _MASTER == 34
-			#if defined @IOnScriptInit
-				@IOnScriptInit(id);
+			#if defined @IOnYSIInit
+				@IOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @IOnScriptInit
+			#define OnMasterSystemInit @IOnYSIInit
 		#elseif _MASTER == 35
-			#if defined @JOnScriptInit
-				@JOnScriptInit(id);
+			#if defined @JOnYSIInit
+				@JOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @JOnScriptInit
+			#define OnMasterSystemInit @JOnYSIInit
 		#elseif _MASTER == 36
-			#if defined @KOnScriptInit
-				@KOnScriptInit(id);
+			#if defined @KOnYSIInit
+				@KOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @KOnScriptInit
+			#define OnMasterSystemInit @KOnYSIInit
 		#elseif _MASTER == 37
-			#if defined @LOnScriptInit
-				@LOnScriptInit(id);
+			#if defined @LOnYSIInit
+				@LOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @LOnScriptInit
+			#define OnMasterSystemInit @LOnYSIInit
 		#elseif _MASTER == 38
-			#if defined @MOnScriptInit
-				@MOnScriptInit(id);
+			#if defined @MOnYSIInit
+				@MOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @MOnScriptInit
+			#define OnMasterSystemInit @MOnYSIInit
 		#elseif _MASTER == 39
-			#if defined @NOnScriptInit
-				@NOnScriptInit(id);
+			#if defined @NOnYSIInit
+				@NOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @NOnScriptInit
+			#define OnMasterSystemInit @NOnYSIInit
 		#elseif _MASTER == 40
-			#if defined @OOnScriptInit
-				@OOnScriptInit(id);
+			#if defined @OOnYSIInit
+				@OOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @OOnScriptInit
+			#define OnMasterSystemInit @OOnYSIInit
 		#elseif _MASTER == 41
-			#if defined @POnScriptInit
-				@POnScriptInit(id);
+			#if defined @POnYSIInit
+				@POnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @POnScriptInit
+			#define OnMasterSystemInit @POnYSIInit
 		#elseif _MASTER == 42
-			#if defined @QOnScriptInit
-				@QOnScriptInit(id);
+			#if defined @QOnYSIInit
+				@QOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @QOnScriptInit
+			#define OnMasterSystemInit @QOnYSIInit
 		#elseif _MASTER == 43
-			#if defined @ROnScriptInit
-				@ROnScriptInit(id);
+			#if defined @ROnYSIInit
+				@ROnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @ROnScriptInit
+			#define OnMasterSystemInit @ROnYSIInit
 		#elseif _MASTER == 44
-			#if defined @SOnScriptInit
-				@SOnScriptInit(id);
+			#if defined @SOnYSIInit
+				@SOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @SOnScriptInit
+			#define OnMasterSystemInit @SOnYSIInit
 		#elseif _MASTER == 45
-			#if defined @TOnScriptInit
-				@TOnScriptInit(id);
+			#if defined @TOnYSIInit
+				@TOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @TOnScriptInit
+			#define OnMasterSystemInit @TOnYSIInit
 		#elseif _MASTER == 46
-			#if defined @UOnScriptInit
-				@UOnScriptInit(id);
+			#if defined @UOnYSIInit
+				@UOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @UOnScriptInit
+			#define OnMasterSystemInit @UOnYSIInit
 		#elseif _MASTER == 47
-			#if defined @VOnScriptInit
-				@VOnScriptInit(id);
+			#if defined @VOnYSIInit
+				@VOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @VOnScriptInit
+			#define OnMasterSystemInit @VOnYSIInit
 		#endif
 	#else
 		#if _MASTER == 48
-			#if defined @WOnScriptInit
-				@WOnScriptInit(id);
+			#if defined @WOnYSIInit
+				@WOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @WOnScriptInit
+			#define OnMasterSystemInit @WOnYSIInit
 		#elseif _MASTER == 49
-			#if defined @XOnScriptInit
-				@XOnScriptInit(id);
+			#if defined @XOnYSIInit
+				@XOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @XOnScriptInit
+			#define OnMasterSystemInit @XOnYSIInit
 		#elseif _MASTER == 50
-			#if defined @YOnScriptInit
-				@YOnScriptInit(id);
+			#if defined @YOnYSIInit
+				@YOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @YOnScriptInit
+			#define OnMasterSystemInit @YOnYSIInit
 		#elseif _MASTER == 51
-			#if defined @ZOnScriptInit
-				@ZOnScriptInit(id);
+			#if defined @ZOnYSIInit
+				@ZOnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @ZOnScriptInit
+			#define OnMasterSystemInit @ZOnYSIInit
 		#elseif _MASTER == 52
-			#if defined @0OnScriptInit
-				@0OnScriptInit(id);
+			#if defined @0OnYSIInit
+				@0OnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @0OnScriptInit
+			#define OnMasterSystemInit @0OnYSIInit
 		#elseif _MASTER == 53
-			#if defined @1OnScriptInit
-				@1OnScriptInit(id);
+			#if defined @1OnYSIInit
+				@1OnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @1OnScriptInit
+			#define OnMasterSystemInit @1OnYSIInit
 		#elseif _MASTER == 54
-			#if defined @2OnScriptInit
-				@2OnScriptInit(id);
+			#if defined @2OnYSIInit
+				@2OnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @2OnScriptInit
+			#define OnMasterSystemInit @2OnYSIInit
 		#elseif _MASTER == 55
-			#if defined @3OnScriptInit
-				@3OnScriptInit(id);
+			#if defined @3OnYSIInit
+				@3OnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @3OnScriptInit
+			#define OnMasterSystemInit @3OnYSIInit
 		#elseif _MASTER == 56
-			#if defined @4OnScriptInit
-				@4OnScriptInit(id);
+			#if defined @4OnYSIInit
+				@4OnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @4OnScriptInit
+			#define OnMasterSystemInit @4OnYSIInit
 		#elseif _MASTER == 57
-			#if defined @5OnScriptInit
-				@5OnScriptInit(id);
+			#if defined @5OnYSIInit
+				@5OnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @5OnScriptInit
+			#define OnMasterSystemInit @5OnYSIInit
 		#elseif _MASTER == 58
-			#if defined @6OnScriptInit
-				@6OnScriptInit(id);
+			#if defined @6OnYSIInit
+				@6OnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @6OnScriptInit
+			#define OnMasterSystemInit @6OnYSIInit
 		#elseif _MASTER == 59
-			#if defined @7OnScriptInit
-				@7OnScriptInit(id);
+			#if defined @7OnYSIInit
+				@7OnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @7OnScriptInit
+			#define OnMasterSystemInit @7OnYSIInit
 		#elseif _MASTER == 60
-			#if defined @8OnScriptInit
-				@8OnScriptInit(id);
+			#if defined @8OnYSIInit
+				@8OnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @8OnScriptInit
+			#define OnMasterSystemInit @8OnYSIInit
 		#elseif _MASTER == 61
-			#if defined @9OnScriptInit
-				@9OnScriptInit(id);
+			#if defined @9OnYSIInit
+				@9OnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @9OnScriptInit
+			#define OnMasterSystemInit @9OnYSIInit
 		#elseif _MASTER == 62
-			#if defined @@OnScriptInit
-				@@OnScriptInit(id);
+			#if defined @@OnYSIInit
+				@@OnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @@OnScriptInit
+			#define OnMasterSystemInit @@OnYSIInit
 		#elseif _MASTER == 63
-			#if defined @_OnScriptInit
-				@_OnScriptInit(id);
+			#if defined @_OnYSIInit
+				@_OnYSIInit(id);
 			#endif
-			#define OnMasterSystemInit @_OnScriptInit
+			#define OnMasterSystemInit @_OnYSIInit
 		#endif
 	#endif
 	return 1;
@@ -663,59 +802,104 @@ public OnMasterSystemInit(id)
 
 public _YCM() <_YCM:y>
 {
-	P:1("%d: " #_YCM "<y> called, master = %d", Master_ID(), getproperty(9, #_YCM));
+	P:1("%d: " #_YCM "() <y> called, master = %d", Master_ID(), getproperty(9, #_YCM));
 	if (getproperty(9, #_YCM) == Master_ID())
 	{
 		P:2(#_YCM " natural end");
+		if (YSI_gModuleShutdown)
+		{
+			// Disable the current mastership.
+			state _YCM:w;
+			_YCM@ = _E_YCM@w;
+			return;
+		}
+		P:2(#_YCM " not shut down");
 		// Disable the current mastership.
-		state _YCM:m;
-		_YCM@ = _E_YCM@m;
-		// Ending normally, relinquish control peacefully.
-		setproperty(9, #_YCM, -1);
+		state _YCM:p;
+		_YCM@ = _E_YCM@p;
+		// Ending normally, relinquish control peacefully to the highest version.
+		setproperty(8, YSIM_VERMAX, 0);
+		CallRemoteFunction(#MAKE_YCM<YSIM_VERSION...>, YSI_EMPTY);
+		setproperty(9, #_YCM, 0);
 		// Called locally to begin the hand off process.
-		CallRemoteFunction(#_YCM, "");
+		_Master_UnnameAll(_MASTER);
+		CallRemoteFunction(#_YCM, YSI_EMPTY);
 	}
 	else
 	{
 		P:2(#_YCM " stolen!");
-		// Brutally stolen!
+		// Brutally stolen, but can be later reclaimed.
+		state _YCM:n;
+		_YCM@ = _E_YCM@n;
 		_Master_Relinquish(#_YCM);
+		_Master_UnnameAll(_MASTER);
 	}
-	// This is where we need to to the handoff.
-	state _YCM:p;
-	_YCM@ = _E_YCM@p;
-	CallLocalFunction(#MAKE_YCM<HANDOFF_SOURCE...>, "");
-	CallLocalFunction(#MAKE_YCM<HANDOFF_SOURCE...Group>, "");
-	// Could, in theory, return to be master if the script doesn't end.
-	state _YCM:n;
-	_YCM@ = _E_YCM@n;
+	if (getproperty(9, #_YCM))
+	{
+		// This is where we need to to the handoff.
+		CallLocalFunction(#MAKE_YCM<HANDOFF_SOURCE...>, YSI_EMPTY);
+		CallLocalFunction(#MAKE_YCM<HANDOFF_SOURCE...Group>, YSI_EMPTY);
+	}
 }
 
 public _YCM() <_YCM:n>
 {
-	P:1("%d: " #_YCM "<n> called", Master_ID());
-	// This has been called remotely from a script which owns the
-	// library masterhood (that's the only way this can ever be called).
-	Master_GetCurrentMaster();
+	P:1("%d: " #_YCM "() <n> called", Master_ID());
+	if (YSI_gModuleShutdown)
+	{
+		// This wasn't the master, but is in a module that's now shutting down.  null-route all
+		// further calls.
+		state _YCM:p;
+		_YCM@ = _E_YCM@p;
+	}
+	else
+	{
+		// This has been called remotely from a script which owns the
+		// library masterhood (that's the only way this can ever be called).
+		Master_GetCurrentMaster(0);
+	}
 }
 
 public _YCM() <_YCM:m, _YCM:p>
 {
-	P:1("%d: " #_YCM "<m,p> called", Master_ID());
+	P:1("%d: " #_YCM "() <m,p> called", Master_ID());
 	// Do nothing at all (just define states).
 }
 
 public _YCM() <_YCM:u>
 {
 	// Finish initialisation.
-	P:1("%d: " #_YCM "<u> called", Master_ID());
+	P:1("%d: " #_YCM "() <u> called", Master_ID());
 	state _YCM:y;
 	_YCM@ = _E_YCM@y;
+}
+
+public _YCM() <_YCM:w>
+{
+	P:1("%d: " #_YCM "() <w> called", Master_ID());
+	// Disable the current mastership.
+	state _YCM:p;
+	_YCM@ = _E_YCM@p;
+	
+	// Ending normally, relinquish control peacefully to the highest version.
+	setproperty(8, YSIM_VERMAX, 0);
+	CallRemoteFunction(#MAKE_YCM<YSIM_VERSION...>, YSI_EMPTY);
+	setproperty(9, #_YCM, 0);
+	// Called locally to begin the hand off process.
+	CallRemoteFunction(#_YCM, YSI_EMPTY);
+
+	// Now try pass everything off.
+	if (getproperty(9, #_YCM))
+	{
+		// This is where we need to to the handoff.
+		CallLocalFunction(#MAKE_YCM<HANDOFF_SOURCE...>, YSI_EMPTY);
+		CallLocalFunction(#MAKE_YCM<HANDOFF_SOURCE...Group>, YSI_EMPTY);
+	}
 }
 
 public _YCM() <>
 {
 	// Do nothing at all (just define states).
-	P:E(#_YCM "() <> called");
+	P:E("%d: " #_YCM "() <> called", Master_ID());
 }
 

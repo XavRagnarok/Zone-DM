@@ -20,7 +20,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -203,28 +204,13 @@ forward Alloc:calloc(size);
 	new
 		YSI_gMallocMemory[1];
 	
-	#if !defined _ALS_OnJITCompile
-		forward OnJITCompile();
-	#endif
-	
-	public OnJITCompile()
-	{
-		P:E("y_malloc with JIT requires \"#define YSI_NO_HEAP_MALLOC\"");
-		// Disable the JIT.
-		Malloc_OnJITCompile();
-		return 0;
-	}
-	
-	CHAIN_FORWARD:Malloc_OnJITCompile() = 1;
-	#if defined _ALS_OnJITCompile
-		#undef OnJITCompile
-	#else
-		#define _ALS_OnJITCompile
-	#endif
-	#define OnJITCompile(%0) CHAIN_PUBLIC:Malloc_OnJITCompile(%0)
+	#include "..\y_cgen\y_cgen"
 	
 	// Allocate space on the heap permanently.
-	#include "y_malloc_warning"
+	#if !defined YSI_YES_HEAP_MALLOC
+		#include "y_malloc_warning"
+	#endif
+	
 	#include "y_malloc_heapalloc"
 #endif
 

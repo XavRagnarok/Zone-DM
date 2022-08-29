@@ -20,7 +20,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -225,6 +226,19 @@ Optional plugins:
 #define Vehicle_Name(%0) (VIM_Name(Vehicle_GetVIM(%0)))
 #define Model_Name(%0) (VIM_Name(Model_ToVIM(%0)))
 #define VIM_Name(%0) (YSI_gVehicleNames[(%0)])
+
+native y_vehicledata_StrUnpack(dest[], const src[], size = sizeof (dest)) = strunpack;
+// When using the `GetName` functions with an optional length the call becomes:
+// `y_vehicledata_StrUnpack(dest, size, src)`, which is the wrong order for
+// `strunpack`.  This correctly rearranges the parameters.
+#define y_vehicledata_StrUnpack(%0,%1,%2) strunpack(%0,%2,%1)
+
+// Vehicle_GetName(vehicleid, dest[], size = sizeof (dest));
+#define Vehicle_GetName(%0,%1) y_vehicledata_StrUnpack(%1,VIM_Name(Vehicle_GetVIM(%0)))
+// Model_GetName(modelid, dest[], size = sizeof (dest));
+#define Model_GetName(%0,%1) y_vehicledata_StrUnpack(%1,VIM_Name(Model_ToVIM(%0)))
+// VIM_GetName(VIM:vim, dest[], size = sizeof (dest));
+#define VIM_GetName(%0,%1) y_vehicledata_StrUnpack(%1,YSI_gVehicleNames[(%0)])
 
 #define Vehicle_TopSpeed(%0) (VIM_TopSpeed(Vehicle_GetVIM(%0)))
 #define Model_TopSpeed(%0) (VIM_TopSpeed(Model_ToVIM(%0)))
@@ -588,7 +602,7 @@ stock
 			_VEHICLE_FLAGS<Unique      | Van       >,
 			_VEHICLE_FLAGS<Sport       | Car       >,
 			_VEHICLE_FLAGS<Trailer     | Train     >,
-			_VEHICLE_FLAGS<Trailer     | Train     >,
+			_VEHICLE_FLAGS<Trailer     | Truck     >,
 			_VEHICLE_FLAGS<Airplane    | Plane     >,
 			_VEHICLE_FLAGS<Airplane    | Plane     >,
 			_VEHICLE_FLAGS<RC          | Flowerpot >,
@@ -618,7 +632,7 @@ stock
 			!"Bravura",
 			!"Buffalo",
 			!"Linerunner",
-			!"Perenniel",
+			!"Perennial",
 			!"Sentinel",
 			!"Dumper",
 			!"Firetruck",
@@ -719,7 +733,7 @@ stock
 			!"Hotring Racer \"A\"",
 			!"Hotring Racer \"B\"",
 			!"Bloodring Banger",
-			!"Rancher",
+			!"Rancher Lure",
 			!"Super GT",
 			!"Elegant",
 			!"Journey",
@@ -1058,9 +1072,9 @@ stock
 stock Vehicle_Speed(vehicleid)
 {
 	static 
-		Float:Vx,
-		Float:Vy,
-		Float:Vz
+		Float:Vx = 0.0,
+		Float:Vy = 0.0,
+		Float:Vz = 0.0
 	;
 	GetVehicleVelocity(vehicleid, Vx, Vy, Vz);
 	return floatround((floatsqroot((Vx * Vx) + (Vy * Vy) + (Vz * Vz)) * 136.666667));

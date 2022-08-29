@@ -23,38 +23,58 @@
 #endif
 #define PHYS_MEMORY_INC
 
+/**
+ * <library name="amx_assembly phys_memory" summary="AMX Assembly Library: Read and write real server addresses.">
+ *   <summary pawndoc="true">
+ *     This library uses the enhanced <em>pawndoc.xsl</em> from
+ *     <a href="https://github.com/pawn-lang/pawndoc">pawn-lang/pawndoc</a>.
+ *     This XSL has features such as library and markdown support, and will not
+ *     render this message when used.
+ *   </summary>
+ * </library>
+ */
+
+/// <p/>
+
 #include <core>
 
 #include "amx_base"
 
+/// <library>amx_assembly phys_memory</library>
 static stock GetDat() {
 	#emit lctrl 1
 	#emit retn
 	return 0; // make compiler happy
 }
 
+/// <library>amx_assembly phys_memory</library>
 static stock AbsToRel(address) {
 	return address - (GetAmxBaseAddress() + GetDat());
 }
 
+/// <library>amx_assembly phys_memory</library>
 static stock RelToAbs(address) {
 	return address + (GetAmxBaseAddress() + GetDat());
 }
 
-// Returns the absolute address of a variable/array.
+/// <library>amx_assembly phys_memory</library>
+/// <summary>
+///   Returns the absolute address of a variable/array.
+/// </summary>
 stock refabs(...) {
 	assert(numargs() == 1);
-	new address;
+	new address = 0;
 	#emit load.s.pri 12
 	#emit stor.s.pri address
 	return RelToAbs(address);
 }
 
+/// <library>amx_assembly phys_memory</library>
 stock ReadPhysMemory(address, dest[], num = sizeof(dest)) {
 	new rel_addr = AbsToRel(address);
 
 	// Current destination cell address.
-	new cur_dest;
+	new cur_dest = 0;
 	#emit load.s.pri dest
 	#emit stor.s.pri cur_dest
 
@@ -73,11 +93,12 @@ stock ReadPhysMemory(address, dest[], num = sizeof(dest)) {
 	return 0; // make compiler happy
 }
 
+/// <library>amx_assembly phys_memory</library>
 stock WritePhysMemory(address, src[], num = sizeof(src)) {
 	new rel_addr = AbsToRel(address);
 
 	// Current destination cell address..
-	new cur_src;
+	new cur_src = 0;
 	#emit load.s.pri src
 	#emit stor.s.pri cur_src
 
@@ -96,6 +117,7 @@ stock WritePhysMemory(address, src[], num = sizeof(src)) {
 	return 0; // make compiler happy
 }
 
+/// <library>amx_assembly phys_memory</library>
 stock ReadPhysMemoryCell(address) {
 	new rel_addr = AbsToRel(address);
 	#emit lref.s.pri rel_addr
@@ -104,6 +126,7 @@ stock ReadPhysMemoryCell(address) {
 	return 0; // make compiler happy
 }
 
+/// <library>amx_assembly phys_memory</library>
 stock WritePhysMemoryCell(address, what) {
 	new rel_addr = AbsToRel(address);
 	#emit load.s.pri what
@@ -112,3 +135,4 @@ stock WritePhysMemoryCell(address, what) {
 	#emit retn
 	return 0; // make compiler happy
 }
+

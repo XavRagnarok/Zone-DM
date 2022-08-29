@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -122,7 +123,7 @@ TEST__ y_malloc_Loads()
 	ASSERT(!free(a));
 }
 
-#define MALLOC_TEST(%0) for (new Alloc:a = malloc(%0), __loop = 1; a && (__loop || !free(a)); --__loop)
+#define MALLOC_TEST(%0) for (new Alloc:a = malloc(%0); __once && a; free(a))
 
 TEST__ y_malloc_mset()
 {
@@ -287,5 +288,37 @@ TEST__ y_malloc_NewS_1()
 		ASSERT_EQ(mget(a, 2), b[2]);
 		free(a);
 	}
+}
+
+forward y_malloc_Deferred(Alloc:alloc);
+
+public y_malloc_Deferred(Alloc:alloc)
+{
+	new
+		Alloc:clobber = malloc(1000);
+	for (new i = 0; i != 1000; ++i)
+	{
+		mset(clobber, i, 0);
+	}
+	for (new i = 0; i != 1000; ++i)
+	{
+		if (mget(alloc, i) != i * 2)
+		{
+			P:E("y_malloc_Deferred test error");
+		}
+	}
+	free(clobber);
+	free(alloc);
+}
+
+TEST__ y_malloc_Deferred()
+{
+	new
+		Alloc:alloc = malloc(1000);
+	for (new i = 0; i != 1000; ++i)
+	{
+		mset(alloc, i, i * 2);
+	}
+	YSI_SetTimerEx("y_malloc_Deferred", 10, false, "i", _:alloc);
 }
 

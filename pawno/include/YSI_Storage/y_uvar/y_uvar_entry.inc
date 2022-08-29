@@ -20,7 +20,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -47,6 +47,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -127,17 +128,17 @@ Optional plugins:
 static stock
 	YSI_g_sFirstUVarData = -1,
 	// These three variables are used to speed up data loading through caching.
-	YSI_g_sLastName[32] = "\1\0",
-	YSI_g_sLastAddr,
-	YSI_g_sLastPlayers,
-	YSI_g_sLastSize;
+	YSI_g_sLastName[FUNCTION_LENGTH] = "\1\0",
+	YSI_g_sLastAddr = 0,
+	YSI_g_sLastPlayers = 0,
+	YSI_g_sLastSize = 0;
 
 forward _y_uvar_include_@();
 
 public _y_uvar_include_@()
 {
-	memset("", 0, 0);
-	Player_WriteArray("", "", 0);
+	MemSet(YSI_EMPTY, 0, 0);
+	Player_WriteArray(YSI_EMPTY, YSI_EMPTY, 0);
 }
 
 static stock Uvar_FindData(const name[], data[])
@@ -153,7 +154,7 @@ static stock Uvar_FindData(const name[], data[])
 		#emit STOR.S.pri data
 		if (!strcmp(data[4], name))
 		{
-			strcpy(YSI_g_sLastName, name);
+			StrCpy(YSI_g_sLastName, name);
 			YSI_g_sLastSize = data[3];
 			YSI_g_sLastPlayers = data[2];
 			YSI_g_sLastAddr = data[1];
@@ -176,7 +177,7 @@ public OnUserData[y_uvar](playerid, name[], value[])
 		if (strcmp(name, YSI_g_sLastName))
 		{
 			// Find the data.
-			Uvar_FindData(name, "");
+			Uvar_FindData(name, YSI_EMPTY);
 		}
 		if (YSI_g_sLastAddr == -1)
 		{
@@ -188,13 +189,13 @@ public OnUserData[y_uvar](playerid, name[], value[])
 	else
 	{
 		// Get the position in the array of this data.
-		//printf("call pos 0");
+		//print("call pos 0");
 		name[pos] = '\0';
 		pos = strval(name[pos + 1]) * ((MAX_INI_ENTRY_TEXT - 1) / 16 * 3);
 		if (strcmp(name[2], YSI_g_sLastName, false))
 		{
 			// Find the data.
-			Uvar_FindData(name[2], "");
+			Uvar_FindData(name[2], YSI_EMPTY);
 		}
 		if (YSI_g_sLastAddr == -1)
 		{
@@ -205,7 +206,7 @@ public OnUserData[y_uvar](playerid, name[], value[])
 		{
 			new
 				len = strlen(value),
-				idx;
+				idx = 0;
 			pos += YSI_g_sLastSize * playerid;
 			// Save this pointer to an array variable for simplicity.
 			#emit LOAD.pri   YSI_g_sLastAddr
@@ -288,12 +289,12 @@ public OnUserData[y_uvar](playerid, name[], value[])
 stock N@(volatile const vardata[], playerCount, dataSize, &pointer)
 {
 	new
-		sAddr;
+		sAddr = 0;
 	// Store the basic data, including linked-list pointers and a pointer to the
 	// location at which the data is stored.
 	#emit LOAD.S.pri vardata
 	#emit STOR.S.pri sAddr
-	printf("", YSI_g_sFirstUVarData);
+	printf(YSI_EMPTY, YSI_g_sFirstUVarData);
 	#emit LOAD.pri   YSI_g_sFirstUVarData
 	#emit SREF.S.pri sAddr
 	YSI_g_sFirstUVarData = sAddr;
@@ -316,8 +317,8 @@ public OnCodeInit()
 	YSI_g_sFirstUVarData = -1;
 	// Call all @yA_ functions to get all required data.
 	new
-		idx,
-		buffer;
+		idx = 0,
+		buffer = 0;
 	while ((idx = AMX_GetPublicPointerSuffix(idx, buffer, _A<@yA_>)))
 	{
 		#emit PUSH.C     0
@@ -388,7 +389,7 @@ stock _Uvar_DoSavePlayer(playerid)
 	Player_SetTag("y_uvar");
 	new
 		p = YSI_g_sFirstUVarData,
-		temp;
+		temp = 0;
 	while (p != -1)
 	{
 		// DO NOT CHANGE THE CODE BELOW HERE!!!
@@ -447,7 +448,7 @@ HOOK__ OnPlayerConnect(playerid)
 	P:1("hook Users_OnPlayerConnect called: %i", playerid);
 	new
 		p = YSI_g_sFirstUVarData,
-		temp;
+		temp = 0;
 	while (p != -1)
 	{
 		// DO NOT CHANGE THE CODE BELOW HERE!!!
@@ -493,8 +494,8 @@ HOOK__ OnPlayerConnect(playerid)
 			#emit ADD.C      36
 			#emit LCTRL      8
 			#emit PUSH.pri
-			// Call "memset" directly.
-			#emit CONST.pri  memset
+			// Call "MemSet" directly.
+			#emit CONST.pri  MemSet
 			#emit SCTRL      6
 			// DO NOT CHANGE THE CODE ABOVE HERE!!!
 		}

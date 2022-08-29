@@ -15,7 +15,7 @@ Legal:
 	The Original Code is the YSI framework.
 	
 	The Initial Developer of the Original Code is Alex "Y_Less" Cole.
-	Portions created by the Initial Developer are Copyright C 2011
+	Portions created by the Initial Developer are Copyright (c) 2022
 	the Initial Developer. All Rights Reserved.
 
 Contributors:
@@ -42,6 +42,7 @@ Contributors:
 	m0k1
 	paulommu
 	udan111
+	Cheaterman
 
 Thanks:
 	JoeBullet/Google63 - Handy arbitrary ASM jump code using SCTRL.
@@ -228,7 +229,11 @@ Optional plugins:
 
 // Default to cloud.
 #if YSIM_HAS_MASTER && !_YSIM_IS_CLIENT && !_YSIM_IS_SERVER && !_YSIM_IS_STUB
-	#define _YSIM_IS_CLOUD 1
+	#if _YSI_SAFE_STARTUP
+		#define _YSIM_IS_CLOUD 1
+	#else
+		#error Select SERVER/CLIENT/STUB for y_master with `ENABLE_YSI_UNSAFE_STARTUP`.
+	#endif
 #else
 	#define _YSIM_IS_CLOUD 0
 #endif
