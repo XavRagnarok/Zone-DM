@@ -8,6 +8,7 @@ CONFIGURATION:
 
 Example server.cfg:
 	echo Executing Server Config...
+	lanmode 0
 	maxplayers 32
 	port 7777
 	hostname Unnamed Server
@@ -15,7 +16,7 @@ Example server.cfg:
 	gamemode0 lvdm 1
 	gamemode1 rivershell 1
 	weburl www.sa-mp.com
-	rcon_password mypassword
+	rcon_password changeme
 
 To configure the server, you must edit the values in server.cfg. They are explained below:
 
@@ -44,6 +45,15 @@ maxplayers
 	Description:
 		Specifies the maximum amount of players.
 		
+lanmode
+-------
+	Parameters:
+		int (0 or 1)
+		
+	Description:
+		Turns lanmode on (1) or off (0). Lanmode (as the name suggests) is for use on LAN games, where bandwidth is not a problem. Lanmode sends data at a higher rate, for a smoother game.
+		
+
 announce
 -------
 	Parameters:

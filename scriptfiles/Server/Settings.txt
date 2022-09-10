@@ -1,3 +1,0 @@
-Connections=10
-motd=Written by Southclaw! Enjoy playing :)
-Registered Players=0
