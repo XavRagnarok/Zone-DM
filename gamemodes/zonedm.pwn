@@ -2,6 +2,12 @@
 
 #include <a_samp>
 #include <zcmd>
+#include <sscanf2>
+
+#define COLOR_WHITE "FFFFFF"
+#define COLOR_PINK "a80ec7"
+
+
 
 
 
@@ -37,3 +43,16 @@ main()
 // login/register
 #include "./modular/player/account.pwn"
 
+
+CMD:jetpack(playerid, params[])
+{
+	if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USEJETPACK)
+	{
+		return
+		SendClientMessage(playerid, COLOR_PINK, "REMOVED YOUR JETPACK")
+		SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
+	}
+	SendClientMessage(playerid, COLOR_PINK, "Enjoy prick and fuck luppino")
+	SetPlayerSpecialAction(playerid, SPECIAL_ACTION_USEJETPACK);
+	return 1;
+}

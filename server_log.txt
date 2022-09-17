@@ -162,3 +162,219 @@ v0.3.7, (C)2005-2015 SA-MP Team
 [17:28:53] Incoming connection: 192.168.0.103:53316 id: 0
 [17:28:53] [join] Ragnarok has joined the server (0:192.168.0.103)
 [17:29:25] [part] Ragnarok has left the server (0:1)
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7, (C)2005-2015 SA-MP Team
+
+[18:18:22] filterscripts = ""  (string)
+[18:18:22] 
+[18:18:22] Server Plugins
+[18:18:22] --------------
+[18:18:22]  Loaded 0 plugins.
+
+[18:18:22] 
+[18:18:22] Filterscripts
+[18:18:22] ---------------
+[18:18:22]   Loaded 0 filterscripts.
+
+[18:18:22] 
+----------------------------------
+[18:18:22] -----Zone dm script journey---------
+[18:18:22] ----------------------------------
+
+[18:18:22] Number of vehicle models: 0
+[18:19:13] [connection] 192.168.0.103:51150 requests connection cookie.
+[18:19:14] Incoming connection: 192.168.0.103:51150 id: 0
+[18:19:14] [join] Ragnarok has joined the server (0:192.168.0.103)
+[18:21:19] [part] Ragnarok has left the server (0:1)
+[18:21:33] --- Server Shutting Down.
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7, (C)2005-2015 SA-MP Team
+
+[18:26:12] filterscripts = ""  (string)
+[18:26:12] 
+[18:26:12] Server Plugins
+[18:26:12] --------------
+[18:26:12]  Loaded 0 plugins.
+
+[18:26:12] 
+[18:26:12] Filterscripts
+[18:26:12] ---------------
+[18:26:12]   Loaded 0 filterscripts.
+
+[18:26:12] 
+----------------------------------
+[18:26:12] -----Zone dm script journey---------
+[18:26:12] ----------------------------------
+
+[18:26:12] Number of vehicle models: 0
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7, (C)2005-2015 SA-MP Team
+
+[18:53:51] filterscripts = ""  (string)
+[18:53:51] 
+[18:53:51] Server Plugins
+[18:53:51] --------------
+[18:53:51]  Loaded 0 plugins.
+
+[18:53:51] 
+[18:53:51] Filterscripts
+[18:53:51] ---------------
+[18:53:51]   Loaded 0 filterscripts.
+
+[18:53:51] Script[gamemodes/zonedm.amx]: Run time error 19: "File or function is not found"
+[18:53:51] Number of vehicle models: 0
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7, (C)2005-2015 SA-MP Team
+
+[18:54:14] filterscripts = ""  (string)
+[18:54:14] 
+[18:54:14] Server Plugins
+[18:54:14] --------------
+[18:54:14]  Loaded 0 plugins.
+
+[18:54:14] 
+[18:54:14] Filterscripts
+[18:54:14] ---------------
+[18:54:14]   Loaded 0 filterscripts.
+
+[18:54:14] Script[gamemodes/zonedm.amx]: Run time error 19: "File or function is not found"
+[18:54:14] Number of vehicle models: 0
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7, (C)2005-2015 SA-MP Team
+
+[18:55:06] filterscripts = ""  (string)
+[18:55:06] 
+[18:55:06] Server Plugins
+[18:55:06] --------------
+[18:55:06]  Loaded 0 plugins.
+
+[18:55:06] 
+[18:55:06] Filterscripts
+[18:55:06] ---------------
+[18:55:06]   Loaded 0 filterscripts.
+
+[18:55:06] Script[gamemodes/zonedm.amx]: Run time error 19: "File or function is not found"
+[18:55:06] Number of vehicle models: 0
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7, (C)2005-2015 SA-MP Team
+
+[18:56:32] filterscripts = ""  (string)
+[18:56:32] 
+[18:56:32] Server Plugins
+[18:56:32] --------------
+[18:56:32]  Loaded 0 plugins.
+
+[18:56:33] 
+[18:56:33] Filterscripts
+[18:56:33] ---------------
+[18:56:33]   Loaded 0 filterscripts.
+
+[18:56:33] Script[gamemodes/zonedm.amx]: Run time error 19: "File or function is not found"
+[18:56:33] Number of vehicle models: 0
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7, (C)2005-2015 SA-MP Team
+
+[18:57:13] filterscripts = ""  (string)
+[18:57:13] 
+[18:57:13] Server Plugins
+[18:57:13] --------------
+[18:57:13]  Loaded 0 plugins.
+
+[18:57:14] 
+[18:57:14] Filterscripts
+[18:57:14] ---------------
+[18:57:14]   Loaded 0 filterscripts.
+
+[18:57:14] Script[gamemodes/zonedm.amx]: Run time error 19: "File or function is not found"
+[18:57:14] Number of vehicle models: 0
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7, (C)2005-2015 SA-MP Team
+
+[18:57:27] filterscripts = ""  (string)
+[18:57:27] 
+[18:57:27] Server Plugins
+[18:57:27] --------------
+[18:57:27]  Loading plugin: sscanf
+[18:57:27] 
+[18:57:27]  ===============================
+[18:57:27] 
+[18:57:27]       sscanf plugin loaded.     
+[18:57:27] 
+[18:57:27]          Version: 2.13.2
+[18:57:27] 
+[18:57:27]    (c) 2022 Alex "Y_Less" Cole  
+[18:57:27] 
+[18:57:27]  ===============================
+[18:57:27] 
+[18:57:27]   Loaded.
+[18:57:27]  Loading plugin: mysql
+[18:57:28]  >> plugin.mysql: R41-4 successfully loaded.
+[18:57:28]   Loaded.
+[18:57:28]  Loaded 2 plugins.
+
+[18:57:28] 
+[18:57:28] Filterscripts
+[18:57:28] ---------------
+[18:57:28]   Loaded 0 filterscripts.
+
+[18:57:28] 
+----------------------------------
+[18:57:28] -----Zone dm script journey---------
+[18:57:28] ----------------------------------
+
+[18:57:28] Number of vehicle models: 0
+[18:58:01] [connection] 192.168.0.103:50197 requests connection cookie.
+[18:58:02] Incoming connection: 192.168.0.103:50197 id: 0
+[18:58:02] [join] Ragnarok has joined the server (0:192.168.0.103)
+[18:59:27] [part] Ragnarok has left the server (0:1)
+[18:59:54] [connection] 192.168.0.103:61505 requests connection cookie.
+[18:59:55] Incoming connection: 192.168.0.103:61505 id: 0
+[18:59:55] [join] Ragnarok has joined the server (0:192.168.0.103)
