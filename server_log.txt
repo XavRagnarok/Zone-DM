@@ -378,3 +378,93 @@ v0.3.7, (C)2005-2015 SA-MP Team
 [18:59:54] [connection] 192.168.0.103:61505 requests connection cookie.
 [18:59:55] Incoming connection: 192.168.0.103:61505 id: 0
 [18:59:55] [join] Ragnarok has joined the server (0:192.168.0.103)
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7, (C)2005-2015 SA-MP Team
+
+[01:03:32] filterscripts = ""  (string)
+[01:03:32] 
+[01:03:32] Server Plugins
+[01:03:32] --------------
+[01:03:32]  Loading plugin: sscanf
+[01:03:33] 
+[01:03:33]  ===============================
+[01:03:33] 
+[01:03:33]       sscanf plugin loaded.     
+[01:03:33] 
+[01:03:33]          Version: 2.13.2
+[01:03:33] 
+[01:03:33]    (c) 2022 Alex "Y_Less" Cole  
+[01:03:33] 
+[01:03:33]  ===============================
+[01:03:33] 
+[01:03:33]   Loaded.
+[01:03:33]  Loading plugin: mysql
+[01:03:33]  >> plugin.mysql: R39-6 successfully loaded.
+[01:03:33]   Loaded.
+[01:03:33]  Loaded 2 plugins.
+
+[01:03:33] 
+[01:03:33] Filterscripts
+[01:03:33] ---------------
+[01:03:33]   Loaded 0 filterscripts.
+
+[01:03:33] [DATABASE]: Connection established to 'zonedm'...
+[01:03:33] 
+----------------------------------
+[01:03:33] -----Zone dm script journey---------
+[01:03:33] ----------------------------------
+
+[01:03:33] Number of vehicle models: 0
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7, (C)2005-2015 SA-MP Team
+
+[01:05:01] filterscripts = ""  (string)
+[01:05:01] 
+[01:05:01] Server Plugins
+[01:05:01] --------------
+[01:05:01]  Loading plugin: sscanf
+[01:05:01] 
+[01:05:01]  ===============================
+[01:05:01] 
+[01:05:01]       sscanf plugin loaded.     
+[01:05:01] 
+[01:05:01]          Version: 2.13.2
+[01:05:01] 
+[01:05:01]    (c) 2022 Alex "Y_Less" Cole  
+[01:05:01] 
+[01:05:01]  ===============================
+[01:05:01] 
+[01:05:01]   Loaded.
+[01:05:01]  Loading plugin: mysql
+[01:05:01]  >> plugin.mysql: R39-6 successfully loaded.
+[01:05:01]   Loaded.
+[01:05:01]  Loaded 2 plugins.
+
+[01:05:01] 
+[01:05:01] Filterscripts
+[01:05:01] ---------------
+[01:05:01]   Loaded 0 filterscripts.
+
+[01:05:01] [DATABASE]: Connection established to 'zonedm'...
+[01:05:01] 
+----------------------------------
+[01:05:01] -----Zone dm script journey---------
+[01:05:01] ----------------------------------
+
+[01:05:01] Number of vehicle models: 0
+[01:07:34] [connection] 192.168.0.103:64805 requests connection cookie.
+[01:07:35] Incoming connection: 192.168.0.103:64805 id: 0
+[01:07:35] [join] Ragnarok has joined the server (0:192.168.0.103)
+[01:07:59] [part] Ragnarok has left the server (0:1)
