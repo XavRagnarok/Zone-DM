@@ -114,65 +114,51 @@ SA-MP Dedicated Server
 ----------------------
 v0.3.7, (C)2005-2015 SA-MP Team
 
-[21:49:36] filterscripts = ""  (string)
-[21:49:36] 
-[21:49:36] Server Plugins
-[21:49:36] --------------
-[21:49:36]  Loading plugin: crashdetect
-[21:49:36]   CrashDetect plugin 4.20
-[21:49:36]   Loaded.
-[21:49:36]  Loading plugin: sscanf
-[21:49:36] 
-[21:49:36]  ===============================
-[21:49:36] 
-[21:49:36]       sscanf plugin loaded.     
-[21:49:36] 
-[21:49:36]          Version: 2.13.2
-[21:49:36] 
-[21:49:36]    (c) 2022 Alex "Y_Less" Cole  
-[21:49:36] 
-[21:49:36]  ===============================
-[21:49:36] 
-[21:49:36]   Loaded.
-[21:49:36]  Loading plugin: mysql
-[21:49:37]  >> plugin.mysql: R41-4 successfully loaded.
-[21:49:37]   Loaded.
-[21:49:37]  Loading plugin: streamer
-[21:49:37] 
+[17:27:27] filterscripts = ""  (string)
+[17:27:27] 
+[17:27:27] Server Plugins
+[17:27:27] --------------
+[17:27:27]  Loaded 0 plugins.
 
-*** Streamer Plugin v2.9.5 by Incognito loaded ***
+[17:27:27] 
+[17:27:27] Filterscripts
+[17:27:27] ---------------
+[17:27:27]   Loaded 0 filterscripts.
 
-[21:49:37]   Loaded.
-[21:49:37]  Loading plugin: bcrypt-samp
-[21:49:37]   Failed.
-[21:49:37]  Loaded 4 plugins.
+[17:27:27] 
+----------------------------------
+[17:27:27] Zone
+[17:27:27] ----------------------------------
 
-[21:49:37] 
-[21:49:37] Filterscripts
-[21:49:37] ---------------
-[21:49:37]   Loaded 0 filterscripts.
+[17:27:27] Number of vehicle models: 0
+[17:28:15] --- Server Shutting Down.
 
-[21:49:37] [debug] Run time error 20: "Invalid index parameter (bad entry point)"
-[21:49:37] Script[gamemodes/zone-dm.amx]: Run time error 20: "Invalid index parameter (bad entry point)"
-[21:49:37] Number of vehicle models: 0
-[21:50:13] [debug] Server received interrupt signal
-[21:50:13] [debug] Native backtrace:
-[21:50:13] [debug] #0 77132ddc in ?? () in C:\WINDOWS\SYSTEM32\ntdll.dll
-[21:50:13] [debug] #1 754a60bf in ?? () in C:\WINDOWS\System32\KERNELBASE.dll
-[21:50:13] [debug] #2 0048acbe in ?? () in samp-server.exe
-[21:50:13] [debug] #3 00499bd1 in ?? () in samp-server.exe
-[21:50:13] [debug] #4 00499be1 in ?? () in samp-server.exe
-[21:50:13] --- Server Shutting Down.
-[21:50:13] 
-[21:50:13]  ===============================
-[21:50:13] 
-[21:50:13]      sscanf plugin unloaded.    
-[21:50:13] 
-[21:50:13]  ===============================
-[21:50:13] 
-[21:50:13] plugin.mysql: Unloading plugin...
-[21:50:13] plugin.mysql: Plugin unloaded.
-[21:50:13] 
+----------
+Loaded log file: "server_log.txt".
+----------
 
-*** Streamer Plugin v2.9.5 by Incognito unloaded ***
+SA-MP Dedicated Server
+----------------------
+v0.3.7, (C)2005-2015 SA-MP Team
 
+[17:28:17] filterscripts = ""  (string)
+[17:28:17] 
+[17:28:17] Server Plugins
+[17:28:17] --------------
+[17:28:17]  Loaded 0 plugins.
+
+[17:28:17] 
+[17:28:17] Filterscripts
+[17:28:17] ---------------
+[17:28:17]   Loaded 0 filterscripts.
+
+[17:28:17] 
+----------------------------------
+[17:28:17] Zone dm script journey
+[17:28:17] ----------------------------------
+
+[17:28:17] Number of vehicle models: 0
+[17:28:52] [connection] 192.168.0.103:53316 requests connection cookie.
+[17:28:53] Incoming connection: 192.168.0.103:53316 id: 0
+[17:28:53] [join] Ragnarok has joined the server (0:192.168.0.103)
+[17:29:25] [part] Ragnarok has left the server (0:1)
