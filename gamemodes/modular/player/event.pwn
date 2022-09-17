@@ -3,24 +3,47 @@ public OnGameModeInit()
 	// Don't use these lines if it's a filterscript
 	SetGameModeText("Zone");
 	AddPlayerClass(0, 1958.3783, 1343.1572, 15.3746, 269.1425, 0, 0, 0, 0, 0, 0);
+
+	// sql related
+	ourConnection = mysql_connect(SQL_HOSTNAME, SQL_USERNAME, SQL_DATABASE, SQL_PASSWORD);
+ 
+    SetGameModeText(SCRIPT_VERSION);
+	if(mysql_errno() != 0)
+		printf ("[DATABASE]: Connection failed to '%s'...", SQL_DATABASE);
+	else printf ("[DATABASE]: Connection established to '%s'...", SQL_DATABASE);
 	return 1;
 }
 
 public OnGameModeExit()
 {
+	mysql_close(ourConnection);
 	return 1;
 }
 
 public OnPlayerRequestClass(playerid, classid)
 {
-	SetPlayerPos(playerid, 1958.3783, 1343.1572, 15.3746);
-	SetPlayerCameraPos(playerid, 1958.3783, 1343.1572, 15.3746);
-	SetPlayerCameraLookAt(playerid, 1958.3783, 1343.1572, 15.3746);
-	return 1;
+	if(PlayerInfo[playerid][pLoggedin] == false)
+	{
+     	SetSpawnInfo( playerid, 0, 0, 563.3157, 3315.2559, 0, 269.15, 0, 0, 0, 0, 0, 0 );
+     	TogglePlayerSpectating(playerid, true);
+     	TogglePlayerSpectating(playerid, false);
+     	SetPlayerCamera(playerid);
+    	return 1;
+ 	}
+	SetSpawnInfo(playerid, 0, PlayerInfo[playerid][pSkin], 2098.5088,1159.1156,11.6484, 65.2418, 0, 0, 0, 0, 0, 0 );
+ 	SpawnPlayer(playerid);
+    return 0;
 }
 
 public OnPlayerConnect(playerid)
 {
+	SetPlayerCamera(playerid);
+    ResetPlayer(playerid);
+ 
+    new existCheck[248];
+ 
+	mysql_format(ourConnection, existCheck, sizeof(existCheck), "SELECT * FROM accounts WHERE acc_name = '%e'", ReturnName(playerid));
+	mysql_tquery(ourConnection, existCheck, "LogPlayerIn", "i", playerid);
 	return 1;
 }
 

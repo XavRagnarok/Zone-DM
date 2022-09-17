@@ -3,9 +3,7 @@
 #include <a_samp>
 #include <zcmd>
 #include <sscanf2>
-
-#define COLOR_WHITE "FFFFFF"
-#define COLOR_PINK "a80ec7"
+#include <a_mysql>
 
 
 
@@ -19,21 +17,36 @@ main()
 	print("----------------------------------\n");
 }
 
-#define mysql_host 	"localhost"
-#define mysql_user 	"root"
-#define mysql_pass 	""
-#define mysql_database 	"test_database"
+//Database establisher:
+new ourConnection;
+
+#define SCRIPT_VERSION "Script Adventure 1.0.1.1"
+
+//================MySQL Connection:=========================
+ 
+#define SQL_HOSTNAME "{Fill in}"
+#define SQL_USERNAME "{Fill in}"
+#define SQL_DATABASE "{Fill in}"
+#define SQL_PASSWORD "{Fill in}"
+ 
+//==========================================================
 
 
 // ========================================================[Modulars]=========================================================
 
 // =======[server]=========
 
+// variables
+#include "./modular/server/variable.pwn"
+
 // event.pwn
 #include "./modular/server/event.pwn"
 
 // dialogs
 #include "./modular/server/dialog.pwn"
+
+// functions
+#include "./modular/server/function.pwn"
 
 // =======[player]==========
 
@@ -42,17 +55,3 @@ main()
 
 // login/register
 #include "./modular/player/account.pwn"
-
-
-CMD:jetpack(playerid, params[])
-{
-	if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USEJETPACK)
-	{
-		return
-		SendClientMessage(playerid, COLOR_PINK, "REMOVED YOUR JETPACK")
-		SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
-	}
-	SendClientMessage(playerid, COLOR_PINK, "Enjoy prick and fuck luppino")
-	SetPlayerSpecialAction(playerid, SPECIAL_ACTION_USEJETPACK);
-	return 1;
-}
