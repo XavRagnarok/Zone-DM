@@ -46,12 +46,13 @@
 [00:07:08 06/15/22] [ERROR] CMySQLConnection::Connect - (error #2003) Can't connect to MySQL server on '127.0.0.1' (10061)
 [00:07:10 06/15/22] [ERROR] CMySQLConnection::Connect - (error #2003) Can't connect to MySQL server on '127.0.0.1' (10061)
 [00:07:10 06/15/22] [ERROR] CMySQLConnection::Connect - (error #2003) Can't connect to MySQL server on '127.0.0.1' (10061)
-[22:42:41 06/17/22] [ERROR] CMySQLConnection::Connect - (error #2003) Can't connect to MySQL server on '127.0.0.1' (10061)
-[22:42:43 06/17/22] [ERROR] CMySQLConnection::Connect - (error #2003) Can't connect to MySQL server on '127.0.0.1' (10061)
-[22:42:43 06/17/22] [ERROR] CMySQLConnection::Connect - (error #2003) Can't connect to MySQL server on '127.0.0.1' (10061)
-[03:27:14 06/19/22] [ERROR] CMySQLConnection::Connect - (error #2003) Can't connect to MySQL server on '127.0.0.1' (10061)
-[03:27:16 06/19/22] [ERROR] CMySQLConnection::Connect - (error #2003) Can't connect to MySQL server on '127.0.0.1' (10061)
-[03:27:16 06/19/22] [ERROR] CMySQLConnection::Connect - (error #2003) Can't connect to MySQL server on '127.0.0.1' (10061)
-[01:52:20 06/21/22] [ERROR] CMySQLConnection::Connect - (error #2003) Can't connect to MySQL server on '127.0.0.1' (10061)
-[01:52:22 06/21/22] [ERROR] CMySQLConnection::Connect - (error #2003) Can't connect to MySQL server on '127.0.0.1' (10061)
-[01:52:22 06/21/22] [ERROR] CMySQLConnection::Connect - (error #2003) Can't connect to MySQL server on '127.0.0.1' (10061)
+[20:48:20 10/04/22] [ERROR] CMySQLConnection::Connect - (error #2005) Unknown MySQL server host 'nl2.optiklink.com' (0)
+[20:48:20 10/04/22] [ERROR] CMySQLConnection::Connect - (error #2005) Unknown MySQL server host 'nl2.optiklink.com' (0)
+[20:48:20 10/04/22] [ERROR] CMySQLConnection::Connect - (error #2005) Unknown MySQL server host 'nl2.optiklink.com' (0)
+[20:48:20 10/04/22] [ERROR] CMySQLConnection::Connect - (error #2005) Unknown MySQL server host 'nl2.optiklink.com' (0)
+[20:51:03 10/04/22] [WARNING] CMySQLResult::GetRowDataByName - field not found ("Admin") (Query: "SELECT * FROM accounts WHERE acc_name = 'Ragnarok'")
+[20:51:03 10/04/22] [ERROR] cache_get_field_content_int - invalid datatype
+[20:51:03 10/04/22] [WARNING] CMySQLResult::GetRowDataByName - field not found ("Cash") (Query: "SELECT * FROM accounts WHERE acc_name = 'Ragnarok'")
+[20:51:03 10/04/22] [ERROR] cache_get_field_content_int - invalid datatype
+[20:51:03 10/04/22] [WARNING] CMySQLResult::GetRowDataByName - field not found ("Score") (Query: "SELECT * FROM accounts WHERE acc_name = 'Ragnarok'")
+[20:51:03 10/04/22] [ERROR] cache_get_field_content_int - invalid datatype

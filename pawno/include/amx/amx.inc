@@ -107,23 +107,12 @@ const AMX_OFFSET_SYSREQ_D = 100;
 stock GetAmxAddress() {
 	static address = 0;
 	if (address == 0) {
-		#if cellbits == 32
-			static const code[] = {
-				0x90909090, 0x90909090, 0x90909090, 0x90909090, // for alignment
-				0x0424448B, 0xC3C3C3C3
-				// 8B 44 24 04 - MOV  eax, [esp + arg_0]
-				// C3          - RETN
-			};
-		#elseif cellbits == 64
-			static const code[] = {
-				0x9090909090909090, 0x9090909090909090, // for alignment
-				0xC3C3C3C30424448B
-				// 8B 44 24 04 - MOV  eax, [esp + arg_0]
-				// C3          - RETN
-			};
-		#else
-			#error Unsupported `cellbits`.
-		#endif
+		static const code[] = {
+			0x90909090, 0x90909090, 0x90909090, 0x90909090, // for alignment
+			0x0424448b, 0xC3C3C3C3
+			// 8B 44 24 04 - MOV  eax, [esp + arg_0]
+			// C3          - RETN
+		};
 		address = RunShellcode(refabs(code));
 	}
 	return address;

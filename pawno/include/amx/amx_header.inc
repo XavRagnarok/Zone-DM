@@ -45,9 +45,7 @@
 #define AMX_HDR_BYTES (56)
 #define AMX_HDR_CELLS (AMX_HDR_BYTES / 4)
 
-// Always 32-bit.
-#define AMX_TAG_LOCAL (0x80000000)
-#define AMX_TAG_MASK (0x7FFFFFFF)
+#define AMX_TAG_MASK (0x80000000)
 #define AMX_TAG_STRONG (0x40000000)
 
 /// <p/>
@@ -193,7 +191,7 @@ stock GetRawAmxHeader(plain_amxhdr[AMX_HDR_CELLS]) {
 
 	for (new i = 0; i < AMX_HDR_CELLS; i++) {
 		plain_amxhdr[i] = ReadAmxMemory(address);
-		address += cellbytes;
+		address += 4;
 	}
 }
 
@@ -277,83 +275,29 @@ stock GetAmxHeaderComponent(AMX_HDR:comp) {
 }
 
 /// <library>amx_assembly amx_header</library>
-static stock PrintAmxNameTable(start, end, decode = false, dereference = false) {
-	new info[AMX_FUNCSTUBNT];
-	new name[64];
-	while (start != end) {
-		info[AMX_FUNCSTUBNT_ADDRESS] = ReadAmxMemory(start);
-		info[AMX_FUNCSTUBNT_NAMEOFS] = ReadAmxMemory(start + cellbytes);
-		if (info[AMX_FUNCSTUBNT_NAMEOFS] == 0) {
-			name = "????";
-		} else {
-			NtCopy(info[AMX_FUNCSTUBNT_NAMEOFS] - GetAmxHeaderComponent(AMX_HDR_DAT), name);
-		}
-		if (decode) {
-			printf("    %32s: 0x%08x%s%s", name, info[AMX_FUNCSTUBNT_ADDRESS], (info[AMX_FUNCSTUBNT_ADDRESS] & AMX_TAG_STRONG) ? (" (strong)") : (""), (info[AMX_FUNCSTUBNT_ADDRESS] & AMX_TAG_LOCAL ? (" (local)") : (""));
-		} else if (dereference) {
-			printf("    %32s: 0x%08x (%d)", name, info[AMX_FUNCSTUBNT_ADDRESS], ReadAmxMemory(info[AMX_FUNCSTUBNT_ADDRESS]));
-		} else {
-			printf("    %32s: 0x%08x", name, info[AMX_FUNCSTUBNT_ADDRESS]);
-		}
-		start += 2 * cellbytes;
-	}
-}
-
-/// <library>amx_assembly amx_header</library>
 stock PrintAmxHeader() {
 	InitStaticAmxHeader();
-	print("---------------------------");
+	print("------------------------");
 	print("AMX Header:");
-	print("---------------------------");
-	printf("    size         %d", gHdr[AMX_HDR_SIZE]);
-	printf("    magic        %x", gHdr[AMX_HDR_MAGIC]);
-	printf("    file_version %d", gHdr[AMX_HDR_FILE_VERSION]);
-	printf("    amx_version  %d", gHdr[AMX_HDR_AMX_VERSION]);
-	printf("    flags        %d", gHdr[AMX_HDR_FLAGS]);
-	printf("    defsize      %d", gHdr[AMX_HDR_DEFSIZE]);
-	printf("    cod          0x%08x", gHdr[AMX_HDR_COD]);
-	printf("    dat          0x%08x", gHdr[AMX_HDR_DAT]);
-	printf("    hea          0x%08x", gHdr[AMX_HDR_HEA]);
-	printf("    stp          0x%08x", gHdr[AMX_HDR_STP]);
-	printf("    cip          0x%08x", gHdr[AMX_HDR_CIP]);
-	printf("    publics      0x%08x", gHdr[AMX_HDR_PUBLICS]);
-	printf("    natives      0x%08x", gHdr[AMX_HDR_NATIVES]);
-	printf("    libraries    0x%08x", gHdr[AMX_HDR_LIBRARIES]);
-	printf("    pubvars      0x%08x", gHdr[AMX_HDR_PUBVARS]);
-	printf("    tags         0x%08x", gHdr[AMX_HDR_TAGS]);
-	printf("    nametable    0x%08x", gHdr[AMX_HDR_NAMETABLE]);
-	print("---------------------------");
-	new
-		start = gHdr[AMX_HDR_PUBLICS] - gHdr[AMX_HDR_DAT],
-		end = gHdr[AMX_HDR_NATIVES] - gHdr[AMX_HDR_DAT];
-	print("Publics:");
-	print("----------------------------------------------------------------");
-	PrintAmxNameTable(start, end);
-	print("----------------------------------------------------------------");
-	start = end;
-	end = gHdr[AMX_HDR_LIBRARIES] - gHdr[AMX_HDR_DAT];
-	print("Natives:");
-	print("----------------------------------------------------------------");
-	PrintAmxNameTable(start, end);
-	print("----------------------------------------------------------------");
-	start = end;
-	end = gHdr[AMX_HDR_PUBVARS] - gHdr[AMX_HDR_DAT];
-	print("Libraries:");
-	print("----------------------------------------------------------------");
-	PrintAmxNameTable(start, end);
-	print("----------------------------------------------------------------");
-	start = end;
-	end = gHdr[AMX_HDR_TAGS] - gHdr[AMX_HDR_DAT];
-	print("Pubvars:");
-	print("----------------------------------------------------------------");
-	PrintAmxNameTable(start, end, .dereference = true);
-	print("----------------------------------------------------------------");
-	start = end;
-	end = gHdr[AMX_HDR_NAMETABLE] - gHdr[AMX_HDR_DAT];
-	print("Tags:");
-	print("----------------------------------------------------------------");
-	PrintAmxNameTable(start, end, .decode = true);
-	print("----------------------------------------------------------------");
+	print("------------------------");
+	printf("size         %d", gHdr[AMX_HDR_SIZE]);
+	printf("magic        %x", gHdr[AMX_HDR_MAGIC]);
+	printf("file_version %d", gHdr[AMX_HDR_FILE_VERSION]);
+	printf("amx_version  %d", gHdr[AMX_HDR_AMX_VERSION]);
+	printf("flags        %d", gHdr[AMX_HDR_FLAGS]);
+	printf("defsize      %d", gHdr[AMX_HDR_DEFSIZE]);
+	printf("cod          0x%08x", gHdr[AMX_HDR_COD]);
+	printf("dat          0x%08x", gHdr[AMX_HDR_DAT]);
+	printf("hea          0x%08x", gHdr[AMX_HDR_HEA]);
+	printf("stp          0x%08x", gHdr[AMX_HDR_STP]);
+	printf("cip          0x%08x", gHdr[AMX_HDR_CIP]);
+	printf("publics      0x%08x", gHdr[AMX_HDR_PUBLICS]);
+	printf("natives      0x%08x", gHdr[AMX_HDR_NATIVES]);
+	printf("libraries    0x%08x", gHdr[AMX_HDR_LIBRARIES]);
+	printf("pubvars      0x%08x", gHdr[AMX_HDR_PUBVARS]);
+	printf("tags         0x%08x", gHdr[AMX_HDR_TAGS]);
+	printf("nametable    0x%08x", gHdr[AMX_HDR_NAMETABLE]);
+	print("------------------------");
 }
 
 /// <library>amx_assembly amx_header</library>
@@ -435,7 +379,7 @@ stock bool:GetPublicInfo(index, info[AMX_FUNCSTUBNT]) {
 
 	new off = gHdr[AMX_HDR_PUBLICS] - gHdr[AMX_HDR_DAT] + index * gHdr[AMX_HDR_DEFSIZE];
 	info[AMX_FUNCSTUBNT_ADDRESS] = ReadAmxMemory(off);
-	info[AMX_FUNCSTUBNT_NAMEOFS] = ReadAmxMemory(off + cellbytes);
+	info[AMX_FUNCSTUBNT_NAMEOFS] = ReadAmxMemory(off + 4);
 
 	return true;
 }
@@ -455,7 +399,7 @@ stock GetPublicIndexFromName(const name[]) {
 		mid = (first + last) / 2;
 
 		new off = gHdr[AMX_HDR_PUBLICS] - gHdr[AMX_HDR_DAT] + mid * gHdr[AMX_HDR_DEFSIZE];
-		new nameofs = ReadAmxMemory(off + cellbytes) - gHdr[AMX_HDR_DAT];
+		new nameofs = ReadAmxMemory(off + 4) - gHdr[AMX_HDR_DAT];
 
 		new diff = NtCompare(nameofs, name);
 		if (diff < 0) {
@@ -552,7 +496,7 @@ stock bool:GetNativeInfo(index, info[AMX_FUNCSTUBNT]) {
 
 	new off = gHdr[AMX_HDR_NATIVES] - gHdr[AMX_HDR_DAT] + index * gHdr[AMX_HDR_DEFSIZE];
 	info[AMX_FUNCSTUBNT_ADDRESS] = ReadAmxMemory(off);
-	info[AMX_FUNCSTUBNT_NAMEOFS] = ReadAmxMemory(off + cellbytes);
+	info[AMX_FUNCSTUBNT_NAMEOFS] = ReadAmxMemory(off + 4);
 
 	return true;
 }
@@ -566,7 +510,7 @@ stock GetNativeIndexFromName(const name[]) {
 
 	// Linear search
 	for (new i = 0; i < num_natives; i++) {
-		new nameofs = ReadAmxMemory(off + cellbytes) - gHdr[AMX_HDR_DAT];
+		new nameofs = ReadAmxMemory(off + 4) - gHdr[AMX_HDR_DAT];
 
 		new diff = NtCompare(nameofs, name);
 		if (diff == 0) {
@@ -640,7 +584,7 @@ stock bool:GetPubVarInfo(index, info[AMX_FUNCSTUBNT]) {
 
 	new off = gHdr[AMX_HDR_PUBVARS] - gHdr[AMX_HDR_DAT] + index * gHdr[AMX_HDR_DEFSIZE];
 	info[AMX_FUNCSTUBNT_ADDRESS] = ReadAmxMemory(off);
-	info[AMX_FUNCSTUBNT_NAMEOFS] = ReadAmxMemory(off + cellbytes);
+	info[AMX_FUNCSTUBNT_NAMEOFS] = ReadAmxMemory(off + 4);
 
 	return true;
 }
@@ -654,7 +598,7 @@ stock GetPubVarIndexFromName(const name[]) {
 
 	// Linear search
 	for (new i = 0; i < num_pubvars; i++) {
-		new nameofs = ReadAmxMemory(off + cellbytes) - gHdr[AMX_HDR_DAT];
+		new nameofs = ReadAmxMemory(off + 4) - gHdr[AMX_HDR_DAT];
 
 		new diff = NtCompare(nameofs, name);
 		if (diff == 0) {
@@ -720,7 +664,7 @@ stock GetNumTags(const amxhdr[AMX_HDR]) {
 /// <library>amx_assembly amx_header</library>
 stock bool:GetTagInfo(index, info[AMX_FUNCSTUBNT]) {
 	if (index == 0) {
-		info[AMX_FUNCSTUBNT_ID] = AMX_TAG_LOCAL;
+		info[AMX_FUNCSTUBNT_ID] = AMX_TAG_MASK;
 		info[AMX_FUNCSTUBNT_NAMEOFS] = 0;
 		return true;
 	}
@@ -733,8 +677,8 @@ stock bool:GetTagInfo(index, info[AMX_FUNCSTUBNT]) {
 	}
 
 	new off = gHdr[AMX_HDR_TAGS] - gHdr[AMX_HDR_DAT] + index * gHdr[AMX_HDR_DEFSIZE];
-	info[AMX_FUNCSTUBNT_ID] = ReadAmxMemory(off) | AMX_TAG_LOCAL;
-	info[AMX_FUNCSTUBNT_NAMEOFS] = ReadAmxMemory(off + cellbytes);
+	info[AMX_FUNCSTUBNT_ID] = ReadAmxMemory(off) | AMX_TAG_MASK;
+	info[AMX_FUNCSTUBNT_NAMEOFS] = ReadAmxMemory(off + 4);
 
 	return true;
 }
@@ -748,7 +692,7 @@ stock GetTagIndexFromName(const name[]) {
 
 	// Linear search
 	for (new i = 0; i < num_tags; i++) {
-		new nameofs = ReadAmxMemory(off + cellbytes) - gHdr[AMX_HDR_DAT];
+		new nameofs = ReadAmxMemory(off + 4) - gHdr[AMX_HDR_DAT];
 
 		new diff = NtCompare(nameofs, name);
 		if (diff == 0) {
@@ -763,7 +707,7 @@ stock GetTagIndexFromName(const name[]) {
 
 /// <library>amx_assembly amx_header</library>
 stock GetTagIndexFromID(id) {
-	id &= AMX_TAG_MASK;
+	id &= ~AMX_TAG_MASK;
 	if (id == 0)
 		return 0;
 	InitStaticAmxHeader();
@@ -785,7 +729,7 @@ stock GetTagIndexFromID(id) {
 /// <library>amx_assembly amx_header</library>
 stock GetTagIDFromIndex(index) {
 	if (index == 0)
-		return AMX_TAG_LOCAL;
+		return AMX_TAG_MASK;
 	new info[AMX_FUNCSTUBNT];
 	GetTagInfo(index, info);
 	return info[AMX_FUNCSTUBNT_ID];
@@ -794,7 +738,7 @@ stock GetTagIDFromIndex(index) {
 /// <library>amx_assembly amx_header</library>
 stock GetTagIDFromName(const name[]) {
 	if (name[0] == '_' && name[1] == '\0')
-		return AMX_TAG_LOCAL;
+		return AMX_TAG_MASK;
 	return GetTagIDFromIndex(GetTagIndexFromName(name));
 }
 
@@ -839,7 +783,7 @@ stock bool:IsTagIDWeak(tag) {
 
 /// <library>amx_assembly amx_header</library>
 stock bool:IsTagIDEmpty(tag) {
-	return !(tag & AMX_TAG_MASK);
+	return !(tag & ~AMX_TAG_MASK);
 }
 
 /// <library>amx_assembly amx_header</library>
@@ -875,40 +819,4 @@ stock bool:IsTagIndexEmpty(tag) {
 }
 
 #undef InitStaticAmxHeader
-
-#if ((__Pawn & 0x0F) >= 0x0A) || ((__Pawn & 0xF0) >= 0xA0)
-	#if !defined __PawnBuild
-		#define __PawnBuild 0
-	#endif
-	#if __PawnBuild >= 10
-		#define HasSysreqD() (bool:(__emit(zero.pri, lctrl 9, eq.c.pri 0)))
-		#define HasReloc() (bool:(__emit(zero.pri, lctrl 9, const.alt 1536, neq)))
-		#endinput
-	#endif
-#endif
-
-/// <library>amx_assembly amx_header</library>
-stock bool:HasSysreqD() {
-	// SA:MP doesn't have the AMX flags in register 9, open.mp does.  Thus if
-	// `pri` is 0 it wasn't set by the control register.
-	#emit zero.pri
-	#emit lctrl 9 // flags
-	#emit eq.c.pri 0
-	#emit retn
-
-	return false;
-}
-
-/// <library>amx_assembly amx_header</library>
-stock bool:HasReloc() {
-	// SA:MP doesn't have the AMX flags in register 9, open.mp does.  Thus if
-	// `pri` is 0 it wasn't set by the control register.
-	#emit zero.pri
-	#emit lctrl 9 // flags
-	#emit const.alt 1536
-	#emit neq
-	#emit retn
-
-	return false;
-}
 

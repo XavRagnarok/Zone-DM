@@ -38,31 +38,13 @@
 
 #include <core>
 
-#if !defined cellbytes
-	const cellbytes = cellbits / charbits;
-#endif
-
-#if !defined __register_names
-	const __cod = 0;
-	const __dat = 1;
-	const __hea = 2;
-	const __stp = 3;
-	const __stk = 4;
-	const __frm = 5;
-	const __cip = 6;
-	const __jit = 8;
-	const __flg = 9;
-	#define __register_names
-#endif
-
 /// <library>amx_assembly amx_memory</library>
 /// <summary>
 ///   Returns the address of a variable/array.
 /// </summary>
 stock ref(...) {
-	const cells0 = 3 * cellbytes;
 	assert(numargs() == 1);
-	#emit load.s.pri cells0 // first argument
+	#emit load.s.pri 12 // first argument
 	#emit retn
 	return 0; // make compiler happy
 }
@@ -72,10 +54,9 @@ stock ref(...) {
 ///   Returns an array from an address.
 /// </summary>
 stock deref(v) {
-	const cells0 = 4 * cellbytes;
 	static gFake[1];
 	#emit load.s.pri  v // first argument
-	#emit stor.s.pri cells0 // secret argument
+	#emit stor.s.pri 16 // secret argument
 	#emit retn
 	return gFake; // make compiler happy
 }
@@ -98,13 +79,13 @@ stock argref(n) {
 ///   Returns an array from a variable parameter.
 /// </summary>
 stock argderef(n) {
-	const cells0 = 4 * cellbytes;
 	static gFake[1];
+	
 	#emit load.s.alt 0
 	#emit load.s.pri n
 	#emit add.c 3
 	#emit lidx
-	#emit stor.s.pri cells0 // secret argument
+	#emit stor.s.pri 16 // secret argument
 	#emit retn
 	return gFake; // make compiler happy
 }
@@ -123,14 +104,14 @@ stock argderef(n) {
 /// <library>amx_assembly amx_memory</library>
 stock ReadAmxMemoryArray(address, values[], size = sizeof(values)) {
 	for (new i = 0; i < size; i++) {
-		values[i] = ReadAmxMemory(address + i * cellbytes);
+		values[i] = ReadAmxMemory(address + i * 4);
 	}
 }
 
 /// <library>amx_assembly amx_memory</library>
 stock WriteAmxMemoryArray(address, const values[], size = sizeof(values)) {
 	for (new i = 0; i < size; i++) {
-		WriteAmxMemory(address + i * cellbytes, values[i]);
+		WriteAmxMemory(address + i * 4, values[i]);
 	}
 }
 
@@ -147,18 +128,16 @@ stock GetAmxNextInstructionPointer()
 }
 
 /// <library>amx_assembly amx_memory</library>
-stock GetAmxHeapBase() {
-	const cells0 = 5 * cellbytes;
-	const cells1 = -1 * cellbytes;
-	const cells2 = 1 * cellbytes;
+stock GetAmxHeapBase()
+{
 	// Initial heap pointer.  Not stored in an accessible register so read it
 	// straight from the original header.
 	#emit lctrl 1  // DAT
 	#emit neg      // -DAT
-	#emit add.c cells0 // -DAT + 20
+	#emit add.c 20 // -DAT + 20
 	#emit push.pri
-	#emit lref.s.pri cells1
-	#emit stack cells2
+	#emit lref.s.pri 0xfffffffc
+	#emit stack 4
 	#emit retn
 	return 0;
 }
@@ -181,10 +160,10 @@ stock GetAmxStackBase()
 }
 
 /// <library>amx_assembly amx_memory</library>
-stock GetAmxStackBottom() {
-	const cells0 = 3 * cellbytes;
+stock GetAmxStackBottom()
+{
 	#emit lctrl 4
-	#emit add.c cells0
+	#emit add.c 12
 	#emit retn
 	return 0;
 }
@@ -207,14 +186,14 @@ stock SetAmxHeapTop(ptr)
 }
 
 /// <library>amx_assembly amx_memory</library>
-stock SetAmxStackBottom(ptr) {
-	const cells0 = 1 * cellbytes;
+stock SetAmxStackBottom(ptr)
+{
 	static
 		cip = 0;
 	// We need to be tricky here, because the return value is on the stack.
 	#emit load.s.alt ptr
 	// Store the return address.
-	#emit load.s.pri cells0
+	#emit load.s.pri 4
 	#emit stor.pri cip
 	// Reset the frame.
 	#emit load.s.pri 0
@@ -229,32 +208,31 @@ stock SetAmxStackBottom(ptr) {
 }
 
 /// <library>amx_assembly amx_memory</library>
-stock SetAmxFrame(ptr) {
-	const cells0 = 1 * cellbytes;
-	const cells1 = 4 * cellbytes;
+stock SetAmxFrame(ptr)
+{
 	// We need to be tricky here, because the return value is in our frame.
 	// Store the return address.
-	#emit load.s.alt cells0
+	#emit load.s.alt 4
 	// Modify the frame.
 	#emit load.s.pri ptr
 	#emit sctrl 5
 	// Return.
 	#emit move.pri
-	#emit stack cells1
+	#emit stack 16
 	#emit sctrl 8
 	#emit sctrl 6
 }
 
 /// <library>amx_assembly amx_memory</library>
-stock SetAmxNextInstructionPointer(ptr) {
-	const cells0 = 4 * cellbytes;
+stock SetAmxNextInstructionPointer(ptr)
+{
 	#emit load.s.alt ptr
 	// Reset the frame.
 	#emit load.s.pri 0
 	#emit sctrl 5
 	// Return.
 	#emit move.pri
-	#emit stack cells0
+	#emit stack 16
 	#emit sctrl 8
 	#emit sctrl 6
 }

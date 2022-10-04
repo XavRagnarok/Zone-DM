@@ -82,7 +82,7 @@ stock DisasmInit(ctx[DisasmContext], start = 0, end = 0) {
 	GetAmxHeader(hdr);
 	
 	gCodBase = GetAmxBaseAddress() + hdr[AMX_HDR_COD];
-	
+
 	new dat = hdr[AMX_HDR_DAT];
 	new cod = hdr[AMX_HDR_COD];
 
@@ -122,8 +122,8 @@ stock bool:DisasmDecodeInsn(ctx[DisasmContext]) {
 	ctx[DisasmContext_opcode] = opcode;
 
 	if (opcode == OP_CASETBL) {
-		ip += cellbytes,
-		ip += ReadAmxMemory(ip) * (2 * cellbytes);
+		ip += 4,
+		ip += ReadAmxMemory(ip) * 8;
 	}
 
 	return
@@ -132,7 +132,11 @@ stock bool:DisasmDecodeInsn(ctx[DisasmContext]) {
 }
 
 /// <library>amx_assembly disasm</library>
+static stock bool:gRelocateRequired;
+
+/// <library>amx_assembly disasm</library>
 stock DisasmInitUnsafe() {
+	gRelocateRequired = IsOpcodeRelocationRequired();
 }
 
 /// <library>amx_assembly disasm</library>
@@ -140,12 +144,12 @@ stock bool:DisasmDecodeInsnUnsafe(ctx[DisasmContext]) {
 	static ip, Opcode:opcode;
 
 	ctx[DisasmContext_cip] = ip = ctx[DisasmContext_nip],
-	ctx[DisasmContext_opcode] = opcode = UnrelocateOpcode(Opcode:ReadAmxMemory(ip));
+	ctx[DisasmContext_opcode] = opcode = gRelocateRequired ? (UnrelocateOpcode(Opcode:ReadAmxMemory(ip))) : (Opcode:ReadAmxMemory(ip));
 
 	if (OP_NONE < opcode < Opcode:NUM_OPCODES) {
 		if (opcode == OP_CASETBL) {
-			ip += cellbytes,
-			ip += ReadAmxMemory(ip) * (2 * cellbytes);
+			ip += 4,
+			ip += ReadAmxMemory(ip) * 8;
 		}
 
 		return
@@ -170,7 +174,7 @@ stock DisasmResult:DisasmNext(ctx[DisasmContext]) {
 		return DISASM_OK;
 	} else {
 		ctx[DisasmContext_cip] = ctx[DisasmContext_nip],
-		ctx[DisasmContext_nip] += cellbytes,
+		ctx[DisasmContext_nip] += 4,
 		ctx[DisasmContext_opcode] = Opcode:NUM_OPCODES;
 		return DISASM_NOP;
 	}
@@ -191,7 +195,7 @@ stock Opcode:DisasmGetOpcode(const ctx[DisasmContext]) {
 
 /// <library>amx_assembly disasm</library>
 stock DisasmGetOperand(const ctx[DisasmContext], index = 0) {
-	return ReadAmxMemory(ctx[DisasmContext_cip] + (index + 1) * cellbytes);
+	return ReadAmxMemory(ctx[DisasmContext_cip] + (index + 1) * 4);
 }
 
 /// <library>amx_assembly disasm</library>
@@ -199,7 +203,7 @@ stock DisasmGetNumOperands(const ctx[DisasmContext]) {
 	new Opcode:opcode = ctx[DisasmContext_opcode];
 
 	if (opcode == OP_CASETBL) {
-		return ReadAmxMemory(ctx[DisasmContext_cip] + cellbytes);
+		return ReadAmxMemory(ctx[DisasmContext_cip] + 4);
 	} else {
 		return gAMXOpcodeParameterCounts[_:opcode];
 	}
@@ -207,7 +211,7 @@ stock DisasmGetNumOperands(const ctx[DisasmContext]) {
 
 /// <library>amx_assembly disasm</library>
 stock bool:DisasmNeedReloc(const ctx[DisasmContext]) {
-	return HasReloc() && GetOpcodeInstructionRelocatable(ctx[DisasmContext_opcode]);
+	return GetOpcodeInstructionRelocatable(ctx[DisasmContext_opcode]);
 }
 
 /// <library>amx_assembly disasm</library>
@@ -238,7 +242,7 @@ stock DisasmGetInsnName(const ctx[DisasmContext], name[], size = sizeof(name)) {
 
 /// <library>amx_assembly disasm</library>
 stock DisasmGetOperandReloc(const ctx[DisasmContext], index = 0) {
-	new param = ReadAmxMemory(ctx[DisasmContext_cip] + (index + 1) * cellbytes);
+	new param = ReadAmxMemory(ctx[DisasmContext_cip] + (index + 1) * 4);
 	new Opcode:op = ctx[DisasmContext_opcode];
 	// Needs special code for dealing with "CASETBL", which has multiple
 	// parameters - not all of them to be relocated.  If the opcode is NOT that,
@@ -278,8 +282,8 @@ static stock ToHexStr(x) {
 	new i = 0;
 	new j = 0;
 
-	while (i < sizeof(s) && j < cellbytes * 2) {
-		new n = x >> (cellbytes * 2 - 1 - j) * 4 & 0xF;
+	while (i < sizeof(s) && j < 8) {
+		new n = x >> (7 - j) * 4 & 0xF;
 		switch (n) {
 			case 0x0..0x9:
 				s[i] = n + '0';
@@ -320,7 +324,7 @@ stock DisasmWriteCode(File:file) {
 	{
 		if (!DisasmDecodeInsn(ctx)) {
 			new cip = DisasmGetNextIp(ctx);
-			ctx[DisasmContext_nip] += cellbytes;
+			ctx[DisasmContext_nip] += 4;
 			fwrite(file, ToHexStr(cip + dat - cod));
 			fwrite(file, " ???? ");
 			fwrite(file, ToHexStr(ReadAmxMemory(cip)));
@@ -409,30 +413,11 @@ stock DisasmWriteCode(File:file) {
 					fwrite(file, name);
 				}
 			}
-#if OPCODE_HAS_O2
-			case OP_SYSREQ_N: {
-				// sysreq.n
-				new name[DISASM_MAX_NATIVE_NAME];
-				new address = DisasmGetOperand(ctx);
-				new index = GetNativeIndexFromAddress(address);
-				if (index >= 0) {
-					GetNativeNameFromIndex(index, name);
-				}
-				fwrite(file, ToHexStr(address));
-				fwrite(file, " ");
-				fwrite(file, ToHexStr(DisasmGetOperand(ctx, 1)));
-				if (strlen(name) > 0) {
-					fwrite(file, "; ");
-					fwrite(file, name);
-				}
-			}
-#endif
 			default: {
 				new n = DisasmGetNumOperands(ctx);
 				for (new i = 0; i < n; i++) {
 					new operand = DisasmGetOperandReloc(ctx, i);
 					fwrite(file, ToHexStr(operand));
-					fwrite(file, " ");
 				}
 			}
 		}
@@ -444,42 +429,32 @@ stock DisasmWriteCode(File:file) {
 /// <library>amx_assembly disasm</library>
 stock DisasmWriteDataRowChar(File:file, start, num, max) {
 	new cur = start;
-	new end = start + num * cellbytes;
+	new end = start + num*4;
 
 	while (cur < max) {
-		new p[cellbytes char + 1];
+		new p[4 char + 1];
 		p[0] = ReadAmxMemory(cur);
 
-		new u[cellbytes + 1];
+		new u[4 + 1];
 		u[0] = ToPrintableAscii(p{0});
 		u[1] = ToPrintableAscii(p{1});
 		u[2] = ToPrintableAscii(p{2});
 		u[3] = ToPrintableAscii(p{3});
-		#if cellbits == 32
-			u[4] = '\0';
-		#elseif cellbits == 64
-			u[4] = ToPrintableAscii(p{4});
-			u[5] = ToPrintableAscii(p{5});
-			u[6] = ToPrintableAscii(p{6});
-			u[7] = ToPrintableAscii(p{7});
-			u[8] = '\0';
-		#else
-			#error Unsupported `cellbits`.
-		#endif
+		u[4] = '\0';
 
 		if (cur < end) {
 			fwrite(file, u);
 		} else {
 			fwrite(file, " ");
 		}
-		cur += cellbytes;
+		cur += 4;
 	}
 }
 
 /// <library>amx_assembly disasm</library>
 stock DisasmWriteDataRowHex(File:file, start, num, max) {
 	new cur = start;
-	new end = start + num * cellbytes;
+	new end = start + num*4;
 
 	while (cur < max) {
 		if (cur < end) {
@@ -488,7 +463,7 @@ stock DisasmWriteDataRowHex(File:file, start, num, max) {
 			fwrite(file, "        ");
 		}
 		fwrite(file, " ");
-		cur += cellbytes;
+		cur += 4;
 	}
 }
 
@@ -503,12 +478,12 @@ stock DisasmWriteData(File:file) {
 	new hea = hdr[AMX_HDR_HEA];
 	new data_end = hea - dat;
 
-	for (new i = 0; i < data_end; i += 4 * cellbytes) {
+	for (new i = 0; i < data_end; i += 0x10) {
 		fwrite(file, ToHexStr(i));
 		fwrite(file, "  ");
-		DisasmWriteDataRowHex(file, i, 4, min(i + 4 * cellbytes, data_end));
+		DisasmWriteDataRowHex(file, i, 4, min(i + 0x10, data_end));
 		fwrite(file, " ");
-		DisasmWriteDataRowChar(file, i, 4, min(i + 4 * cellbytes, data_end));
+		DisasmWriteDataRowChar(file, i, 4, min(i + 0x10, data_end));
 		fwrite(file, "\n");
 	}
 }

@@ -145,6 +145,10 @@ stock MyFunc(a, b[], ...) {
 #define O@2_:%9$%0&%1|||%2)   O@F_),(O@A_()?(((CALL@%1),O@V_)?1:2):_:O@X_:O@Y_:O@Z_:$(O@V_)%2)
 #define O@3_:%9$%1|||%2)      O@I_ ),(_:O@X_:O@Y_:O@Z_:$(%1)%2)
 
+#if !defined cellbytes
+	#define cellbytes (cellbits / charbits)
+#endif
+
 #if !defined CODE_SCAN_MAX_PATTERN
 	#define CODE_SCAN_MAX_PATTERN (16)
 #endif
@@ -255,7 +259,7 @@ static stock bool:CodeScanCheckJumpTarget(cip, deloc, &stk, &hea, jumpTargets[Co
 		if (jumpTargets[CodeScanner_jump_target][num]) {
 			if ((sip = jumpTargets[CodeScanner_jump_switch][num])) {
 				for (new count = ReadAmxMemory(sip + cellbytes) + 1; count; --count) {
-					if (ReadAmxMemory(sip + count * (2 * cellbytes)) == deloc) {
+					if (ReadAmxMemory(sip + (count << 3)) == deloc) {
 						return
 							--jumpTargets[CodeScanner_jump_target][num],
 							stk = jumpTargets[CodeScanner_jump_stack][num],
@@ -489,7 +493,7 @@ static stock bool:CodeScanCheck(Opcode:op, const dctx[DisasmContext], cs[CodeSca
 		}
 	}
 	new
-		cnt = (op == OP_CASETBL) ? (_:ReadAmxMemory(dctx[DisasmContext_cip] + cellbytes)) : (gAMXOpcodeParameterCounts[_:op]),
+		cnt = (op == OP_CASETBL) ? (_:ReadAmxMemory(dctx[DisasmContext_cip] + 4)) : (gAMXOpcodeParameterCounts[_:op]),
 		len = cs[CodeScanMatcher_len];
 	for (new idx = 0; idx != CODE_SCAN_MAX_PARALLEL; ++idx) {
 		off = cs[CodeScanMatcher_offset][idx];
@@ -625,39 +629,6 @@ static stock bool:CodeScanStepInternal(dctx[DisasmContext], csState[CodeScanner]
 				}
 				parseState = 0;
 			}
-#if OPCODE_HAS_O2
-			case OP_PUSH2_C, OP_PUSH2, OP_PUSH2_S, OP_PUSH2_ADR: {
-				if (stk != cellmin) {
-					stk += cellbytes * 2;
-				}
-				parseState = 0;
-			}
-			case OP_PUSH3_C, OP_PUSH3, OP_PUSH3_S, OP_PUSH3_ADR: {
-				if (stk != cellmin) {
-					stk += cellbytes * 3;
-				}
-				parseState = 0;
-			}
-			case OP_PUSH4_C, OP_PUSH4, OP_PUSH4_S, OP_PUSH4_ADR: {
-				if (stk != cellmin) {
-					stk += cellbytes * 4;
-				}
-				parseState = 0;
-			}
-			case OP_PUSH5_C, OP_PUSH5, OP_PUSH5_S, OP_PUSH5_ADR: {
-				if (stk != cellmin) {
-					stk += cellbytes * 5;
-				}
-				parseState = 0;
-			}
-			case OP_SYSREQ_N: {
-				// sysreq.n cleans itself up, it isn't followed by `stack`.
-				if (stk != cellmin) {
-					stk -= DISASM_GET_OPERAND_INLINE(dctx, 1);
-				}
-				parseState = 0;
-			}
-#endif
 			case OP_STACK: {
 				// The stack grows down, but our count is positive.
 				if (stk != cellmin) {
@@ -808,27 +779,23 @@ static stock CodeScanCall(const cs[CodeScanMatcher], matcher__, csState[CodeScan
 	new
 		func = cs[CodeScanMatcher_func];
 	if (cs[CodeScanMatcher_flags] & SCANNER_HAS_USER_DATA) {
-		const cells0 = 2 * cellbytes;
-		const cells1 = 9 * cellbytes;
 		new
 			param = cs[CodeScanMatcher_user_data];
 		#emit PUSH.S     param
 		#emit PUSH.S     csState
-		#emit PUSH.C     cells0
+		#emit PUSH.C     8
 		#emit LCTRL      6
-		#emit ADD.C      cells1
+		#emit ADD.C      36
 		#emit LCTRL      8
 		#emit PUSH.pri
 		#emit LOAD.S.pri func
 		#emit SCTRL      6
 		#emit STOR.S.pri func
 	} else {
-		const cells2 = 1 * cellbytes;
-		const cells3 = 9 * cellbytes;
 		#emit PUSH.S     csState
-		#emit PUSH.C     cells2
+		#emit PUSH.C     4
 		#emit LCTRL      6
-		#emit ADD.C      cells3
+		#emit ADD.C      36
 		#emit LCTRL      8
 		#emit PUSH.pri
 		#emit LOAD.S.pri func
@@ -888,20 +855,20 @@ static stock CodeScanRunFastPrescanLocated(&proc, &nextaddr, const searchFuncAdd
 		switch (o = Opcode:ReadAmxMemory(addr)) {
 			case OP_PROC: {
 				proc = addr;
-				addr += cellbytes;
+				addr += 4;
 			}
 			case OP_CASETBL: {
-				addr += ReadAmxMemory(addr + cellbytes) * (2 * cellbytes) + (3 * cellbytes);
+				addr += (2 * ReadAmxMemory(addr + 4) + 3) * 4;
 			}
 			case OP_CALL: {
-				if (ReadAmxMemory(addr + cellbytes) - gCodBase == searchFuncAddr) {
+				if (ReadAmxMemory(addr + 4) - gCodBase == searchFuncAddr) {
 					nextaddr = addr;
 					return true;
 				}
-				addr += 2 * cellbytes;
+				addr += 8;
 			}
 			default: {
-				addr += (0 <= _:o < sizeof (gAMXOpcodeBaseSizes)) ? (gAMXOpcodeBaseSizes[_:o]) : (cellbytes);
+				addr += (0 <= _:o < sizeof (gAMXOpcodeBaseSizes)) ? (gAMXOpcodeBaseSizes[_:o]) : (4);
 			}
 		}
 	}
@@ -918,20 +885,20 @@ static stock CodeScanRunFastPrescanRelocate(&proc, &nextaddr, const searchFuncAd
 		switch (o = UnrelocateOpcode(Opcode:ReadAmxMemory(addr))) {
 			case OP_PROC: {
 				proc = addr;
-				addr += cellbytes;
+				addr += 4;
 			}
 			case OP_CASETBL: {
-				addr += ReadAmxMemory(addr + cellbytes) * (2 * cellbytes) + (3 * cellbytes);
+				addr += (2 * ReadAmxMemory(addr + 4) + 3) * 4;
 			}
 			case OP_CALL: {
-				if (ReadAmxMemory(addr + cellbytes) - gCodBase == searchFuncAddr) {
+				if (ReadAmxMemory(addr + 4) - gCodBase == searchFuncAddr) {
 					nextaddr = addr;
 					return true;
 				}
-				addr += 2 * cellbytes;
+				addr += 8;
 			}
 			default: {
-				addr += (0 <= _:o < sizeof (gAMXOpcodeBaseSizes)) ? (gAMXOpcodeBaseSizes[_:o]) : (cellbytes);
+				addr += (0 <= _:o < sizeof (gAMXOpcodeBaseSizes)) ? (gAMXOpcodeBaseSizes[_:o]) : (4);
 			}
 		}
 	}
@@ -959,14 +926,14 @@ stock bool:CodeScanRunFast(csState[CodeScanner], searchFuncAddr = 0) {
 		dctx[DisasmContext_end_ip] = 0;
 		// Call the correct function based on the status of relocation requirements.
 		while (gRelocateRequired ? CodeScanRunFastPrescanRelocate(proc, addr, searchFuncAddr) : CodeScanRunFastPrescanLocated(proc, addr, searchFuncAddr)) {
-			addr += 2 * cellbytes,
+			addr += 8,
 			second = false,
 			dctx[DisasmContext_nip] = proc;
 			for (cur = csState[CodeScanner_first]; cur != -1; CodeScanReset(CodeScanDeref(cur), cur)) { }
 			while (CodeScanStepInternal(dctx, csState, parseState, parseParam)) {
 				if (second && dctx[DisasmContext_opcode] == OP_PROC) {
 					// Finished the function we know has relevant code in.  Move on.
-					addr = (proc = dctx[DisasmContext_cip]) + cellbytes;
+					addr = (proc = dctx[DisasmContext_cip]) + 4;
 					break;
 				}
 				second = true;

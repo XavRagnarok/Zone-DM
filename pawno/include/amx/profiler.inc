@@ -156,7 +156,6 @@ static stock exit_public() {
 
 /// <library>amx_assembly profiler</library>
 static stock enter_public(index, address) {
-	const cells0 = 5 * cellbytes;
 	//{
 	//	new public_name[64];
 	//	GetPublicNameByIndex(index, public_name);
@@ -173,7 +172,7 @@ static stock enter_public(index, address) {
 	}
 
 	// Pop locals + arguments + numbytes + return address + frm.
-	#emit stack cells0
+	#emit stack 20
 
 	++g_call_depth;
 
@@ -202,7 +201,7 @@ static stock new_pec(index, address, code_start) {
 		pec[pec_push_index] = index;
 
 		pec[pec_push_c2] = RelocateOpcode(OP_PUSH_C);
-		pec[pec_push_8] = 2 * cellbytes;
+		pec[pec_push_8] = 8;
 
 		new enter_proc = 0;
 		#emit const.pri enter_public
@@ -226,7 +225,7 @@ stock ProfilerInit() {
 	new defsize = hdr[AMX_HDR_DEFSIZE];
 	new num_publics = (hdr[AMX_HDR_NATIVES] - hdr[AMX_HDR_PUBLICS]) / defsize;
 
-	new amx_base = GetAmxBaseAddress() + hdr[AMX_HDR_COD];
+	new amx_base = GetAmxBaseAddress();
 
 	// Redirect all public calls to ProfileHook().
 	for (new i = 0, cur = publics; i < num_publics; cur += defsize, i++) {
@@ -234,7 +233,7 @@ stock ProfilerInit() {
 		#emit lref.s.pri cur
 		#emit stor.s.pri address
 
-		new pec_index = new_pec(i, address, amx_base);
+		new pec_index = new_pec(i, address, amx_base + hdr[AMX_HDR_COD]);
 		if (pec_index < 0) {
 			printf("profiler warning: Too many public functions (%d). Consider increasing PROF_MAX_PUBLICS.", num_publics);
 			break;
