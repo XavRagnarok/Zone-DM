@@ -1,0 +1,119 @@
+/*
+***************************
+Click Teleport FilterScript
+Made By: Mouiz Ghouri / K0P
+Release Date: 1/29/2016
+****************************
+*/
+
+#include <a_samp> //Here we include the a_samp.inc
+#include <ZCMD> //Here we include the zcmd.inc
+
+/////////////////////////////////- DEFINES -////////////////////////////////////
+
+#define FILTERSCRIPT //Here we defined the filterscript
+
+/////////////////////////////////- VARIABLES -//////////////////////////////////
+
+new ClickTeleport[MAX_PLAYERS]; //Here we created the ClickTeleport variable which will help to toggle the click teleport on/off
+new MClickTeleport[MAX_PLAYERS]; //Here we created the MClickTeleport variable which will help to toggle the player teleports on/off
+
+///////////////////////////////////- STOCKS -///////////////////////////////////
+
+stock GetName(playerid) //Here we made the GetName stock to make the further scripting little bit easy
+{
+	new Name[MAX_PLAYER_NAME]; //Name variable
+	GetPlayerName(playerid, Name, sizeof(Name));//Saving player name in the "Name" variable
+	return Name;
+}
+
+//////////////////////////- PUBLIC FUNCTIONS -//////////////////////////////////
+
+public OnFilterScriptInit()
+{
+	print("Filterscript Loaded");
+	return 1;
+}
+
+public OnFilterScriptExit()
+{
+	print("Filterscript UnLoaded");
+	return 1;
+}
+
+public OnPlayerDisconnect(playerid, reason)
+{
+    ClickTeleport[playerid] = 0;
+    MClickTeleport[playerid] = 0;
+    return 1;
+}
+
+public OnPlayerClickPlayer(playerid, clickedplayerid, source) //We will make the Click Teleport function in this public function
+{
+	if(ClickTeleport[playerid] == 1) //Checking if the player has enabled the click teleport
+	{
+		if(MClickTeleport[clickedplayerid] == 0) return GameTextForPlayer(playerid, "~g~You are not allowed to teleport to this player", 4500, 3); //Sending a message to the player if the clicked player's teleports are disabled
+		new str[150],str2[150],Float:Pos[3]; //Making the variables, 1) "str" we will use this for the format function. 2)"str2" We will use this variable to make the second format function. 3)"Float:Pos[3]" in this variable we will save the all 3 positions of the clicked player x,y,z
+
+		if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+		{
+			if(GetPlayerInterior(clickedplayerid) > 1) return SendClientMessage(playerid, 0xFFFFFF, "You can teleport to a player with a vehicle who is inside an interior"); //Destroy the vehicle if the clicked player is in an interior
+	        GetPlayerPos(clickedplayerid, Pos[0], Pos[1], Pos[2]);
+	        SetVehiclePos(GetPlayerVehicleID(playerid), Pos[0], Pos[1], Pos[2]);
+	        LinkVehicleToInterior(GetPlayerVehicleID(playerid), GetPlayerInterior(clickedplayerid));
+	        SetVehicleVirtualWorld(GetPlayerVehicleID(playerid), GetPlayerVirtualWorld(clickedplayerid));
+	        
+			format(str,sizeof(str),"You have teleported to %s(%d)",GetName(clickedplayerid), clickedplayerid); //formatting the message in the "str" variable
+			SendClientMessage(playerid, 0xFFFFFF, str); //Sending the message which is saved in "str" variable to the player
+
+			format(str2,sizeof(str2),"%s(%d) has teleported to your position",GetName(playerid),playerid); //formatting the message in the "str2" variable
+			SendClientMessage(clickedplayerid, 0xFFFFFF, str2); //Sending the message which is saved in the "str2" variable to the clicked player
+		}
+		else
+		{
+			GetPlayerPos(clickedplayerid, Pos[0], Pos[1], Pos[2]); //Saving clicked player positions in the "Pos[3]" variable
+			SetPlayerPos(playerid, Pos[0], Pos[1], Pos[2] + 5); //Setting the player's position to the position which is saved in the "Pos[3]" variable
+			SetPlayerVirtualWorld(playerid, GetPlayerVirtualWorld(clickedplayerid)); //Setting player's virtual world to the virual world in which the clicked player is
+			SetPlayerInterior(playerid, GetPlayerInterior(clickedplayerid)); //Setting player's interior number equal to the interior of the clicked player
+
+			format(str,sizeof(str),"You have teleported to %s(%d)",GetName(clickedplayerid), clickedplayerid); //formatting the message in the "str" variable
+			SendClientMessage(playerid, 0xFFFFFF, str); //Sending the message which is saved in "str" variable to the player
+
+			format(str2,sizeof(str2),"%s(%d) has teleported to your position",GetName(playerid),playerid); //formatting the message in the "str2" variable
+			SendClientMessage(clickedplayerid, 0xFFFFFF, str2); //Sending the message which is saved in the "str2" variable to the clicked player
+		}
+	}
+	return 1;
+}
+
+//////////////////////////////////- COMMANDS -//////////////////////////////////
+
+CMD:cteleport(playerid, params[]) //Here we made the command which helps the player to enable and disable the click teleport
+{
+	if(ClickTeleport[playerid] == 0)
+	{
+		ClickTeleport[playerid] = 1; //Setting the ClickTeleport variable's value to 1 if its value is 0
+		GameTextForPlayer(playerid,"~g~Click Teleport ~w~On", 4500, 3); //Send a message to the player in the form of gametext
+	}
+	else if(ClickTeleport[playerid] == 1)
+	{
+		ClickTeleport[playerid] = 0; //Setting the ClickTeleport variable's value to 0 if its value is 1
+		GameTextForPlayer(playerid,"~g~Click Teleport ~w~Off", 4500, 3); //Send a message to the player in the form of gametext
+	}
+	return 1;
+}
+
+CMD:mcteleport(playerid, params[]) //Here we made the command which helps the player to enable and disable the teleports
+{
+	if(MClickTeleport[playerid] == 0)
+	{
+		MClickTeleport[playerid] = 1; //Setting the MClickTeleport variable's value to 1 if its value is 0
+		GameTextForPlayer(playerid, "~g~Teleports ~w~On",4500,3); //Send a message to the player in the form of gametext
+	}
+	else if(MClickTeleport[playerid] == 1)
+	{
+		MClickTeleport[playerid] = 0;  //Setting the MClickTeleport variable's value to 0 if its value is 1
+		GameTextForPlayer(playerid, "~g~Teleports ~w~Off",4500,3); //Send a message to the player in the form of gametext
+	}
+	return 1;
+}
