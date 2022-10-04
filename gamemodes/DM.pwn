@@ -644,17 +644,6 @@ public OnPlayerClickPlayer(playerid, clickedplayerid, source)
 
 public OnPlayerModelSelection(playerid, response, listid, modelid)
 {
-    if(listid == joinskin)
-	{
-	if(!response)
-		return ShowModelSelectionMenu(playerid, joinskin, "please pick a skin you want to use");
-
-	SetCameraBehindPlayer(playerid);
-	SetPlayerSkin(playerid, modelid);
-	PlayerInfo[playerid][pSkin] = modelid;
-	SetSpawnInfo(playerid, 0, modelid, 223.0138,-1872.2523,4.4400,1.4446,0,0,0,0,0,0);
-	SpawnPlayer(playerid);
-	}
 	return 1;
 }
 
@@ -1562,7 +1551,6 @@ function:LoggingIn(playerid)
 	format(PlayerInfo[playerid][pAccName], 32, "%s", ReturnName(playerid));
 
 	PlayerInfo[playerid][pLoggedin] = true;
-	ShowModelSelectionMenu(playerid, joinskin, "please pick a skin you want to use");
 	return 1;
 }
 
