@@ -25,7 +25,7 @@
 #define COLOR_YELLOWD (0xc0c52cFF)
 #define COLOR_CYAN (0x1fe0ddFF)
 #define COL_GREEN (0x00FF00FF)
-#define COLOR_GREY(0xa8a8a3FF)
+#define COLOR_GREY (0xa8a8a3FF)
 #define COLOR_ERROR 0xFF8282FF
 
 #define SCM SendClientMessage
@@ -107,7 +107,9 @@ enum e_playerInfo
 	pCash,
 	pSkin,
 	pScore,
-	pAdmin
+	pAdmin,
+	pPassFailed,
+	pKicked
 };
 new PlayerInfo[MAX_PLAYERS][e_playerInfo];
 
@@ -122,7 +124,6 @@ main()
 
 new joinskin = mS_INVALID_LISTID;
 
-new PlayerLogin[MAX_PLAYERS];
 //===============================================================
 
 
@@ -1545,7 +1546,7 @@ public OnPassHash(playerid)
     GetPlayerName(playerid, pname, sizeof(pname));
     bcrypt_get_hash(pass);
 	print("On Pass Hash");
-    mysql_format(handle, query, sizeof(query), "INSERT INTO users (Name, Password, RegisteredIP, Register_Timestamp) VALUES ('%e', '%e', '%e', %i);", pname, pass, pipadress, _:Now());
+    mysql_format(handle, query, sizeof(query), "INSERT INTO users (Name, Password, RegisteredIP, Register_Timestamp) VALUES ('%e', '%e', '%e', %i);", pname, pass, pipadress);
 	mysql_tquery(handle, query, "OnPlayerRegister", "d", playerid);
 	return 1;
 }
@@ -1599,6 +1600,9 @@ ResetPlayerInfo(playerid)
 	PlayerInfo[playerid][pMasterID] = 0;
 	PlayerInfo[playerid][pSkin] = 0;
 	PlayerInfo[playerid][pScore] = 0;
+
+	PlayerInfo[playerid][pPassFailed] = 0;
+	PlayerInfo[playerid][pKicked] = 0;
 
 	return 1;
 }
