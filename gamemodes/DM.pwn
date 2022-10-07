@@ -120,10 +120,6 @@ main()
 	printf("Login Script Loaded");
 }
 
-// =====================REGISTER/LOGGING STUFF===================
-
-new joinskin = mS_INVALID_LISTID;
-
 //===============================================================
 
 
@@ -187,6 +183,10 @@ public OnGameModeInit()
 
 	// ===
 
+	EnableStuntBonusForAll(0); // So players dont get money by doing stunts
+	DisableInteriorEnterExits(); // Default interiors dont show
+	ShowPlayerMarkers(PLAYER_MARKERS_MODE_STREAMED); // show markers to nearby players
+
  	SetGameModeText("friends zone");
 
  	ddmpickup = CreateDynamicPickup(1318, 2, 238.7231,-1882.8654,4.4767, -1, -1, -1, 100.0, -1, 0);
@@ -211,6 +211,8 @@ public OnGameModeExit()
 		if(PlayerInfo[i][pLoggedIn]) SavePlayerData(i);
 	}
 	mysql_close(handle);
+
+
 	return 1;
 }
 
@@ -232,13 +234,13 @@ public OnPlayerConnect(playerid)
 
 	ResetPlayerInfo(playerid);
 
-	{
-		new query[64];
-		new pname[MAX_PLAYER_NAME];
-		GetPlayerName(playerid, pname, sizeof(pname));
-		mysql_format(handle, query, sizeof(query), "SELECT COUNT(Name) from `users` where Name = '%s' ", pname);
-		mysql_tquery(handle, query, "OnPlayerJoin", "d", playerid);
-	}
+	
+	new query[64];
+	new pname[MAX_PLAYER_NAME];
+	GetPlayerName(playerid, pname, sizeof(pname));
+	mysql_format(handle, query, sizeof(query), "SELECT * FROM users WHERE Name = '%e';", pname);
+	mysql_pquery(handle, query, "OnPlayerJoin", "d", playerid);
+	
 	return 1;
 }
 
@@ -511,6 +513,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	    {
 			if(response)
 			{
+				print("Input entered!");
 			    bcrypt_hash(inputtext, 12, "OnPassHash", "d", playerid);
 			}
 			else Kick(playerid);
@@ -523,7 +526,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				new query[128], pname[MAX_PLAYER_NAME];
 				GetPlayerName(playerid, pname, sizeof(pname));
     			SetPVarString(playerid, "Unhashed_Pass",inputtext);
-				mysql_format(handle, query, sizeof(query), "SELECT password, Master_ID from `users` WHERE Name = '%s'", pname);
+				mysql_format(handle, query, sizeof(query), "SELECT Password, Master_ID FROM users WHERE Name = '%e';", pname);
 				mysql_tquery(handle, query, "OnPlayerLogin", "d", playerid);
 			}
 			else Kick(playerid);
@@ -630,17 +633,6 @@ public OnPlayerClickPlayer(playerid, clickedplayerid, source)
 
 public OnPlayerModelSelection(playerid, response, listid, modelid)
 {
-    if(listid == joinskin)
-	{
-	if(!response)
-		return ShowModelSelectionMenu(playerid, joinskin, "please pick a skin you want to use");
-
-	SetCameraBehindPlayer(playerid);
-	SetPlayerSkin(playerid, modelid);
-	PlayerInfo[playerid][pSkin] = modelid;
-	SetSpawnInfo(playerid, 0, modelid, 223.0138,-1872.2523,4.4400,1.4446,0,0,0,0,0,0);
-	SpawnPlayer(playerid);
-	}
 	return 1;
 }
 
@@ -1484,7 +1476,7 @@ SavePlayerData(playerid)
 {
 	new query[256], pname[MAX_PLAYER_NAME];
  	GetPlayerName(playerid, pname, sizeof(pname));
-	mysql_format(handle, query, sizeof(query), "UPDATE `users` set Skin = %d, Score = %d WHERE Master_ID = %d", PlayerInfo[playerid][pSkin], PlayerInfo[playerid][pScore], PlayerInfo[playerid][pMasterID]);
+	mysql_format(handle, query, sizeof(query), "UPDATE `accounts` set Skin = %d, Score = %d WHERE Master_ID = %d", PlayerInfo[playerid][pSkin], PlayerInfo[playerid][pScore], PlayerInfo[playerid][pMasterID]);
 	mysql_query(handle, query);
 	printf("Saved %s's data", pname);
 	return 1;
@@ -1498,21 +1490,19 @@ public OnPlayerJoin(playerid)
 	InterpolateCameraPos(playerid, 1332.7262, -1071.3055, 83.0842, 1383.8170, -909.1896, 74.4843, 10000);
 	InterpolateCameraLookAt(playerid, 1333.0266, -1070.3523, 83.0337, 1384.1174, -908.2363, 74.4337, 10000);
 
+	cache_get_value_name_int(0, "Master_ID", PlayerInfo[playerid][pMasterID]);
+
 
 	if(cache_num_rows()){
 		new loginstr[200];
 		format(loginstr, sizeof(loginstr), "{FFFFFF}Wazzup, {00FF22}%s{FFFFFF}! You have already registered on our server.\n{FFFFFF}Simply type your password below in order to login.", GetPlayerNameEx(playerid));
 		ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, SERVER_NAME, loginstr, "Login", "Quit");
 	}
-	else
+	if(!cache_num_rows())
 	{
 		new registerstr[200];
 		format(registerstr, sizeof(registerstr), "{FFFFFF}Welcome, {00FF22}%s{FFFFFF}! It looks like you are new here.\n{00FF22}Simply type your password below in order to register.", GetPlayerNameEx(playerid));
 		
-		if(strfind(GetPlayerNameEx(playerid), "_") == -1) {
-			SendClientMessage(playerid, COLOR_ERROR, "Your name must be formatted as Firstname_Lastname. Please rejoin with a acceptable name");
-			KickPlayer(playerid);
-		}
 		ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, SERVER_NAME, registerstr, "Register", "Quit");
 	}
 	return 1;
@@ -1521,6 +1511,7 @@ forward OnPlayerRegister(playerid);
 public OnPlayerRegister(playerid)
 {
 	SendClientMessage(playerid, 0x0033FFFF /*Blue*/, "Thank you for registering! You can now Login");
+	print("OnPlayerRegister");
     ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", "Thank you for registering! You can now Login with\npassword you just used to register.", "Login", "Quit");
 	return 1;
 }
@@ -1531,11 +1522,11 @@ public OnPlayerLogin(playerid)
 	GetPVarString(playerid, "Unhashed_Pass",unhashed_pass,sizeof(unhashed_pass));
 	if(cache_num_rows())
 	{
-		cache_get_value_index(0, 0, pPass);
-		cache_get_value_index_int(0, 1, PlayerInfo[playerid][pMasterID]);
+		cache_get_value_name(0, "Password", pPass);
+		printf("%s has loaded master id: %d", ReturnName(playerid), PlayerInfo[playerid][pMasterID]);
 		bcrypt_check(unhashed_pass, pPass, "OnPassCheck", "dd",playerid, PlayerInfo[playerid][pMasterID]);
   	}
-    else printf("ERROR ");
+    else printf("ERROR");
 	return 1;
 }
 forward OnPassHash(playerid);
@@ -1546,7 +1537,7 @@ public OnPassHash(playerid)
     GetPlayerName(playerid, pname, sizeof(pname));
     bcrypt_get_hash(pass);
 	print("On Pass Hash");
-    mysql_format(handle, query, sizeof(query), "INSERT INTO users (Name, Password, RegisteredIP, Register_Timestamp) VALUES ('%e', '%e', '%e', %i);", pname, pass, pipadress);
+    mysql_format(handle, query, sizeof(query), "INSERT INTO accounts (Name, Password, RegisteredIP) VALUES ('%e', '%e', '%e');", pname, pass, pipadress);
 	mysql_tquery(handle, query, "OnPlayerRegister", "d", playerid);
 	return 1;
 }
@@ -1557,7 +1548,7 @@ public OnPassCheck(playerid, DBID)
     if(bcrypt_is_equal())
 	{
 		new query[128];
-		mysql_format(handle, query, sizeof(query), "SELECT * FROM users WHERE Master_ID = %d;", DBID);
+		mysql_format(handle, query, sizeof(query), "SELECT * FROM accounts WHERE Master_ID = %d;", PlayerInfo[playerid][pMasterID]);
 		mysql_tquery(handle, query, "SetPlayerInfo", "i", playerid);
 	}
 	else
