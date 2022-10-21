@@ -68,20 +68,28 @@ CMD:arm(playerid, params[])
 
 CMD:v(playerid, params[])
 {
-	new vehicleid;
-	new Float:X, Float:Y, Float:Z;
+	new model[20], modelid, Float:x, Float:y, Float:z, vehicleid;
 
-	GetPlayerPos(playerid, Float:X, Float:Y, Float:Z);
+	GetPlayerPos(playerid, Float:x, Float:y, Float:z);
 
-	if(sscanf(params, "i", vehicleid))
+	if(sscanf(params, "s[20]", model))
 	    return SCM(playerid, COLOR_RED, "Usage: /v [vehicle id 400-611]");
 
-	if(vehicleid < 400 || vehicleid > 611)
-	    return SCM(playerid, COLOR_RED, "[SERVER]: Invalid ID");
+	if((modelid = GetVehicleModelByName(model)) == 0)
+	{
+	    return SendClientMessage(playerid, COLOR_RED, "Invalid vehicle model.");
+	}
 
- 	CreateVehicle(vehicleid, X, Y, Z, 2.0, 0, 0, 0, 0);
+	if(IsPlayerInAnyVehicle(playerid) == 1)
+	{
+		DestroyVehicle(GetPlayerVehicleID(playerid));
+	}
 
-	SCMex(playerid, COLOR_CYAN, "You have Successfully spawned a vehicle (%i)", vehicleid);
+ 	vehicleid = AddStaticVehicleEx(modelid, x, y, z, 2.0, 0, 0, 0, 0);
+
+ 	PutPlayerInVehicle(playerid, vehicleid, 0);
+
+	SCMex(playerid, COLOR_CYAN, "You have Successfully spawned a vehicle (%s)", GetVehicleName(vehicleid));
 
 	return 1;
 }

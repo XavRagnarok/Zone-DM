@@ -1,2 +1,16 @@
 [18:12:37 10/21/22] [WARNING] CMySQLResult::GetRowDataByName - field not found ("Admin") (Query: "SELECT * FROM accounts WHERE acc_name = 'Ragnaroktest'")
 [18:12:37 10/21/22] [ERROR] cache_get_field_content_int - invalid datatype
+[21:34:23 10/21/22] [WARNING] CMySQLResult::GetRowDataByName - field not found ("Admin") (Query: "SELECT * FROM accounts WHERE acc_name = 'Ragnarok'")
+[21:34:23 10/21/22] [ERROR] cache_get_field_content_int - invalid datatype
+[21:35:55 10/21/22] [WARNING] CMySQLResult::GetRowDataByName - field not found ("Admin") (Query: "SELECT * FROM accounts WHERE acc_name = 'Ragnarok'")
+[21:35:55 10/21/22] [ERROR] cache_get_field_content_int - invalid datatype
+[21:36:32 10/21/22] [WARNING] CMySQLResult::GetRowDataByName - field not found ("Admin") (Query: "SELECT * FROM accounts WHERE acc_name = 'Ragnarok'")
+[21:36:32 10/21/22] [ERROR] cache_get_field_content_int - invalid datatype
+[21:42:20 10/21/22] [WARNING] CMySQLResult::GetRowDataByName - field not found ("Admin") (Query: "SELECT * FROM accounts WHERE acc_name = 'Ragnarok'")
+[21:42:20 10/21/22] [ERROR] cache_get_field_content_int - invalid datatype
+[21:43:50 10/21/22] [WARNING] CMySQLResult::GetRowDataByName - field not found ("Admin") (Query: "SELECT * FROM accounts WHERE acc_name = 'Ragnarok'")
+[21:43:50 10/21/22] [ERROR] cache_get_field_content_int - invalid datatype
+[21:48:13 10/21/22] [WARNING] CMySQLResult::GetRowDataByName - field not found ("Admin") (Query: "SELECT * FROM accounts WHERE acc_name = 'Ragnarok'")
+[21:48:13 10/21/22] [ERROR] cache_get_field_content_int - invalid datatype
+[22:05:50 10/21/22] [WARNING] CMySQLResult::GetRowDataByName - field not found ("Admin") (Query: "SELECT * FROM accounts WHERE acc_name = 'Ragnarok'")
+[22:05:50 10/21/22] [ERROR] cache_get_field_content_int - invalid datatype

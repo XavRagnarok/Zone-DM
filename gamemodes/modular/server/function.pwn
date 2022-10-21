@@ -114,17 +114,39 @@ stock SendClientMessageEx(playerid, color, const str[], {Float,_}:...)
 	return SendClientMessage(playerid, color, str);
 }
 
-stock ReturnVehicleName(vehicleid)
+stock GetVehicleName(vehicleid)
 {
 	new
-		model = GetVehicleModel(vehicleid),
-		name[32] = "None";
+		modelid = GetVehicleModel(vehicleid),
+		name[32];
 
-    if (model < 400 || model > 611)
-	    return name;
+	if(400 <= modelid <= 611)
+	    strcat(name, vehicleNames[modelid - 400]);
+	else
+	    name = "Unknown";
 
-	format(name, sizeof(name), g_arrVehicleNames[model - 400]);
 	return name;
+}
+
+stock GetVehicleModelByName(const string[])
+{
+	new
+	    modelid = strval(string);
+
+	if(400 <= modelid <= 611)
+	{
+	    return modelid;
+	}
+
+	for(new i = 0; i < sizeof(vehicleNames); i ++)
+	{
+		if(strfind(vehicleNames[i], string, true) != -1)
+  		{
+			return i + 400;
+		}
+	}
+
+	return 0;
 }
 
 function:KickTimer(playerid) 
