@@ -1,0 +1,2 @@
+[18:12:37 10/21/22] [WARNING] CMySQLResult::GetRowDataByName - field not found ("Admin") (Query: "SELECT * FROM accounts WHERE acc_name = 'Ragnaroktest'")
+[18:12:37 10/21/22] [ERROR] cache_get_field_content_int - invalid datatype

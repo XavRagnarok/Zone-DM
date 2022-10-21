@@ -1,1 +1,0 @@
-[02:02:45] [plugins/mysql] error #1146 while executing query "SELECT * FROM users WHERE Name = 'Ragnarok2';": Table 'zonedm.users' doesn't exist

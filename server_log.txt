@@ -156,3 +156,447 @@ v0.3.7-R2, (C)2005-2015 SA-MP Team
 [02:02:44] [connection] incoming connection: 192.168.0.102:49653 id: 0
 [02:02:45] [join] Ragnarok2 has joined the server (0:192.168.0.102)
 [02:02:48] [part] Ragnarok2 has left the server (0:1)
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[20:37:46] 
+[20:37:46] Server Plugins
+[20:37:46] --------------
+[20:37:46]  Loading plugin: mysql
+[20:37:46]  >> plugin.mysql: R41-4 successfully loaded.
+[20:37:46]   Loaded.
+[20:37:46]  Loading plugin: sscanf
+[20:37:46] 
+[20:37:46]  ===============================
+[20:37:46] 
+[20:37:46]       sscanf plugin loaded.     
+[20:37:46] 
+[20:37:46]          Version: 2.13.1
+[20:37:46] 
+[20:37:46]    (c) 2022 Alex "Y_Less" Cole  
+[20:37:46] 
+[20:37:46]  ===============================
+[20:37:46] 
+[20:37:46]   Loaded.
+[20:37:46]  Loading plugin: streamer
+[20:37:46] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[20:37:46]   Loaded.
+[20:37:46]  Loading plugin: bcrypt-samp
+[20:37:46]   plugin.bcrypt v2.2.3 was loaded.
+[20:37:46]   plugin.bcrypt: 4 cores detected, 3 threads will be used.
+[20:37:46]   Loaded.
+[20:37:46]  Loaded 4 plugins.
+
+[20:37:46] 
+[20:37:46] Filterscripts
+[20:37:46] ---------------
+[20:37:46]   Loaded 0 filterscripts.
+
+[20:37:47] [MYSQL] Connection successful
+[20:37:47] Login Script Loaded
+[20:37:47] Number of vehicle models: 0
+[20:38:07] plugin.bcrypt: Version check failed.
+[20:38:25] [connection] 192.168.0.102:49843 requests connection cookie.
+[20:38:26] [connection] incoming connection: 192.168.0.102:49843 id: 0
+[20:38:26] [join] Ragnarok has joined the server (0:192.168.0.102)
+[20:38:31] Input entered!
+[20:38:31] On Pass Hash
+[20:38:39] [part] Ragnarok has left the server (0:1)
+[20:47:35] --- Server Shutting Down.
+[20:47:35] plugin.mysql: Unloading plugin...
+[20:47:35] plugin.mysql: Plugin unloaded.
+[20:47:35] 
+[20:47:35]  ===============================
+[20:47:35] 
+[20:47:35]      sscanf plugin unloaded.    
+[20:47:35] 
+[20:47:35]  ===============================
+[20:47:35] 
+[20:47:35] 
+
+*** Streamer Plugin v2.9.5 by Incognito unloaded ***
+
+[20:47:35] plugin.bcrypt: Plugin unloaded.
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[20:47:44] 
+[20:47:44] Server Plugins
+[20:47:44] --------------
+[20:47:44]  Loading plugin: mysql
+[20:47:44]  >> plugin.mysql: R41-4 successfully loaded.
+[20:47:44]   Loaded.
+[20:47:44]  Loading plugin: sscanf
+[20:47:44] 
+[20:47:44]  ===============================
+[20:47:44] 
+[20:47:44]       sscanf plugin loaded.     
+[20:47:44] 
+[20:47:44]          Version: 2.13.1
+[20:47:44] 
+[20:47:44]    (c) 2022 Alex "Y_Less" Cole  
+[20:47:44] 
+[20:47:44]  ===============================
+[20:47:44] 
+[20:47:44]   Loaded.
+[20:47:44]  Loading plugin: streamer
+[20:47:44] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[20:47:44]   Loaded.
+[20:47:44]  Loading plugin: bcrypt-samp
+[20:47:44]   plugin.bcrypt v2.2.3 was loaded.
+[20:47:44]   plugin.bcrypt: 4 cores detected, 3 threads will be used.
+[20:47:44]   Loaded.
+[20:47:44]  Loaded 4 plugins.
+
+[20:47:44] 
+[20:47:44] Filterscripts
+[20:47:44] ---------------
+[20:47:44]   Loaded 0 filterscripts.
+
+[20:47:44] [MYSQL] Connection successful
+[20:47:44] Login Script Loaded
+[20:47:44] Number of vehicle models: 0
+[20:47:45] plugin.bcrypt: Version check failed.
+[20:48:15] [connection] 192.168.0.102:56179 requests connection cookie.
+[20:48:16] [connection] incoming connection: 192.168.0.102:56179 id: 0
+[20:48:16] [join] Ragnarok has joined the server (0:192.168.0.102)
+[20:48:18] Input entered!
+[20:48:19] On Pass Hash
+[20:48:22] [part] Ragnarok has left the server (0:1)
+[20:49:48] --- Server Shutting Down.
+[20:49:48] plugin.mysql: Unloading plugin...
+[20:49:48] plugin.mysql: Plugin unloaded.
+[20:49:48] 
+[20:49:48]  ===============================
+[20:49:48] 
+[20:49:48]      sscanf plugin unloaded.    
+[20:49:48] 
+[20:49:48]  ===============================
+[20:49:48] 
+[20:49:48] 
+
+*** Streamer Plugin v2.9.5 by Incognito unloaded ***
+
+[20:49:48] plugin.bcrypt: Plugin unloaded.
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[20:49:50] 
+[20:49:50] Server Plugins
+[20:49:50] --------------
+[20:49:50]  Loading plugin: mysql
+[20:49:50]  >> plugin.mysql: R41-4 successfully loaded.
+[20:49:50]   Loaded.
+[20:49:50]  Loading plugin: sscanf
+[20:49:50] 
+[20:49:50]  ===============================
+[20:49:50] 
+[20:49:50]       sscanf plugin loaded.     
+[20:49:50] 
+[20:49:50]          Version: 2.13.1
+[20:49:50] 
+[20:49:50]    (c) 2022 Alex "Y_Less" Cole  
+[20:49:50] 
+[20:49:50]  ===============================
+[20:49:50] 
+[20:49:50]   Loaded.
+[20:49:50]  Loading plugin: streamer
+[20:49:50] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[20:49:50]   Loaded.
+[20:49:50]  Loading plugin: bcrypt-samp
+[20:49:50]   plugin.bcrypt v2.2.3 was loaded.
+[20:49:50]   plugin.bcrypt: 4 cores detected, 3 threads will be used.
+[20:49:50]   Loaded.
+[20:49:50]  Loaded 4 plugins.
+
+[20:49:50] 
+[20:49:50] Filterscripts
+[20:49:50] ---------------
+[20:49:50]   Loaded 0 filterscripts.
+
+[20:49:50] [MYSQL] Connection successful
+[20:49:50] Login Script Loaded
+[20:49:50] Number of vehicle models: 0
+[20:49:51] plugin.bcrypt: Version check failed.
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[22:11:05] 
+[22:11:05] Server Plugins
+[22:11:05] --------------
+[22:11:05]  Loading plugin: mysql
+[22:11:05]  >> plugin.mysql: R41-4 successfully loaded.
+[22:11:05]   Loaded.
+[22:11:05]  Loading plugin: sscanf
+[22:11:05] 
+[22:11:05]  ===============================
+[22:11:05] 
+[22:11:05]       sscanf plugin loaded.     
+[22:11:05] 
+[22:11:05]          Version: 2.13.1
+[22:11:05] 
+[22:11:05]    (c) 2022 Alex "Y_Less" Cole  
+[22:11:05] 
+[22:11:05]  ===============================
+[22:11:05] 
+[22:11:05]   Loaded.
+[22:11:05]  Loading plugin: streamer
+[22:11:06] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[22:11:06]   Loaded.
+[22:11:06]  Loading plugin: bcrypt-samp
+[22:11:06]   plugin.bcrypt v2.2.3 was loaded.
+[22:11:06]   plugin.bcrypt: 4 cores detected, 3 threads will be used.
+[22:11:06]   Loaded.
+[22:11:06]  Loaded 4 plugins.
+
+[22:11:06] 
+[22:11:06] Filterscripts
+[22:11:06] ---------------
+[22:11:06]   Loaded 0 filterscripts.
+
+[22:11:06] [MYSQL] Connection successful
+[22:11:06] Login Script Loaded
+[22:11:06] Number of vehicle models: 0
+[22:11:07] plugin.bcrypt: Version check failed.
+[22:13:27] [connection] 192.168.0.102:58300 requests connection cookie.
+[22:13:28] [connection] incoming connection: 192.168.0.102:58300 id: 0
+[22:13:28] [join] Ragnarok has joined the server (0:192.168.0.102)
+[22:13:33] Input entered!
+[22:13:33] On Pass Hash
+[22:13:41] [part] Ragnarok has left the server (0:1)
+[22:16:45] --- Server Shutting Down.
+[22:16:45] plugin.mysql: Unloading plugin...
+[22:16:45] plugin.mysql: Plugin unloaded.
+[22:16:45] 
+[22:16:45]  ===============================
+[22:16:45] 
+[22:16:45]      sscanf plugin unloaded.    
+[22:16:45] 
+[22:16:45]  ===============================
+[22:16:45] 
+[22:16:45] 
+
+*** Streamer Plugin v2.9.5 by Incognito unloaded ***
+
+[22:16:45] plugin.bcrypt: Plugin unloaded.
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[18:10:17] 
+[18:10:17] Server Plugins
+[18:10:17] --------------
+[18:10:17]  Loading plugin: mysql
+[18:10:18]  >> plugin.mysql: R41-4 successfully loaded.
+[18:10:18]   Loaded.
+[18:10:18]  Loading plugin: sscanf
+[18:10:18] 
+[18:10:18]  ===============================
+[18:10:18] 
+[18:10:18]       sscanf plugin loaded.     
+[18:10:18] 
+[18:10:18]          Version: 2.13.1
+[18:10:18] 
+[18:10:18]    (c) 2022 Alex "Y_Less" Cole  
+[18:10:18] 
+[18:10:18]  ===============================
+[18:10:18] 
+[18:10:18]   Loaded.
+[18:10:18]  Loading plugin: streamer
+[18:10:18] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[18:10:18]   Loaded.
+[18:10:18]  Loading plugin: bcrypt-samp
+[18:10:18]   plugin.bcrypt v2.2.3 was loaded.
+[18:10:18]   plugin.bcrypt: 4 cores detected, 3 threads will be used.
+[18:10:18]   Loaded.
+[18:10:18]  Loaded 4 plugins.
+
+[18:10:18] 
+[18:10:18] Filterscripts
+[18:10:18] ---------------
+[18:10:18]   Loaded 0 filterscripts.
+
+[18:10:18] Script[gamemodes/DM.amx]: Run time error 19: "File or function is not found"
+[18:10:18] Number of vehicle models: 0
+[18:10:21] --- Server Shutting Down.
+[18:10:21] plugin.mysql: Unloading plugin...
+[18:10:21] plugin.mysql: Plugin unloaded.
+[18:10:21] 
+[18:10:21]  ===============================
+[18:10:21] 
+[18:10:21]      sscanf plugin unloaded.    
+[18:10:21] 
+[18:10:21]  ===============================
+[18:10:21] 
+[18:10:21] 
+
+*** Streamer Plugin v2.9.5 by Incognito unloaded ***
+
+[18:10:21] plugin.bcrypt: Plugin unloaded.
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[18:10:37] 
+[18:10:37] Server Plugins
+[18:10:37] --------------
+[18:10:37]  Loading plugin: mysql
+[18:10:37]  >> plugin.mysql: R41-4 successfully loaded.
+[18:10:37]   Loaded.
+[18:10:37]  Loading plugin: sscanf
+[18:10:37] 
+[18:10:37]  ===============================
+[18:10:37] 
+[18:10:37]       sscanf plugin loaded.     
+[18:10:37] 
+[18:10:37]          Version: 2.13.1
+[18:10:37] 
+[18:10:37]    (c) 2022 Alex "Y_Less" Cole  
+[18:10:37] 
+[18:10:37]  ===============================
+[18:10:37] 
+[18:10:37]   Loaded.
+[18:10:37]  Loading plugin: streamer
+[18:10:37] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[18:10:37]   Loaded.
+[18:10:37]  Loaded 3 plugins.
+
+[18:10:37] 
+[18:10:37] Filterscripts
+[18:10:37] ---------------
+[18:10:37]   Loaded 0 filterscripts.
+
+[18:10:37] Script[gamemodes/DM.amx]: Run time error 19: "File or function is not found"
+[18:10:37] Number of vehicle models: 0
+[18:10:39] --- Server Shutting Down.
+[18:10:39] plugin.mysql: Unloading plugin...
+[18:10:39] plugin.mysql: Plugin unloaded.
+[18:10:39] 
+[18:10:39]  ===============================
+[18:10:39] 
+[18:10:39]      sscanf plugin unloaded.    
+[18:10:39] 
+[18:10:39]  ===============================
+[18:10:39] 
+[18:10:39] 
+
+*** Streamer Plugin v2.9.5 by Incognito unloaded ***
+
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[18:11:29] 
+[18:11:29] Server Plugins
+[18:11:29] --------------
+[18:11:29]  Loading plugin: mysql
+[18:11:31]  >> plugin.mysql: R39-6 successfully loaded.
+[18:11:31]   Loaded.
+[18:11:31]  Loading plugin: sscanf
+[18:11:31] 
+[18:11:31]  ===============================
+[18:11:31] 
+[18:11:31]       sscanf plugin loaded.     
+[18:11:31] 
+[18:11:31]          Version: 2.13.1
+[18:11:31] 
+[18:11:31]    (c) 2022 Alex "Y_Less" Cole  
+[18:11:31] 
+[18:11:31]  ===============================
+[18:11:31] 
+[18:11:31]   Loaded.
+[18:11:31]  Loading plugin: streamer
+[18:11:31] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[18:11:31]   Loaded.
+[18:11:31]  Loaded 3 plugins.
+
+[18:11:31] 
+[18:11:31] Filterscripts
+[18:11:31] ---------------
+[18:11:31]   Loaded 0 filterscripts.
+
+[18:11:31] [DATABASE]: Connection established to MySQL
+[18:11:31] 
+-------------------------------------
+[18:11:31] This is the sick script we are making
+[18:11:31] ---------------------------------------
+
+[18:11:31] Number of vehicle models: 0
+[18:12:25] [connection] 192.168.0.102:51163 requests connection cookie.
+[18:12:26] [connection] incoming connection: 192.168.0.102:51163 id: 0
+[18:12:26] [join] Ragnaroktest has joined the server (0:192.168.0.102)
+[18:15:32] --- Server Shutting Down.
+[18:15:33] [part] Ragnaroktest has left the server (0:0)
+[18:15:33] plugin.mysql: Unloading plugin...
+[18:15:33] plugin.mysql: Plugin unloaded.
+[18:15:33] 
+[18:15:33]  ===============================
+[18:15:33] 
+[18:15:33]      sscanf plugin unloaded.    
+[18:15:33] 
+[18:15:33]  ===============================
+[18:15:33] 
+[18:15:33] 
+
+*** Streamer Plugin v2.9.5 by Incognito unloaded ***
+

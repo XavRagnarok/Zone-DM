@@ -13,8 +13,6 @@
 #include <k_functions>
 #include <string>
 #include <streamer>
-#include <bcrypt>
-
 
 
 
@@ -26,17 +24,78 @@
 #define COLOR_CYAN (0x1fe0ddFF)
 #define COL_GREEN (0x00FF00FF)
 #define COLOR_GREY (0xa8a8a3FF)
-#define COLOR_ERROR 0xFF8282FF
 
 #define SCM SendClientMessage
 #define function:%0(%1) forward %0(%1); public %0(%1)
 #define SCMex SendClientMessageEx
 #define SCMall SendClientMessageToAll
 
-#define SERVER_NAME "Savline RPG"
+#define SCRIPT_VERSION "Script Adventure 1.0.1.1"
 
 new pms[MAX_PLAYERS],
-pPM[MAX_PLAYERS];
+pPM[MAX_PLAYERS],
+aduty[MAX_PLAYERS];
+
+//========================Related to cbug=================
+
+#define MAX_SLOTS 48
+
+new NotMoving[MAX_PLAYERS];
+new WeaponID[MAX_PLAYERS];
+new CheckCrouch[MAX_PLAYERS];
+new Ammo[MAX_PLAYERS][MAX_SLOTS];
+
+new aWeaponNames[][32] = {
+	{"Fist"}, // 0
+	{"Brass Knuckles"}, // 1
+	{"Golf Club"}, // 2
+	{"Night Stick"}, // 3
+	{"Knife"}, // 4
+	{"Baseball Bat"}, // 5
+	{"Shovel"}, // 6
+	{"Pool Cue"}, // 7
+	{"Katana"}, // 8
+	{"Chainsaw"}, // 9
+	{"Purple Dildo"}, // 10
+	{"Vibrator"}, // 11
+	{"Vibrator"}, // 12
+	{"Vibrator"}, // 13
+	{"Flowers"}, // 14
+	{"Cane"}, // 15
+	{"Grenade"}, // 16
+	{"Teargas"}, // 17
+	{"Molotov"}, // 18
+	{" "}, // 19
+	{" "}, // 20
+	{" "}, // 21
+	{"Colt 45"}, // 22
+	{"Silenced Pistol"}, // 23
+	{"Deagle"}, // 24
+	{"Shotgun"}, // 25
+	{"Sawns"}, // 26
+	{"Spas"}, // 27
+	{"Uzi"}, // 28
+	{"MP5"}, // 29
+	{"AK47"}, // 30
+	{"M4"}, // 31
+	{"Tec9"}, // 32
+	{"Country Rifle"}, // 33
+	{"Sniper Rifle"}, // 34
+	{"Rocket Launcher"}, // 35
+	{"Heat-Seeking Rocket Launcher"}, // 36
+	{"Flamethrower"}, // 37
+	{"Minigun"}, // 38
+	{"Satchel Charge"}, // 39
+	{"Detonator"}, // 40
+	{"Spray Can"}, // 41
+	{"Fire Extinguisher"}, // 42
+	{"Camera"}, // 43
+	{"Night Vision Goggles"}, // 44
+	{"Infrared Vision Goggles"}, // 45
+	{"Parachute"}, // 46
+	{"Fake Pistol"} // 47
+};
+
 
 //=========================Dynamic pickups================
 
@@ -45,25 +104,24 @@ new sdmpickup;
 new sosdmpickup;
 
 //================================Dialogs==================
-enum //Always use some kind of structure for Dialog IDs.
-{
-	DIALOG_REGISTER,
-	DIALOG_LOGIN,
- 	DIALOG_HELP, 
-	DIALOG_ACCOUNT, 
-	DIALOG_DM,
-	DIALOG_CONFIRMDDM, 
-	DIALOG_CONFIRMSDM, 
-	DIALOG_CONFIRMSOSDM
-};
 
+#define DIALOG_REGISTER 0
+#define DIALOG_LOGIN 1
+#define DIALOG_HELP 2
+#define DIALOG_ACCOUNT 3
+#define DIALOG_DM 4
+#define DIALOG_CONFIRMDDM 5
+#define DIALOG_CONFIRMSDM 6
+#define DIALOG_CONFIRMSOSDM 7
 
 //================MySQL Connection:=========================
 
-#define DB_HOST "localhost" //IP of your host. In case of using it on same pc, use localhost or 127.0.0.1
-#define DB_NAME "zonedm" //Name of Database you are gonna use.. I have used login, but change it according to your needs.
-#define DB_USER "root" //User name of your MySQL client.
-#define DB_PASS "" //Password of your MySQL client.
+new ourConnection;
+
+#define SQL_HOSTNAME "127.0.0.1"
+#define SQL_USERNAME "root"
+#define SQL_DATABASE "zonedm"
+#define SQL_PASSWORD ""
 
 //===========================================================
 
@@ -100,26 +158,23 @@ static stock g_arrVehicleNames[][] = {
 
 //=======================Account Data Stuff========================
 
-enum e_playerInfo
+enum P_ACCOUNT_DATA
 {
-	pMasterID,
-	bool:pLoggedIn,
-	pCash,
-	pSkin,
-	pScore,
-	pAdmin,
-	pPassFailed,
-	pKicked
-};
-new PlayerInfo[MAX_PLAYERS][e_playerInfo];
-
-new MySQL:handle; //This connection handle of data type MySQL is required to carry out Mysql operations.
-
-main()
-{
-	printf("Login Script Loaded");
+    pDBID,
+    pAccName[60],
+    pSkin,
+    bool:pLoggedin,
+    pAdmin,
+    pCash,
+    pScore,
 }
+new PlayerInfo[MAX_PLAYERS][P_ACCOUNT_DATA];
 
+// =====================REGISTER/LOGGING STUFF===================
+
+new joinskin = mS_INVALID_LISTID;
+
+new PlayerLogin[MAX_PLAYERS];
 //===============================================================
 
 
@@ -152,7 +207,7 @@ new Float:SDMRandomSpawn[][12] =
 	{211.3380,187.8945,1003.0313,179.4331}, // 10
 	{189.5367,158.4363,1003.0234,272.9816}, // 11
 	{189.3243,179.1608,1003.0234,269.0112} // 12
-
+	
 };
 
 new Float:SOSRandomSpawn[][4] =
@@ -165,61 +220,75 @@ new Float:SOSRandomSpawn[][4] =
 //===============================================================
 
 
+main()
+{
+	print("\n-------------------------------------");
+	print("This is the sick script we are making");
+	print("---------------------------------------\n");
+}
+
 public OnGameModeInit()
 {
     DisableInteriorEnterExits();
 
-    // SQL related
+    ourConnection = mysql_connect(SQL_HOSTNAME, SQL_USERNAME, SQL_DATABASE, SQL_PASSWORD);
 
-    handle = mysql_connect(DB_HOST, DB_USER, DB_PASS, DB_NAME);
-	
-	if(mysql_errno(handle) == 0) printf("[MYSQL] Connection successful"); //returns number of errors. 0 means no errors..
-	else
-	{
-	    new error[100];
-	    mysql_error(error, sizeof(error), handle);
-		printf("[MySQL] Connection Failed : %s", error);
-	}
+    if(mysql_errno() !=0)
+        printf ("[DATABASE]: Connection failed to MySQL", SQL_DATABASE);
+    else printf ("[DATABASE]: Connection established to MySQL", SQL_DATABASE);
 
-	// ===
-
-	EnableStuntBonusForAll(0); // So players dont get money by doing stunts
-	DisableInteriorEnterExits(); // Default interiors dont show
-	ShowPlayerMarkers(PLAYER_MARKERS_MODE_STREAMED); // show markers to nearby players
+    joinskin = LoadModelSelectionMenu("skins.txt");
 
  	SetGameModeText("friends zone");
-
+ 	
  	ddmpickup = CreateDynamicPickup(1318, 2, 238.7231,-1882.8654,4.4767, -1, -1, -1, 100.0, -1, 0);
-
+ 	
  	CreateDynamic3DTextLabel("Press ~k~~VEHICLE_ENTER_EXIT~", -1, 238.7231,-1882.8654,4.4767, 5.0, -1, -1, 1, -1, -1, -1, 5.0);
-
+ 	
  	sdmpickup = CreateDynamicPickup(1318, 2, 236.1373,-1882.9423,4.4698, -1, -1, -1, 100.0, -1, 0);
-
+ 	
     CreateDynamic3DTextLabel("Press ~k~~VEHICLE_ENTER_EXIT~", -1, 236.1373,-1882.9423,4.4698, 5.0, -1, -1, 1, -1, -1, -1, 5.0);
-
+    
 	sosdmpickup = CreateDynamicPickup(1318, 2, 233.6071,-1883.0021,4.4685, -1, -1, -1, 100.0, -1, 0);
-
+    
     CreateDynamic3DTextLabel("Press ~k~~VEHICLE_ENTER_EXIT~", -1, 233.6071,-1883.0021,4.4685, 5.0, -1, -1, 1, -1, -1, -1, 5.0);
-
+ 	
 	return 1;
 }
 
 public OnGameModeExit()
 {
-	foreach(new i : Player)
-	{
-		if(PlayerInfo[i][pLoggedIn]) SavePlayerData(i);
-	}
-	mysql_close(handle);
-
-
+	mysql_close(ourConnection);
 	return 1;
 }
 
 public OnPlayerRequestClass(playerid, classid)
 {
+	if(PlayerInfo[playerid][pLoggedin] == false)
+		{
+	    SetSpawnInfo(playerid, 0, 0, 563.3157, 3315.2559, 0, 269.15, 0, 0, 0, 0, 0, 0 );
+	    TogglePlayerSpectating(playerid, true);
+     	TogglePlayerSpectating(playerid, false);
+        SetPlayerCamera(playerid);
+        return 1;
+		}
+
+	SetSpawnInfo(playerid, 0, PlayerInfo[playerid][pSkin], 223.0138,-1872.2523,4.4400,1.4446,0,0,0,0,0,0);
+	SpawnPlayer(playerid);
+
+
 	return 0;
 }
+
+public OnPlayerCommandPerformed(playerid, cmdtext[], success)
+{
+	if(!success)
+	{
+		return SCM(playerid, COLOR_GREY, "The cmd does not exist, please use /help");
+	}
+	return 1;
+}
+
 
 public OnPlayerConnect(playerid)
 {
@@ -229,18 +298,15 @@ public OnPlayerConnect(playerid)
 		SendClientMessageToAll(0xFFFFFFFF, line);
 	}
     SetPlayerCamera(playerid);
+	ResetPlayer(playerid);
 	dm[playerid] = 0;
 	Streak[playerid] = 0;
 
-	ResetPlayerInfo(playerid);
+	new existcheck[248];
 
-	
-	new query[64];
-	new pname[MAX_PLAYER_NAME];
-	GetPlayerName(playerid, pname, sizeof(pname));
-	mysql_format(handle, query, sizeof(query), "SELECT * FROM users WHERE Name = '%e';", pname);
-	mysql_pquery(handle, query, "OnPlayerJoin", "d", playerid);
-	
+	mysql_format(ourConnection, existcheck, sizeof(existcheck), "SELECT * FROM accounts WHERE acc_name = '%e'", ReturnName(playerid));
+    mysql_tquery(ourConnection, existcheck, "LogPlayerIn", "i", playerid);
+
 	return 1;
 }
 
@@ -256,13 +322,14 @@ public OnPlayerDisconnect(playerid, reason)
 	SendClientMessageToAll(0xFFFFFFFF, line);
 	}
 	{
-		if(PlayerInfo[playerid][pLoggedIn]){
-		SavePlayerData(playerid);
-		}
-	
-		PlayerInfo[playerid][pLoggedIn] = false;
-		ResetPlayerInfo(playerid);
+		new insert[128];
+
+		PlayerInfo[playerid][pCash] = GetPlayerMoney(playerid);
+
+		mysql_format(ourConnection, insert, sizeof(insert), "UPDATE accounts SET Cash = %i WHERE acc_dbid = %i",PlayerInfo[playerid][pCash] , PlayerInfo[playerid][pDBID]);
+		mysql_tquery(ourConnection, insert);
 	}
+
 	{
 		dm[playerid] = 0;
 		Streak[playerid] = 0;
@@ -270,6 +337,24 @@ public OnPlayerDisconnect(playerid, reason)
 		{
 	    	DeletePlayer3DTextLabel(playerid, Info[playerid]);
 		}
+	}
+	
+	{
+		new insert[130];
+
+		PlayerInfo[playerid][pScore] = GetPlayerScore(playerid);
+
+		mysql_format(ourConnection, insert, sizeof(insert), "UPDATE accounts SET Score = %i WHERE acc_dbid = %i",PlayerInfo[playerid][pScore] , PlayerInfo[playerid][pDBID]);
+		mysql_tquery(ourConnection, insert);
+	}
+
+	{
+		new insert[300];
+
+		PlayerInfo[playerid][pSkin] = GetPlayerSkin(playerid);
+
+		mysql_format(ourConnection, insert, sizeof(insert), "UPDATE accounts SET Skin = %i WHERE acc_dbid = %i", PlayerInfo[playerid][pSkin], PlayerInfo[playerid][pDBID]);
+		mysql_tquery(ourConnection, insert);
 	}
 	return 1;
 }
@@ -466,6 +551,43 @@ public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
 
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
+	if((newkeys & KEY_FIRE) && (oldkeys & KEY_CROUCH) && !((oldkeys & KEY_FIRE) || (newkeys & KEY_HANDBRAKE)) || (oldkeys & KEY_FIRE) && (newkeys & KEY_CROUCH) && !((newkeys & KEY_FIRE) || (newkeys & KEY_HANDBRAKE)) ) {
+        switch(GetPlayerWeapon(playerid)) {
+		    case 23..25, 27, 29..34, 41: {
+		        if(Ammo[playerid][GetPlayerWeapon(playerid)] > GetPlayerAmmo(playerid)) {
+					OnPlayerCBug(playerid);
+				}
+				return 1;
+			}
+		}
+	}
+
+	if(CheckCrouch[playerid] == 1) {
+		switch(WeaponID[playerid]) {
+		    case 23..25, 27, 29..34, 41: {
+		    	if((newkeys & KEY_CROUCH) && !((newkeys & KEY_FIRE) || (newkeys & KEY_HANDBRAKE)) && GetPlayerSpecialAction(playerid) != SPECIAL_ACTION_DUCK ) {
+		    		if(Ammo[playerid][GetPlayerWeapon(playerid)] > GetPlayerAmmo(playerid)) {
+						OnPlayerCBug(playerid);
+					}
+		    	}
+		    }
+		}
+	}
+
+	//if(newkeys & KEY_CROUCH || (oldkeys & KEY_CROUCH)) return 1;
+
+	else if(((newkeys & KEY_FIRE) && (newkeys & KEY_HANDBRAKE) && !((newkeys & KEY_SPRINT) || (newkeys & KEY_JUMP))) ||
+	(newkeys & KEY_FIRE) && !((newkeys & KEY_SPRINT) || (newkeys & KEY_JUMP)) ||
+	(NotMoving[playerid] && (newkeys & KEY_FIRE) && (newkeys & KEY_HANDBRAKE)) ||
+	(NotMoving[playerid] && (newkeys & KEY_FIRE)) ||
+	(newkeys & KEY_FIRE) && (oldkeys & KEY_CROUCH) && !((oldkeys & KEY_FIRE) || (newkeys & KEY_HANDBRAKE)) ||
+	(oldkeys & KEY_FIRE) && (newkeys & KEY_CROUCH) && !((newkeys & KEY_FIRE) || (newkeys & KEY_HANDBRAKE)) ) {
+		SetTimerEx("CrouchCheck", 3000, 0, "d", playerid);
+		CheckCrouch[playerid] = 1;
+		WeaponID[playerid] = GetPlayerWeapon(playerid);
+		Ammo[playerid][GetPlayerWeapon(playerid)] = GetPlayerAmmo(playerid);
+		return 1;
+	}
 	return 1;
 }
 
@@ -482,6 +604,52 @@ public OnPlayerUpdate(playerid)
 	{
 		UpdatePlayer3DTextLabelText(i, Info[playerid], -1, string_3D);
 	}
+
+	new Keys, ud, lr;
+	GetPlayerKeys(playerid, Keys, ud, lr);
+	if(CheckCrouch[playerid] == 1) {
+		switch(WeaponID[playerid]) {
+		    case 23..25, 27, 29..34, 41: {
+		    	if((Keys & KEY_CROUCH) && !((Keys & KEY_FIRE) || (Keys & KEY_HANDBRAKE)) && GetPlayerSpecialAction(playerid) != SPECIAL_ACTION_DUCK ) {
+		    		if(Ammo[playerid][GetPlayerWeapon(playerid)] > GetPlayerAmmo(playerid)) {
+						OnPlayerCBug(playerid);
+					}
+		    	}
+		    	//else SendClientMessage(playerid, COLOR_RED, "Failed in onplayer update");
+		    }
+		}
+	}
+
+	if(!ud && !lr) { NotMoving[playerid] = 1; /*OnPlayerKeyStateChange(playerid, Keys, 0);*/ }
+	else { NotMoving[playerid] = 0; /*OnPlayerKeyStateChange(playerid, Keys, 0);*/ }
+	return 1;
+}
+
+forward OnPlayerCBug(playerid);
+public OnPlayerCBug(playerid) {
+	/*new playername[MAX_PLAYER_NAME];
+	GetPlayerName(playerid, playername, sizeof(playername));
+	new str2[128];
+	format(str2, sizeof(str2), "Automatic system has kicked you for Crouch bugging with weapon (%s!)", aWeaponNames[WeaponID[playerid]]);
+	SendClientMessage(playerid, COLOR_RED, str2);
+	CheckCrouch[playerid] = 0;
+	Kick(playerid);*/
+	new playername[MAX_PLAYER_NAME];
+	GetPlayerName(playerid, playername, sizeof(playername));
+	new str2[128];
+	format(str2, sizeof(str2), "Automatic system has slapped you for Crouch bugging with weapon (%s!)", aWeaponNames[WeaponID[playerid]]);
+	SendClientMessageToAll(COLOR_RED, str2);
+	new Float:Pos[3];
+	GetPlayerPos(playerid,Pos[0],Pos[1],Pos[2]);
+	SetPlayerPos(playerid,Pos[0],Pos[1],Pos[2]+2.5);
+	PlayerPlaySound(playerid,1190,0.0,0.0,0.0);
+	CheckCrouch[playerid] = 0;
+	return 1;
+}
+
+forward CrouchCheck(playerid);
+public CrouchCheck(playerid) {
+	CheckCrouch[playerid] = 0;
 	return 1;
 }
 
@@ -509,29 +677,36 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
 	switch(dialogid)
 	{
-		case DIALOG_REGISTER:
+	    case DIALOG_REGISTER:
 	    {
-			if(response)
-			{
-				print("Input entered!");
-			    bcrypt_hash(inputtext, 12, "OnPassHash", "d", playerid);
-			}
-			else Kick(playerid);
+			if(!response)
+			    return Kick(playerid);
+
+			new insert[256];
+
+			if(strlen(inputtext) > 128 || strlen(inputtext) < 3)
+			    return ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Registration page", "{ffffff}Your password length should be in between {ff0000}3 - 128\nPlease enter a new password in the space given below:\nthank you!", "Register", "Close");
+
+			mysql_format(ourConnection, insert, sizeof(insert), "INSERT INTO accounts (acc_name, acc_pass, register_ip, register_date) VALUES('%e', sha1('%e'), '%e', '%e')", ReturnName(playerid), inputtext, ReturnIP(playerid), ReturnDate());
+			mysql_tquery(ourConnection, insert, "OnPlayerRegister", "i", playerid);
 		}
-		
 		case DIALOG_LOGIN:
 		{
-			if(response)
+		    if (!response)
 			{
-				new query[128], pname[MAX_PLAYER_NAME];
-				GetPlayerName(playerid, pname, sizeof(pname));
-    			SetPVarString(playerid, "Unhashed_Pass",inputtext);
-				mysql_format(handle, query, sizeof(query), "SELECT Password, Master_ID FROM users WHERE Name = '%e';", pname);
-				mysql_tquery(handle, query, "OnPlayerLogin", "d", playerid);
+				SendClientMessage(playerid, COLOR_RED, "You were kicked for not logging in.");
+				return KickEx(playerid);
 			}
-			else Kick(playerid);
+
+			new continueCheck[211];
+
+			mysql_format(ourConnection, continueCheck, sizeof(continueCheck), "SELECT acc_dbid FROM accounts WHERE acc_name = '%e' AND acc_pass = sha1('%e') LIMIT 1", ReturnName(playerid), inputtext);
+
+			mysql_tquery(ourConnection, continueCheck, "LoggingIn", "i", playerid);
+			return 1;
 		}
 	}
+
 	if(dialogid == DIALOG_HELP)
 	{
 	    if(response)
@@ -539,6 +714,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	    	if(listitem == 0)
 	    	{
 	        	return ShowPlayerDialog(playerid, DIALOG_ACCOUNT, DIALOG_STYLE_MSGBOX, "Account info", "UnderConstruction", "Close", "");
+	    	}
+
+	    	if(listitem == 1)
+	    	{
+	        	return ShowPlayerDialog(playerid, DIALOG_ACCOUNT, DIALOG_STYLE_MSGBOX, "Rules", "UnderConstruction", "Close", "");
+	    	}
+
+	    	if(listitem == 2)
+	    	{
+	        	return ShowPlayerDialog(playerid, DIALOG_ACCOUNT, DIALOG_STYLE_MSGBOX, "VIP", "UnderConstruction", "Close", "");
 	    	}
 	    }
 	}
@@ -561,7 +746,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        }
 	    }
     }
-
+    
     if(dialogid == DIALOG_DM)
 	{
 		if(response)
@@ -633,6 +818,17 @@ public OnPlayerClickPlayer(playerid, clickedplayerid, source)
 
 public OnPlayerModelSelection(playerid, response, listid, modelid)
 {
+    if(listid == joinskin)
+	{
+	if(!response)
+		return ShowModelSelectionMenu(playerid, joinskin, "please pick a skin you want to use");
+
+
+	SetCameraBehindPlayer(playerid);
+	SetPlayerSkin(playerid, modelid);
+	SetSpawnInfo(playerid, 0, modelid, 223.0138,-1872.2523,4.4400,1.4446,0,0,0,0,0,0);
+	SpawnPlayer(playerid);
+	}
 	return 1;
 }
 
@@ -655,6 +851,11 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 	return 1;
 }
 
+//================================ANTICHEAT RELATED STUFF=====================
+
+
+
+
 //=================================Commands================================
 
 CMD:pms(playerid,params[])
@@ -675,28 +876,28 @@ CMD:pms(playerid,params[])
 CMD:pm(playerid, params[])
 {
     new id, str[500], ip[16];
-
+    
     if(sscanf(params, "us[500]", id, params))
  	{
 		return SCM(playerid, COLOR_RED, "Usage: /pm [id] [text]");
 	}
-
+	
 	if(id == INVALID_PLAYER_ID)
 	{
 		return SCM(playerid, COLOR_RED, "Player is not connected");
 	}
-
+	
 	if(pms[id] == 0)
 	{
 		return SCM(playerid, COLOR_RED, "Player has Disabled their pms");
 	}
-
+	
 	if(pms[playerid] == 0)
 	{
  		SCM(playerid,COLOR_RED, "You have disabled your pms");
 		return SCM(playerid, COLOR_RED, "Type /pms to enable your pms");
 	}
-
+	
 	GetPlayerIp(playerid, ip, sizeof(ip));
     format(str, sizeof(str), "PM to %s(%d): %s", GetName(id), id, params);
     SCM(playerid, COLOR_YELLOW, str);
@@ -710,19 +911,19 @@ CMD:pm(playerid, params[])
 CMD:r(playerid, params[])
 {
     new str[128], ip[16],id = pPM[playerid];
-
+    
     if(id == -1)
 	{
 		return SCM(playerid, COLOR_RED, "Player is not connected");
 	}
-
+	
 	if(!IsPlayerConnected(id))
 	{
 		return SCM(playerid, COLOR_RED, "Player is not connected");
 	}
 
 	GetPlayerIp(playerid, ip, sizeof(ip));
-
+	
     if(IsPlayerConnected(id))
     {
         if(isnull(params))
@@ -756,6 +957,11 @@ CMD:skin(playerid, params[])
 
 	if(sscanf(params, "i", skinid))
 	    return SCM(playerid, COLOR_RED, "Usage: /skin [ID]");
+
+	if(skinid < 1 || skinid > 300)
+	{
+		return SCM(playerid, COLOR_RED, "Please choose a skin from 1 - 300");
+	}
 
 	SetPlayerSkin(playerid, skinid);
 
@@ -828,7 +1034,6 @@ CMD:help(playerid, params[])
 
 //Admin related commands
 
-/*
 CMD:setadmin(playerid, params[])
 {
 	if(PlayerInfo[playerid][pAdmin] >= 2 || IsPlayerAdmin(playerid))
@@ -839,9 +1044,11 @@ CMD:setadmin(playerid, params[])
 	        return SCM(playerid, COLOR_RED, "Usage: /setadmin [id/name] [Level 1-2]");
 
         if(playerb == INVALID_PLAYER_ID)
-			return GameTextForPlayer(playerid,"~g~player is not connected",4500,4);
+			return SCM(playerid, COLOR_RED, "player is not connected");
+		if(playerb == playerid)
+			return SCM(playerid, COLOR_RED, "You cannot set yourself an admin level");
 
-  		if(adminlvl < 0 || adminlvl > 2)
+  		if(adminlvl < 1 || adminlvl > 2)
    			return SCM(playerid, COLOR_RED, "[SERVER]: Invalid Admin Level");
 
 		SCMex(playerid, COLOR_CYAN, "You've just made %s admin level (%i)", ReturnName(playerb), adminlvl);
@@ -856,17 +1063,75 @@ CMD:setadmin(playerid, params[])
 
 	return 1;
 }
-*/
+
+CMD:radmin(playerid, params[])
+{
+	if(PlayerInfo[playerid][pAdmin] >= 2 || IsPlayerAdmin(playerid))
+	{
+		new playerb, insert[128];
+
+		if(sscanf(params, "ui", playerb))
+	        return SCM(playerid, COLOR_RED, "Usage: /radmin [id/name]");
+
+        if(playerb == INVALID_PLAYER_ID)
+			return SCM(playerid, COLOR_RED, "player is not connected");
+
+		if(playerb == playerid)
+			return SCM(playerid, COLOR_RED, "You cannot remove yourself as admin");
+
+		SCMex(playerid, COLOR_CYAN, "You've just now removed admin permissions from %s", ReturnName(playerb));
+		SCMex(playerb, COLOR_RED, "Admin permissions has been taken from you");
+
+		mysql_format(ourConnection, insert, sizeof(insert), "UPDATE accounts SET Admin = 0 WHERE acc_dbid = %i", PlayerInfo[playerb][pDBID]);
+		mysql_tquery(ourConnection, insert);
+	}
+	else return SCM(playerid, COLOR_RED, "You don't have permissions to use this command");
+	return 1;
+}
+
+CMD:aduty(playerid,params[])
+{
+	if(PlayerInfo[playerid][pAdmin] >= 1)
+	{
+		if(aduty[playerid] == 1) 
+		{	
+			aduty[playerid] = 0;
+			SetPlayerHealth(playerid,100.0);
+			SetPlayerChatBubble(playerid," ",0xFF0000FF, 100.0, 1000);
+			new string[128];
+			format(string,sizeof(string),"{ff0000}[Administrator]%s is now off duty", ReturnName(playerid));
+			SendClientMessageToAll(-1,string);
+			return 1;
+		}
+
+		aduty[playerid] = 1;
+		SetPlayerHealth(playerid,100000);
+		SetPlayerChatBubble(playerid,"Administrator",-1,100.0,99999999);
+		new string[128];
+		format(string,sizeof(string),"{ff0000}[Administrator]%s is on duty", ReturnName(playerid));
+		SendClientMessageToAll(-1,string);
+	}
+
+	else return SCM(playerid, COLOR_RED, "You don't have permissions to use this command");
+
+	return 1;
+}
+
 CMD:setap(playerid, params[])
 {
     if(PlayerInfo[playerid][pAdmin] < 1)
 	    return SCM(playerid, COLOR_RED, "You don't have permissions to use this command");
 
+	if(aduty[playerid] == 0)
+	{
+		return SCM(playerid, COLOR_RED,"You are not on admin duty");
+	}
+
 	new playerb, amount;
 
 	if(sscanf(params, "ui", playerb, amount))
 	    return SCM(playerid, COLOR_RED, "Usage: /setap [name/id] [amount 0-100]");
-
+	    
     if(playerb == INVALID_PLAYER_ID)
 		return GameTextForPlayer(playerid,"~g~player is not connected",4500,4);
 
@@ -888,13 +1153,18 @@ CMD:agcash(playerid, params[])
 	    return SCM(playerid, COLOR_RED, "You don't have permissions to use this command");
 	}
 
+	if(aduty[playerid] == 0)
+	{
+		return SCM(playerid, COLOR_RED,"You are not on admin duty");
+	}
+
 	new playerb, cash;
 
 	if(sscanf(params, "ui", playerb, cash))
 	{
 		return SCM(playerid, COLOR_RED, "Usage: /agcash [name/id] [amount]");
 	}
-
+	
 	if(playerb == INVALID_PLAYER_ID)
 	{
 		return SCM(playerid, COLOR_RED, "Player is not connected");
@@ -914,13 +1184,18 @@ CMD:arcash(playerid, params[])
 	    return SCM(playerid, COLOR_RED, "You don't have permissions to use this command");
 	}
 
+	if(aduty[playerid] == 0)
+	{
+		return SCM(playerid, COLOR_RED,"You are not on admin duty");
+	}
+
 	new playerb, cash;
 
 	if(sscanf(params, "ui", playerb, cash))
 	{
 		return SCM(playerid, COLOR_RED, "Usage: /arcash [name/id] [amount]");
 	}
-
+	
 	if(playerb == INVALID_PLAYER_ID)
 	{
 		return SCM(playerid, COLOR_RED, "Player is not connected");
@@ -940,6 +1215,11 @@ CMD:agscore(playerid, params[])
 	    return SCM(playerid, COLOR_RED, "You don't have permissions to use this command");
 	}
 
+	if(aduty[playerid] == 0)
+	{
+		return SCM(playerid, COLOR_RED,"You are not on admin duty");
+	}
+
 	new playerb, score;
 	new oscore = GetPlayerScore(playerid);
 
@@ -947,12 +1227,12 @@ CMD:agscore(playerid, params[])
 	{
 	    return SCM(playerid, COLOR_RED, "Usage: /agscore [name/id] [score 1 - 100000]");
 	}
-
+	
 	if(playerb == INVALID_PLAYER_ID)
 	{
 		return SCM(playerid, COLOR_RED, "Player is not connected");
 	}
-
+	
 	if(score < 1 || score > 100000)
 	{
 	    return SCM(playerid, COLOR_RED, "You have put an invalid score");
@@ -972,19 +1252,24 @@ CMD:arscore(playerid, params[])
 	    return SCM(playerid, COLOR_RED, "You don't have permissions to use this command");
 	}
 
+	if(aduty[playerid] == 0)
+	{
+		return SCM(playerid, COLOR_RED,"You are not on admin duty");
+	}
+
 	new playerb, score;
 	new oscore = GetPlayerScore(playerid);
-
+	
     if(sscanf(params, "ui", playerb, score))
 	{
 	    return SCM(playerid, COLOR_RED, "Usage: /arscore [name/id] [score 1 - 100000]");
 	}
-
+	
 	if(playerb == INVALID_PLAYER_ID)
 	{
 		return SCM(playerid, COLOR_RED, "Player is not connected");
 	}
-
+	
 	if(score < 0  || score > 100000)
 	{
 	    return SCM(playerid, COLOR_RED, "You have put an invalid score");
@@ -1001,6 +1286,11 @@ CMD:kick(playerid, params[])
 {
     if(PlayerInfo[playerid][pAdmin] < 1)
 	    return SCM(playerid, COLOR_RED, "You don't have permissions to use this command");
+
+	if(aduty[playerid] == 0)
+	{
+		return SCM(playerid, COLOR_RED,"You are not on admin duty");
+	}
 
 	new playerb, reason[80];
 	if(sscanf(params, "us[80]", playerb, reason))
@@ -1113,7 +1403,7 @@ CMD:lvpd(playerid, params[])
 CMD:handsup(playerid, params[])
 {
 	SetPlayerSpecialAction(playerid, SPECIAL_ACTION_HANDSUP);
-	SCM(playerid, COLOR_CYAN, "[SERVER]: To stop animation please use cmd (/sa) or press (F)");
+	SCM(playerid, COLOR_GREY, "[SERVER]: To stop animation please use cmd (/sa) or press (F)");
 	return 1;
 }
 
@@ -1127,27 +1417,27 @@ CMD:dance(playerid, params[])
 	if(danceid == 1)
 	{
 		SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DANCE1);
-		SCM(playerid, COLOR_CYAN, "[SERVER]: To stop animation please use cmd (/sa) or press (F)");
+		SCM(playerid, COLOR_GREY, "[SERVER]: To stop animation please use cmd (/sa) or press (F)");
 		return 1;
 	}
  	if(danceid == 2)
 	{
 		SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DANCE2);
-		SCM(playerid, COLOR_CYAN, "[SERVER]: To stop animation please use cmd (/sa) or press (F)");
+		SCM(playerid, COLOR_GREY, "[SERVER]: To stop animation please use cmd (/sa) or press (F)");
 		return 1;
 	}
 
 	if(danceid == 3)
 	{
 		SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DANCE3);
-		SCM(playerid, COLOR_CYAN, "[SERVER]: To stop animation please use cmd (/sa) or press (F)");
+		SCM(playerid, COLOR_GREY, "[SERVER]: To stop animation please use cmd (/sa) or press (F)");
 		return 1;
 	}
 
 	if(danceid == 4)
 	{
 		SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DANCE4);
-		SCM(playerid, COLOR_CYAN, "[SERVER]: To stop animation please use cmd (/sa) or press (F)");
+		SCM(playerid, COLOR_GREY, "[SERVER]: To stop animation please use cmd (/sa) or press (F)");
 		return 1;
 	}
 
@@ -1472,153 +1762,87 @@ function:SetPlayerCamera(playerid)
 	return 1;
 }
 
-SavePlayerData(playerid)
+function:ResetPlayer(playerid)
 {
-	new query[256], pname[MAX_PLAYER_NAME];
- 	GetPlayerName(playerid, pname, sizeof(pname));
-	mysql_format(handle, query, sizeof(query), "UPDATE `accounts` set Skin = %d, Score = %d WHERE Master_ID = %d", PlayerInfo[playerid][pSkin], PlayerInfo[playerid][pScore], PlayerInfo[playerid][pMasterID]);
-	mysql_query(handle, query);
-	printf("Saved %s's data", pname);
+	PlayerLogin[playerid] = 0;
+	PlayerInfo[playerid][pDBID] = 0;
+    PlayerInfo[playerid][pLoggedin] = false;
+    PlayerInfo[playerid][pSkin] = 0;
+    PlayerInfo[playerid][pAdmin] = 0;
+    PlayerInfo[playerid][pCash] = 0;
+    PlayerInfo[playerid][pScore] = 0;
+
+    return 1;
+}
+
+function:LogPlayerIn(playerid)
+{
+
+	new rows, fields;
+	cache_get_data(rows, fields, ourConnection);
+	if(!rows)
+	{
+	    SCMex(playerid, COLOR_YELLOW, "The user (%s) you're connected with isn't registered", ReturnName(playerid));
+	    SCMex(playerid, COLOR_YELLOW, "Please register in order to continue");
+
+        ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, "Welcome to Zone's DM server", "{ffffff}It seems that you are not {ff0000}Registered {ffffff}so kindly please register yourself by entering a new password \nin the space given below:\nthank you!\n\n", "Register", "Close");
+		return 1;
+	}
+
+	SCMex(playerid, COLOR_YELLOW, "Welcome to Zones DM server!");
+	ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Welcome to Zone's DM server", "{ffffff}It seems that you already have an account, so kindly please {ff0000}Login {ffffff}by entering your \npassword in the given section below:\nThank you!\n\n", "Login", "Close");
 	return 1;
 }
 
-forward OnPlayerJoin(playerid);
-public OnPlayerJoin(playerid)
+function:OnPlayerRegister(playerid)
 {
-	ResetPlayerInfo(playerid);
+	PlayerInfo[playerid][pDBID] = cache_insert_id();
+	format(PlayerInfo[playerid][pAccName], 32, "%s", ReturnName(playerid));
 
-	InterpolateCameraPos(playerid, 1332.7262, -1071.3055, 83.0842, 1383.8170, -909.1896, 74.4843, 10000);
-	InterpolateCameraLookAt(playerid, 1333.0266, -1070.3523, 83.0337, 1384.1174, -908.2363, 74.4337, 10000);
+	new thread[128];
 
-	cache_get_value_name_int(0, "Master_ID", PlayerInfo[playerid][pMasterID]);
+	mysql_format(ourConnection, thread, sizeof(thread), "SELECT * FROM accounts WHERE acc_name = '%e'", ReturnName(playerid));
+	mysql_tquery(ourConnection, thread, "Query_LoadAccount", "i", playerid);
 
+	PlayerInfo[playerid][pLoggedin] = true;
+}
 
-	if(cache_num_rows()){
-		new loginstr[200];
-		format(loginstr, sizeof(loginstr), "{FFFFFF}Wazzup, {00FF22}%s{FFFFFF}! You have already registered on our server.\n{FFFFFF}Simply type your password below in order to login.", GetPlayerNameEx(playerid));
-		ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, SERVER_NAME, loginstr, "Login", "Quit");
-	}
+function:LoggingIn(playerid)
+{
 	if(!cache_num_rows())
 	{
-		new registerstr[200];
-		format(registerstr, sizeof(registerstr), "{FFFFFF}Welcome, {00FF22}%s{FFFFFF}! It looks like you are new here.\n{00FF22}Simply type your password below in order to register.", GetPlayerNameEx(playerid));
-		
-		ShowPlayerDialog(playerid, DIALOG_REGISTER, DIALOG_STYLE_PASSWORD, SERVER_NAME, registerstr, "Register", "Quit");
-	}
-	return 1;
-}
-forward OnPlayerRegister(playerid);
-public OnPlayerRegister(playerid)
-{
-	SendClientMessage(playerid, 0x0033FFFF /*Blue*/, "Thank you for registering! You can now Login");
-	print("OnPlayerRegister");
-    ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Login", "Thank you for registering! You can now Login with\npassword you just used to register.", "Login", "Quit");
-	return 1;
-}
-forward OnPlayerLogin(playerid);
-public OnPlayerLogin(playerid)
-{
-	new pPass[255], unhashed_pass[128];
-	GetPVarString(playerid, "Unhashed_Pass",unhashed_pass,sizeof(unhashed_pass));
-	if(cache_num_rows())
-	{
-		cache_get_value_name(0, "Password", pPass);
-		printf("%s has loaded master id: %d", ReturnName(playerid), PlayerInfo[playerid][pMasterID]);
-		bcrypt_check(unhashed_pass, pPass, "OnPassCheck", "dd",playerid, PlayerInfo[playerid][pMasterID]);
-  	}
-    else printf("ERROR");
-	return 1;
-}
-forward OnPassHash(playerid);
-public OnPassHash(playerid)
-{
-	new pass[BCRYPT_HASH_LENGTH], query[256], pname[MAX_PLAYER_NAME], pipadress[16];
-    GetPlayerIp(playerid, pipadress, sizeof(pipadress));
-    GetPlayerName(playerid, pname, sizeof(pname));
-    bcrypt_get_hash(pass);
-	print("On Pass Hash");
-    mysql_format(handle, query, sizeof(query), "INSERT INTO accounts (Name, Password, RegisteredIP) VALUES ('%e', '%e', '%e');", pname, pass, pipadress);
-	mysql_tquery(handle, query, "OnPlayerRegister", "d", playerid);
-	return 1;
-}
-
-forward OnPassCheck(playerid, DBID);
-public OnPassCheck(playerid, DBID)
-{
-    if(bcrypt_is_equal())
-	{
-		new query[128];
-		mysql_format(handle, query, sizeof(query), "SELECT * FROM accounts WHERE Master_ID = %d;", PlayerInfo[playerid][pMasterID]);
-		mysql_tquery(handle, query, "SetPlayerInfo", "i", playerid);
-	}
-	else
-	{
-		if(PlayerInfo[playerid][pPassFailed] >= 3)
+	    PlayerLogin[playerid]++;
+        if(PlayerLogin[playerid] == 3)
 		{
-			KickPlayer(playerid);
+			SCM(playerid, COLOR_RED, "[SERVER]: You were kicked for bad password attempts.");
+			return KickEx(playerid);
 		}
-
-		PlayerInfo[playerid][pPassFailed]++;
-		SendClientMessageEx(playerid, COLOR_ERROR, "You have %i/3 login attempts remaining", PlayerInfo[playerid][pPassFailed]);
-
-		ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, SERVER_NAME, "{FF2121}You entered an incorrect password!\n{FFFFFF}You have already registered to {00FF22}"SERVER_NAME"{FFFFFF}!\n{FFFFFF}Simply type your password below in order to login.", "Login", "Quit");
+		return ShowPlayerDialog(playerid, DIALOG_LOGIN, DIALOG_STYLE_PASSWORD, "Welcome to Zone's DM server", "{ff0000}You entered the wrong password!\nPlease try again and enter your password in the space given below:\nthank you!", "Login", "Cancel");
 	}
-	return 1;
-}
-forward SetPlayerInfo(playerid);
-public SetPlayerInfo(playerid)
-{
-	cache_get_value_index_int(0, 4, PlayerInfo[playerid][pSkin]);
-	cache_get_value_index_int(0, 5, PlayerInfo[playerid][pScore]);
-	
-	PlayerInfo[playerid][pLoggedIn] = true;
-	
-	SetPlayerScore(playerid, PlayerInfo[playerid][pScore]);
-	SetSpawnInfo(playerid, 0, PlayerInfo[playerid][pSkin], 223.0138, -1872.2523, 4.4400, 1.4446 , 0, 0, 0, 0, 0, 0);
-	TogglePlayerSpectating(playerid, false);
-	TogglePlayerControllable(playerid, true);
-	new name[MAX_PLAYER_NAME], str[80];
-	GetPlayerName(playerid, name, sizeof(name));
-	format(str, sizeof(str), "{00FF22}Welcome to the server, {FFFFFF}%s", name);
-	SendClientMessage(playerid, -1, str);
-	DeletePVar(playerid, "Unhashed_Pass");
-	SpawnPlayer(playerid);
+
+    new thread[128];
+
+	mysql_format(ourConnection, thread, sizeof(thread), "SELECT * FROM accounts WHERE acc_name = '%e'", ReturnName(playerid));
+	mysql_tquery(ourConnection, thread, "Query_LoadAccount", "i", playerid);
+
+    PlayerInfo[playerid][pDBID] = cache_insert_id();
+	format(PlayerInfo[playerid][pAccName], 32, "%s", ReturnName(playerid));
+
+	PlayerInfo[playerid][pLoggedin] = true;
 	return 1;
 }
 
-ResetPlayerInfo(playerid)
+function:Query_LoadAccount(playerid)
 {
-	PlayerInfo[playerid][pMasterID] = 0;
-	PlayerInfo[playerid][pSkin] = 0;
-	PlayerInfo[playerid][pScore] = 0;
-
-	PlayerInfo[playerid][pPassFailed] = 0;
-	PlayerInfo[playerid][pKicked] = 0;
-
+	PlayerInfo[playerid][pAdmin] = cache_get_field_content_int(0, "Admin", ourConnection);
+    PlayerInfo[playerid][pDBID] = cache_get_field_content_int(0, "acc_dbid", ourConnection);
+    PlayerInfo[playerid][pCash] = cache_get_field_content_int(0, "Cash", ourConnection), GivePlayerMoney(playerid, PlayerInfo[playerid][pCash]);
+	PlayerInfo[playerid][pScore] = cache_get_field_content_int(0, "Score", ourConnection), SetPlayerScore(playerid, PlayerInfo[playerid][pScore]);
+	PlayerInfo[playerid][pSkin] = cache_get_field_content_int(0, "Skin", ourConnection), SetSpawnInfo(playerid, 0, PlayerInfo[playerid][pSkin], 223.0138,-1872.2523,4.4400,1.4446,0,0,0,0,0,0), SpawnPlayer(playerid);
 	return 1;
 }
 
-function:KickTimer(playerid) { return Kick(playerid); }
-
-GetPlayerNameEx(playerid)
-{
-	new name[MAX_PLAYER_NAME];
-	GetPlayerName(playerid, name, sizeof(name));
-	return name;
+function:KickTimer(playerid) 
+{ 
+	return Kick(playerid); 
 }
-
-forward KickPlayer(playerid);
-public KickPlayer(playerid)
-{
-	if(!PlayerInfo[playerid][pKicked])
-	{
-	    PlayerInfo[playerid][pKicked] = 1;
-	    SetTimerEx("KickPlayer", 500, false, "i", playerid);
-	}
-	else
-	{
-	    PlayerInfo[playerid][pKicked] = 0;
-	    Kick(playerid);
-	}
-}
-
