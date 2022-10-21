@@ -153,3 +153,11 @@ function:KickTimer(playerid)
 { 
 	return Kick(playerid); 
 }
+
+GetWeaponID(weaponname[]) {
+	for(new i = 0; i < 55; ++i) {
+		if(strfind(WeaponNames[i], weaponname, true) != -1)
+		return i;
+	}
+	return -1;
+}

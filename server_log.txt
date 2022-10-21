@@ -1062,3 +1062,120 @@ v0.3.7-R2, (C)2005-2015 SA-MP Team
 
 *** Streamer Plugin v2.9.5 by Incognito unloaded ***
 
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[23:19:37] 
+[23:19:37] Server Plugins
+[23:19:37] --------------
+[23:19:37]  Loading plugin: mysql
+[23:19:37]  >> plugin.mysql: R39-6 successfully loaded.
+[23:19:37]   Loaded.
+[23:19:37]  Loading plugin: sscanf
+[23:19:37] 
+[23:19:37]  ===============================
+[23:19:37] 
+[23:19:37]       sscanf plugin loaded.     
+[23:19:37] 
+[23:19:37]          Version: 2.13.1
+[23:19:37] 
+[23:19:37]    (c) 2022 Alex "Y_Less" Cole  
+[23:19:37] 
+[23:19:37]  ===============================
+[23:19:37] 
+[23:19:37]   Loaded.
+[23:19:37]  Loading plugin: streamer
+[23:19:37] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[23:19:37]   Loaded.
+[23:19:37]  Loaded 3 plugins.
+
+[23:19:37] 
+[23:19:37] Filterscripts
+[23:19:37] ---------------
+[23:19:37]   Loaded 0 filterscripts.
+
+[23:19:37] [DATABASE]: Connection established to MySQL
+[23:19:37] 
+-------------------------------------
+[23:19:37] This is the sick script we are making
+[23:19:37] ---------------------------------------
+
+[23:19:37] Number of vehicle models: 0
+[23:19:57] [connection] 192.168.0.102:62360 requests connection cookie.
+[23:19:58] [connection] incoming connection: 192.168.0.102:62360 id: 0
+[23:19:58] [join] Ragnarok has joined the server (0:192.168.0.102)
+[23:42:18] [part] Ragnarok has left the server (0:1)
+[23:42:20] --- Server Shutting Down.
+[23:42:20] plugin.mysql: Unloading plugin...
+[23:42:20] plugin.mysql: Plugin unloaded.
+[23:42:20] 
+[23:42:20]  ===============================
+[23:42:20] 
+[23:42:20]      sscanf plugin unloaded.    
+[23:42:20] 
+[23:42:20]  ===============================
+[23:42:20] 
+[23:42:20] 
+
+*** Streamer Plugin v2.9.5 by Incognito unloaded ***
+
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[23:42:25] 
+[23:42:25] Server Plugins
+[23:42:25] --------------
+[23:42:25]  Loading plugin: mysql
+[23:42:25]  >> plugin.mysql: R39-6 successfully loaded.
+[23:42:25]   Loaded.
+[23:42:25]  Loading plugin: sscanf
+[23:42:25] 
+[23:42:25]  ===============================
+[23:42:25] 
+[23:42:25]       sscanf plugin loaded.     
+[23:42:25] 
+[23:42:25]          Version: 2.13.1
+[23:42:25] 
+[23:42:25]    (c) 2022 Alex "Y_Less" Cole  
+[23:42:25] 
+[23:42:25]  ===============================
+[23:42:25] 
+[23:42:25]   Loaded.
+[23:42:25]  Loading plugin: streamer
+[23:42:25] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[23:42:25]   Loaded.
+[23:42:25]  Loaded 3 plugins.
+
+[23:42:25] 
+[23:42:25] Filterscripts
+[23:42:25] ---------------
+[23:42:25]   Loaded 0 filterscripts.
+
+[23:42:25] [DATABASE]: Connection established to MySQL
+[23:42:25] 
+-------------------------------------
+[23:42:25] This is the sick script we are making
+[23:42:25] ---------------------------------------
+
+[23:42:25] Number of vehicle models: 0
+[23:42:44] [connection] 192.168.0.102:65252 requests connection cookie.
+[23:42:45] [connection] incoming connection: 192.168.0.102:65252 id: 0
+[23:42:45] [join] Ragnarok has joined the server (0:192.168.0.102)

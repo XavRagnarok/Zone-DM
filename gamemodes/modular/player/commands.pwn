@@ -31,20 +31,30 @@ CMD:skin(playerid, params[])
 
 CMD:w(playerid, params[])
 {
-	new weaponid, ammo;
+	new weapon[30], ammo, gunname[32];
 
-	if(sscanf(params, "ii", weaponid, ammo))
-	    return SCM(playerid, COLOR_RED, "Usage: /w [ID], [AMMO]");
+	if(sscanf(params, "s[30]i", weapon, ammo))
+	{
+	    return SCM(playerid, COLOR_RED, "Usage: /w [weaponname], [AMMO]");
+	}
 
-	if(weaponid < 1 || weaponid > 46 || weaponid == 18)
-	    return SCM(playerid, COLOR_RED, "[SERVER]: You have specified a invalid weapon");
+	new gun = GetWeaponID(weapon);
 
-	if(ammo < 1)
-	    return SCM(playerid, COLOR_RED, "[SERVER]: You have specified invalid ammo amount");
+	if(gun < 1 || gun > 46)
+	{
+		return SCM(playerid, COLOR_RED, "Invalid Weapon!");
+	}
 
-	GivePlayerWeapon(playerid, weaponid, ammo);
+	if(ammo < 1 || ammo > 999)
+	{
+		return SCM(playerid, COLOR_RED, "[SERVER]: You have specified invalid ammo amount");
+	}
 
-	SCM(playerid, COLOR_CYAN, "Enjoy your Weapon, prick");
+	GivePlayerWeapon(playerid, gun, ammo);
+
+	GetWeaponName(gun, gunname, sizeof(gunname));
+
+	SCMex(playerid, COLOR_CYAN, "Enjoy your %s, prick", gunname);
 
 	return 1;
 }

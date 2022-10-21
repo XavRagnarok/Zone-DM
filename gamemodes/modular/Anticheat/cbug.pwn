@@ -84,7 +84,7 @@ public OnPlayerCBug(playerid) {
 	GetPlayerName(playerid, playername, sizeof(playername));
 	new str2[128];
 	format(str2, sizeof(str2), "Automatic system has slapped you for Crouch bugging with weapon (%s!)", aWeaponNames[WeaponID[playerid]]);
-	SendClientMessageToAll(COLOR_RED, str2);
+	SendClientMessage(playerid, COLOR_RED, str2);
 	new Float:Pos[3];
 	GetPlayerPos(playerid,Pos[0],Pos[1],Pos[2]);
 	SetPlayerPos(playerid,Pos[0],Pos[1],Pos[2]+2.5);

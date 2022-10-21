@@ -199,4 +199,15 @@ new aWeaponNames[][32] = {
 	{"Fake Pistol"} // 47
 };
 
+new const WeaponNames[55][] =
+{
+		{"Punch"},{"Brass Knuckles"},{"Golf Club"},{"Nite Stick"},{"Knife"},{"Baseball Bat"},{"Shovel"},{"Pool Cue"},{"Katana"},{"Chainsaw"},{"Purple Dildo"},
+		{"Smal White Vibrator"},{"Large White Vibrator"},{"Silver Vibrator"},{"Flowers"},{"Cane"},{"Grenade"},{"Tear Gas"},{"Molotov Cocktail"},
+		{""},{""},{""}, // Empty spots for ID 19-20-21 (invalid weapon id's)
+		{"9mm"},{"Silenced 9mm"},{"Deagle"},{"Shotgun"},{"Sawn-off"},{"Spas"},{"Micro SMG"},{"MP5"},{"AK-47"},{"M4"},{"Tec9"},
+		{"Rifle"},{"Sniper"},{"RPG"},{"HS Rocket"},{"Flame-thrower"},{"Minigun"},{"Satchel Charge"},{"Detonator"},
+		{"Spraycan"},{"Fire Extinguisher"},{"Camera"},{"Nightvision Goggles"},{"Thermal Goggles"},{"Parachute"}, {"Fake Pistol"},{""}, {"Vehicle"}, {"Helicopter Blades"},
+		{"Explosion"}, {""}, {"Suicide"}, {"Collision"}
+};
+
 //=================================================================
