@@ -170,6 +170,11 @@ public OnPlayerTakeDamage(playerid, issuerid, Float: amount, weaponid, bodypart)
         GameTextForPlayer(playerid && issuerid,"~r~Headshot",2000, 3);
 	}
 	PlayerPlaySound(issuerid, 17802, 0.0, 0.0, 0.0);
+
+	if(aduty[playerid] == 1)
+	{
+		return 0;
+	}
     return 1;
 }
 

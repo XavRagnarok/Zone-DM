@@ -71,7 +71,6 @@ CMD:aduty(playerid,params[])
 		}
 
 		aduty[playerid] = 1;
-		SetPlayerHealth(playerid,100000);
 		SetPlayerChatBubble(playerid,"Administrator",-1,100.0,99999999);
 		new string[128];
 		format(string,sizeof(string),"{ff0000}[Administrator]%s is on duty", ReturnName(playerid));
