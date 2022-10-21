@@ -75,20 +75,7 @@ CMD:dm(playerid, params[])
 
 stock DDM(playerid)
 {
-    new str[100];
-	format(str,sizeof(str),"%s(%d) joined the deagle deathmatch",GetName(playerid), playerid);
-	foreach(Player, i)
-	{
-		if(IsPlayerConnected(i))
-		{
-			if(dm[i] == 1)
-			{
-			    SendClientMessage(i, COLOR_BLUE, str);
-			}
-		}
-	}
-
-	for(new i; i < 6; i++) //Just to avoid bugs
+ 	for(new i; i < 6; i++) //Just to avoid bugs
 	{
 	    DeletePlayer3DTextLabel(playerid, Info[playerid]);
 	}
@@ -112,20 +99,7 @@ stock DDM(playerid)
 
 stock SDM(playerid)
 {
-    new str[100];
-	format(str,sizeof(str),"%s(%d) joined the sniper deathmatch",GetName(playerid), playerid);
-	foreach(Player, i)
-	{
-		if(IsPlayerConnected(i))
-		{
-			if(dm[i] == 2)
-			{
-			    SendClientMessage(i, COLOR_BLUE, str);
-			}
-		}
-	}
-
-	for(new i; i < 6; i++) //Just to avoid bugs
+   	for(new i; i < 6; i++) //Just to avoid bugs
 	{
 	    DeletePlayer3DTextLabel(playerid, Info[playerid]);
 	}
@@ -149,19 +123,6 @@ stock SDM(playerid)
 
 stock SOSDM(playerid)
 {
-    new str[100];
-	format(str,sizeof(str),"%s(%d) joined the sawn-off shotgun deathmatch",GetName(playerid), playerid);
-	foreach(Player, i)
-	{
-		if(IsPlayerConnected(i))
-		{
-			if(dm[i] == 3)
-			{
-			    SendClientMessage(i, COLOR_BLUE, str);
-			}
-		}
-	}
-
 	for(new i; i < 6; i++) //Just to avoid bugs
 	{
 	    DeletePlayer3DTextLabel(playerid, Info[playerid]);
