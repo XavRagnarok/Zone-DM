@@ -12,9 +12,8 @@ public OnPlayerRequestClass(playerid, classid)
         return 1;
 		}
 
-	SetSpawnInfo(playerid, 0, PlayerInfo[playerid][pSkin], 223.0138,-1872.2523,4.4400,1.4446,0,0,0,0,0,0);
+	SetSpawnInfo(playerid, 0, PlayerInfo[playerid][pSkin], 384.3023,-2080.2852,7.8301,0.1614,0,0,0,0,0,0);
 	SpawnPlayer(playerid);
-
 
 	return 0;
 }

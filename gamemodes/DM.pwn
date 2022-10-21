@@ -70,6 +70,9 @@
 // ============= COMMANDS ===========
 #include "./modular/admin/commands.pwn"
 
+// ============= Functions ==========
+#include "./modular/admin/functions.pwn"
+
 
 /////////////////////////////////////////////
 

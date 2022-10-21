@@ -108,8 +108,14 @@ function:Query_LoadAccount(playerid)
 {
 	PlayerInfo[playerid][pAdmin] = cache_get_field_content_int(0, "Admin", ourConnection);
     PlayerInfo[playerid][pDBID] = cache_get_field_content_int(0, "acc_dbid", ourConnection);
-    PlayerInfo[playerid][pCash] = cache_get_field_content_int(0, "Cash", ourConnection), GivePlayerMoney(playerid, PlayerInfo[playerid][pCash]);
-	PlayerInfo[playerid][pScore] = cache_get_field_content_int(0, "Score", ourConnection), SetPlayerScore(playerid, PlayerInfo[playerid][pScore]);
-	PlayerInfo[playerid][pSkin] = cache_get_field_content_int(0, "Skin", ourConnection), SetSpawnInfo(playerid, 0, PlayerInfo[playerid][pSkin], 223.0138,-1872.2523,4.4400,1.4446,0,0,0,0,0,0), SpawnPlayer(playerid);
+    PlayerInfo[playerid][pCash] = cache_get_field_content_int(0, "Cash", ourConnection);
+	PlayerInfo[playerid][pScore] = cache_get_field_content_int(0, "Score", ourConnection);
+	PlayerInfo[playerid][pSkin] = cache_get_field_content_int(0, "Skin", ourConnection);
+
+	GivePlayerMoney(playerid, PlayerInfo[playerid][pCash]);
+	SetPlayerScore(playerid, PlayerInfo[playerid][pScore]);
+	SetSpawnInfo(playerid, 0, PlayerInfo[playerid][pSkin], 384.3023,-2080.2852,7.8301,0.1614,0,0,0,0,0,0);
+	
+	SpawnPlayer(playerid);
 	return 1;
 }
