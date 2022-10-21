@@ -113,7 +113,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		format(str, sizeof(str), "~r~You killed~n~%s~n~~r~1 Score", GetName(playerid));
 		GameTextForPlayer(killerid, str, 4500, 3);
 		SetPlayerScore(killerid, GetPlayerScore(playerid) + 1);
-		PlayerPlaySound(playerid, 17802, 0.0, 0.0, 0.0);
+		PlayerPlaySound(killerid, 17802, 0.0, 0.0, 0.0);
 		Streak[killerid] = 0;
 
 		if(Streak[killerid] != 8)
@@ -169,6 +169,7 @@ public OnPlayerTakeDamage(playerid, issuerid, Float: amount, weaponid, bodypart)
         PlayerPlaySound(issuerid, 17802, 0.0, 0.0, 0.0);
         GameTextForPlayer(playerid && issuerid,"~r~Headshot",2000, 3);
 	}
+	PlayerPlaySound(issuerid, 17802, 0.0, 0.0, 0.0);
     return 1;
 }
 

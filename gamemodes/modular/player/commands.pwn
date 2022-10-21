@@ -26,6 +26,8 @@ CMD:skin(playerid, params[])
 
 	SetPlayerSkin(playerid, skinid);
 
+	skinid = PlayerInfo[playerid][pSkin];
+
 	return 1;
 }
 
@@ -78,9 +80,10 @@ CMD:arm(playerid, params[])
 
 CMD:v(playerid, params[])
 {
-	new model[20], modelid, Float:x, Float:y, Float:z, vehicleid;
+	new model[20], modelid, Float:x, Float:y, Float:z, Float:a, vehicleid;
 
 	GetPlayerPos(playerid, Float:x, Float:y, Float:z);
+	GetPlayerFacingAngle(playerid, Float:a);
 
 	if(sscanf(params, "s[20]", model))
 	    return SCM(playerid, COLOR_RED, "Usage: /v [vehicle id 400-611]");
@@ -95,7 +98,7 @@ CMD:v(playerid, params[])
 		DestroyVehicle(GetPlayerVehicleID(playerid));
 	}
 
- 	vehicleid = AddStaticVehicleEx(modelid, x, y, z, 2.0, 0, 0, 0, 0);
+ 	vehicleid = AddStaticVehicleEx(modelid, x, y, z, a, 0, 0, 0, 0);
 
  	PutPlayerInVehicle(playerid, vehicleid, 0);
 

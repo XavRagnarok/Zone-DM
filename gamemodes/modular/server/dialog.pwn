@@ -62,15 +62,24 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
             	if(listitem == 0)
             	{
+            		new string[128];
 					DDM(playerid);
+					format(string, sizeof(string), "%s(%d) has joined the Deagle Deathmatch", GetName(playerid), playerid);
+	    			SCMall(COLOR_BLUE, string);
 	        	}
             	if(listitem == 1)
             	{
+            		new string[128];
 					SOSDM(playerid);
+					format(string, sizeof(string), "%s(%d) has joined the Sawn off Shotgun Deathmatch", GetName(playerid), playerid);
+	    			SCMall(COLOR_BLUE, string);
 	        	}
             	if(listitem == 2)
             	{
+            		new string[128];
 					SDM(playerid);
+					format(string, sizeof(string), "%s(%d) has joined the Sniper Deathmatch", GetName(playerid), playerid);
+	    			SCMall(COLOR_BLUE, string);
 	        	}
 	    	}
     	}

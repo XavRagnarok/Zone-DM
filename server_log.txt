@@ -1179,3 +1179,18 @@ v0.3.7-R2, (C)2005-2015 SA-MP Team
 [23:42:44] [connection] 192.168.0.102:65252 requests connection cookie.
 [23:42:45] [connection] incoming connection: 192.168.0.102:65252 id: 0
 [23:42:45] [join] Ragnarok has joined the server (0:192.168.0.102)
+[23:50:26] [part] Ragnarok has left the server (0:1)
+[23:50:28] --- Server Shutting Down.
+[23:50:28] plugin.mysql: Unloading plugin...
+[23:50:28] plugin.mysql: Plugin unloaded.
+[23:50:28] 
+[23:50:28]  ===============================
+[23:50:28] 
+[23:50:28]      sscanf plugin unloaded.    
+[23:50:28] 
+[23:50:28]  ===============================
+[23:50:28] 
+[23:50:28] 
+
+*** Streamer Plugin v2.9.5 by Incognito unloaded ***
+
