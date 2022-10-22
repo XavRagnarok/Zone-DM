@@ -1194,3 +1194,190 @@ v0.3.7-R2, (C)2005-2015 SA-MP Team
 
 *** Streamer Plugin v2.9.5 by Incognito unloaded ***
 
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[21:33:12] 
+[21:33:12] Server Plugins
+[21:33:12] --------------
+[21:33:12]  Loading plugin: mysql
+[21:33:12]  >> plugin.mysql: R39-6 successfully loaded.
+[21:33:12]   Loaded.
+[21:33:12]  Loading plugin: sscanf
+[21:33:12] 
+[21:33:12]  ===============================
+[21:33:12] 
+[21:33:12]       sscanf plugin loaded.     
+[21:33:12] 
+[21:33:12]          Version: 2.13.1
+[21:33:12] 
+[21:33:12]    (c) 2022 Alex "Y_Less" Cole  
+[21:33:12] 
+[21:33:12]  ===============================
+[21:33:12] 
+[21:33:12]   Loaded.
+[21:33:12]  Loading plugin: streamer
+[21:33:12] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[21:33:12]   Loaded.
+[21:33:12]  Loaded 3 plugins.
+
+[21:33:12] 
+[21:33:12] Filterscripts
+[21:33:12] ---------------
+[21:33:12]   Loaded 0 filterscripts.
+
+[21:33:12] [DATABASE]: Connection established to MySQL
+[21:33:12] 
+-------------------------------------
+[21:33:12] This is the sick script we are making
+[21:33:12] ---------------------------------------
+
+[21:33:12] Number of vehicle models: 0
+[21:35:03] [connection] 192.168.0.102:57388 requests connection cookie.
+[21:35:04] [connection] incoming connection: 192.168.0.102:57388 id: 0
+[21:35:04] [join] Ragnarok has joined the server (0:192.168.0.102)
+[21:35:19] RCON (In-Game): Player #0 (Ragnarok) has logged in.
+[21:35:56] [part] Ragnarok has left the server (0:1)
+[21:35:58] --- Server Shutting Down.
+[21:35:58] plugin.mysql: Unloading plugin...
+[21:35:58] plugin.mysql: Plugin unloaded.
+[21:35:58] 
+[21:35:58]  ===============================
+[21:35:58] 
+[21:35:58]      sscanf plugin unloaded.    
+[21:35:58] 
+[21:35:58]  ===============================
+[21:35:58] 
+[21:35:58] 
+
+*** Streamer Plugin v2.9.5 by Incognito unloaded ***
+
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[21:36:03] 
+[21:36:03] Server Plugins
+[21:36:03] --------------
+[21:36:03]  Loading plugin: mysql
+[21:36:03]  >> plugin.mysql: R39-6 successfully loaded.
+[21:36:03]   Loaded.
+[21:36:03]  Loading plugin: sscanf
+[21:36:03] 
+[21:36:03]  ===============================
+[21:36:03] 
+[21:36:03]       sscanf plugin loaded.     
+[21:36:03] 
+[21:36:03]          Version: 2.13.1
+[21:36:03] 
+[21:36:03]    (c) 2022 Alex "Y_Less" Cole  
+[21:36:03] 
+[21:36:03]  ===============================
+[21:36:03] 
+[21:36:03]   Loaded.
+[21:36:03]  Loading plugin: streamer
+[21:36:03] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[21:36:03]   Loaded.
+[21:36:03]  Loaded 3 plugins.
+
+[21:36:03] 
+[21:36:03] Filterscripts
+[21:36:03] ---------------
+[21:36:03]   Loaded 0 filterscripts.
+
+[21:36:03] [DATABASE]: Connection established to MySQL
+[21:36:03] 
+-------------------------------------
+[21:36:03] This is the sick script we are making
+[21:36:03] ---------------------------------------
+
+[21:36:03] Number of vehicle models: 0
+[21:36:19] [connection] 192.168.0.102:55101 requests connection cookie.
+[21:36:20] [connection] incoming connection: 192.168.0.102:55101 id: 0
+[21:36:20] [join] Ragnarok has joined the server (0:192.168.0.102)
+[21:37:02] RCON (In-Game): Player #0 (Ragnarok) has logged in.
+[21:39:29] [part] Ragnarok has left the server (0:1)
+[21:39:32] --- Server Shutting Down.
+[21:39:32] plugin.mysql: Unloading plugin...
+[21:39:32] plugin.mysql: Plugin unloaded.
+[21:39:32] 
+[21:39:32]  ===============================
+[21:39:32] 
+[21:39:32]      sscanf plugin unloaded.    
+[21:39:32] 
+[21:39:32]  ===============================
+[21:39:32] 
+[21:39:32] 
+
+*** Streamer Plugin v2.9.5 by Incognito unloaded ***
+
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[21:39:34] 
+[21:39:34] Server Plugins
+[21:39:34] --------------
+[21:39:34]  Loading plugin: mysql
+[21:39:34]  >> plugin.mysql: R39-6 successfully loaded.
+[21:39:34]   Loaded.
+[21:39:34]  Loading plugin: sscanf
+[21:39:34] 
+[21:39:34]  ===============================
+[21:39:34] 
+[21:39:34]       sscanf plugin loaded.     
+[21:39:34] 
+[21:39:34]          Version: 2.13.1
+[21:39:34] 
+[21:39:34]    (c) 2022 Alex "Y_Less" Cole  
+[21:39:34] 
+[21:39:34]  ===============================
+[21:39:34] 
+[21:39:34]   Loaded.
+[21:39:34]  Loading plugin: streamer
+[21:39:34] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[21:39:34]   Loaded.
+[21:39:34]  Loaded 3 plugins.
+
+[21:39:34] 
+[21:39:34] Filterscripts
+[21:39:34] ---------------
+[21:39:34]   Loaded 0 filterscripts.
+
+[21:39:34] [DATABASE]: Connection established to MySQL
+[21:39:34] 
+-------------------------------------
+[21:39:34] This is the sick script we are making
+[21:39:34] ---------------------------------------
+
+[21:39:34] Number of vehicle models: 0
+[21:39:51] [connection] 192.168.0.102:63674 requests connection cookie.
+[21:39:52] [connection] incoming connection: 192.168.0.102:63674 id: 0
+[21:39:53] [join] Ragnarok has joined the server (0:192.168.0.102)
+[21:40:35] RCON (In-Game): Player #0 (Ragnarok) has logged in.
+[21:40:59] sscanf warning (`ui`): "Format specifier does not match parameter count 3: i."

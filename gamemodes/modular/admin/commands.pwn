@@ -7,15 +7,27 @@ CMD:setadmin(playerid, params[])
 		new playerb, adminlvl, insert[128];
 
 		if(sscanf(params, "ui", playerb, adminlvl))
+	    {
 	        return SCM(playerid, COLOR_RED, "Usage: /setadmin [id/name] [Level 1-2]");
+	    }
 
         if(playerb == INVALID_PLAYER_ID)
+		{
 			return SCM(playerid, COLOR_RED, "player is not connected");
-		if(playerb == playerid)
-			return SCM(playerid, COLOR_RED, "You cannot set yourself an admin level");
+		}
+
+		if(!IsPlayerAdmin(playerid))
+		{
+			if(playerb == playerid)
+			{
+				return SCM(playerid, COLOR_RED, "You cannot set yourself an admin level");
+			}
+		}
 
   		if(adminlvl < 1 || adminlvl > 2)
+   		{
    			return SCM(playerid, COLOR_RED, "[SERVER]: Invalid Admin Level");
+   		}
 
 		SCMex(playerid, COLOR_CYAN, "You've just made %s admin level (%i)", ReturnName(playerb), adminlvl);
 		SCMex(playerb, COLOR_CYAN, "You've just been made admin level (%i) by an Admin", adminlvl, ReturnName(playerid));
@@ -42,8 +54,13 @@ CMD:radmin(playerid, params[])
         if(playerb == INVALID_PLAYER_ID)
 			return SCM(playerid, COLOR_RED, "player is not connected");
 
-		if(playerb == playerid)
-			return SCM(playerid, COLOR_RED, "You cannot remove yourself as admin");
+		if(!IsPlayerAdmin(playerid))
+		{
+			if(playerb == playerid)
+			{
+				return SCM(playerid, COLOR_RED, "You cannot remove yourself from admin");
+			}
+		}
 
 		SCMex(playerid, COLOR_CYAN, "You've just now removed admin permissions from %s", ReturnName(playerb));
 		SCMex(playerb, COLOR_RED, "Admin permissions has been taken from you");
