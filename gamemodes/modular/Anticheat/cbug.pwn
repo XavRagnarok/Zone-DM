@@ -68,6 +68,27 @@ public OnPlayerUpdate(playerid)
 
 	if(!ud && !lr) { NotMoving[playerid] = 1; /*OnPlayerKeyStateChange(playerid, Keys, 0);*/ }
 	else { NotMoving[playerid] = 0; /*OnPlayerKeyStateChange(playerid, Keys, 0);*/ }
+
+
+	// RACE RELATED
+
+	if(RACE_isRaceStarted)
+	{
+		if(RACE_pInfo[playerid][RACE_isPlayerInRace])
+		{
+			new
+				speed = RACE_getPlayerSpeed(playerid),
+				string[32]
+			;
+
+			format(string, sizeof(string), "~g~Speed:~w~ %d KM/H", speed);
+			TextDrawSetString(RACE_pInfo[playerid][RACE_textdrawSpeed], string);
+		}
+	}
+	
+	#if defined RACE_OnPlayerUpdate
+        RACE_OnPlayerUpdate(playerid);
+    #endif
 	return 1;
 }
 

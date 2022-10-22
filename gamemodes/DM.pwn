@@ -106,7 +106,10 @@
 // =================GAMES==============
 
 // ============= all dm arenas ======
-#include "./modular/deathmatch/all_dms.pwn"
+#include "./modular/games/all_dms.pwn"
+
+// ============= races ==============
+#include "./modular/games/race.pwn"
 
 
 ////////////////////////////////////////////

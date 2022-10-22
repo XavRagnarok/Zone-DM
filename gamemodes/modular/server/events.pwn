@@ -33,6 +33,22 @@ public OnGameModeInit()
     CreateDynamic3DTextLabel("Press ~k~~VEHICLE_ENTER_EXIT~", -1, 233.6071,-1883.0021,4.4685, 5.0, -1, -1, 1, -1, -1, -1, 5.0);
  	///////////////////////////
     //////////////////////////
+
+    // RACE RELATED
+    for(new i = 0; i < MAX_RACES; i++)
+    {
+        RACE_loadRaceFromFile(i);
+    }
+    
+    printf(" ___________________________________________________________\n");
+    printf("  » Raf Racing System loaded. (Loaded %d Races)", RACE_loadedRaces);
+    printf(" ___________________________________________________________\n\n\n");
+    
+    RACE_loadTextdraws();
+    
+    #if defined RACE_OnGameModeInit
+        RACE_OnGameModeInit();
+    #endif
 	return 1;
 }
 

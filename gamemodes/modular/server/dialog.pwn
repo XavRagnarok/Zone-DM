@@ -128,6 +128,21 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             	SCM(playerid, COLOR_RED, "You have Chosen Not to enter inside Sawn off Shotgun Deathmatch");
         	}
     	}
-    }
+
+    	// RACE RELATED
+
+    	case DIALOG_RACE:
+    	{
+        	if(response)
+        	{
+				RACE_prepareEvent(listitem);
+			}
+    	}
+		
+		#if defined RACE_OnDialogResponse
+        	RACE_OnDialogResponse(playerid, dialogid, response, listitem, inputtext);
+    	#endif
+
+ 	}
 	return 1;
 }

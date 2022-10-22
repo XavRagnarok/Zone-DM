@@ -16,6 +16,15 @@
 
 #define SCRIPT_VERSION "Ragnarok's script adventure"
 
+// race related
+
+#define MAX_RACES 			1
+#define MAX_CHECKS 			40
+
+#define DIALOG_UNUSED 		0
+
+#define RACE_VIRTUALWORLD 	1
+
 //////////////////////////////////////////////////////////////
 
 new pms[MAX_PLAYERS],
@@ -57,10 +66,19 @@ enum // dialog ids
 	DIALOG_LOGIN,
 	DIALOG_HELP,
 	DIALOG_ACCOUNT,
+
+	// dm related
 	DIALOG_DM,
 	DIALOG_CONFIRMDDM,
 	DIALOG_CONFIRMSDM,
-	DIALOG_CONFIRMSOSDM
+	DIALOG_CONFIRMSOSDM,
+
+	// admin related
+	DIALOG_ADMINS,
+
+	// RACE RELATED
+	DIALOG_RACE
+
 };
 
 ////////////////////////////////////////////////////////////
@@ -211,3 +229,82 @@ new const WeaponNames[55][] =
 };
 
 //=================================================================
+
+
+// RACE RELATED
+enum RACE_playerInfo
+{
+	RACE_playerUsername[MAX_PLAYER_NAME],
+	
+	RACE_playerVehicle,
+	
+	RACE_playerPosition,
+	RACE_playerCheckpointsPassed,
+	RACE_playerTimeTookToFinish,
+
+    Text:RACE_textdrawBar,
+	Text:RACE_textdrawBox,
+	Text:RACE_textdrawTitle,
+	Text:RACE_textdrawName,
+	Text:RACE_textdrawPosition,
+	Text:RACE_textdrawCheckpoint,
+	Text:RACE_textdrawTimeLeft,
+	Text:RACE_textdrawSpeed,
+
+    bool:RACE_isPlayerInRace,
+	
+	Text:RACE_textdrawTip,
+	Text:RACE_textdrawTip2
+};
+
+enum RACE_raceInfo
+{
+	raceName[24],
+
+	raceVehicleID,
+	raceMaxCheckpoints,
+	raceInterior,
+	raceDistance,
+	raceRecord,
+	raceRecordPlaced,
+	raceRecordHolder[24],
+	
+	Float:raceSpawnPositionX,
+	Float:raceSpawnPositionY,
+	Float:raceSpawnPositionZ,
+	Float:raceSpawnPositionA,
+
+	Float:raceCheckpointPositionX,
+	Float:raceCheckpointPositionY,
+	Float:raceCheckpointPositionZ
+};
+
+new	
+	RACE_pInfo[MAX_PLAYERS][RACE_playerInfo],
+	
+	RACE_rInfo[MAX_RACES][MAX_CHECKS][RACE_raceInfo],
+
+    RACE_loadedRaces = 0,
+	RACE_runningID,
+
+	RACE_playersInEvent = 0,
+	RACE_playersLeft = 0,
+	RACE_playersSpawned = 0,
+
+	RACE_timeLeft,
+	RACE_timerCounter,
+
+	RACE_countdownTimer,
+	RACE_checkRaceTimer,
+
+	RACE_checkpoints[MAX_CHECKS],
+	
+	RACE_spawnSlots[16] = {-1, ...},
+
+ 	bool:RACE_isRaceStarted = false,
+	bool:RACE_isRaceInLobby = false,
+	
+	RACE_globalString[144]
+;
+
+//////////////////////////////////////////////////////////////////

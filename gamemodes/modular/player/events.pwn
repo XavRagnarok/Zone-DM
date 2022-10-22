@@ -35,6 +35,16 @@ public OnPlayerConnect(playerid)
 	mysql_format(ourConnection, existcheck, sizeof(existcheck), "SELECT * FROM accounts WHERE acc_name = '%e'", ReturnName(playerid));
     mysql_tquery(ourConnection, existcheck, "LogPlayerIn", "i", playerid);
 
+    // RACE RELATED
+
+    GetPlayerName(playerid, RACE_pInfo[playerid][RACE_playerUsername], MAX_PLAYER_NAME);
+	
+	RACE_resetPlayerVariables(playerid);
+	
+	#if defined RACE_OnPlayerConnect
+        RACE_OnPlayerConnect(playerid);
+    #endif
+
 	return 1;
 }
 
@@ -84,6 +94,17 @@ public OnPlayerDisconnect(playerid, reason)
 		mysql_format(ourConnection, insert, sizeof(insert), "UPDATE accounts SET Skin = %i WHERE acc_dbid = %i", PlayerInfo[playerid][pSkin], PlayerInfo[playerid][pDBID]);
 		mysql_tquery(ourConnection, insert);
 	}
+
+	// RACE RELATED
+
+	if(RACE_pInfo[playerid][RACE_isPlayerInRace])
+	{
+		RACE_playerExitEvent(playerid);
+	}
+	
+	#if defined RACE_OnPlayerDisconnect
+        RACE_OnPlayerDisconnect(playerid, reason);
+    #endif
 	return 1;
 }
 
@@ -157,6 +178,17 @@ public OnPlayerDeath(playerid, killerid, reason)
 			GameTextForPlayer(killerid, "~r~Godlike!", 4500, 1);
 		}
 	}
+
+	// RACE RELATED
+
+	if(RACE_pInfo[playerid][RACE_isPlayerInRace])
+	{
+		RACE_playerExitEvent(playerid);
+	}
+	
+	#if defined RACE_OnPlayerDeath
+        RACE_OnPlayerDeath(playerid, killerid, reason);
+    #endif
 	return 1;
 }
 
@@ -200,11 +232,31 @@ public OnPlayerEnterVehicle(playerid, vehicleid, ispassenger)
 
 public OnPlayerExitVehicle(playerid, vehicleid)
 {
+	if(RACE_pInfo[playerid][RACE_isPlayerInRace])
+	{
+	    return 0;
+	}
+	
+	#if defined RACE_OnPlayerExitVehicle
+        RACE_OnPlayerExitVehicle(playerid, vehicleid);
+    #endif
 	return 1;
 }
 
 public OnPlayerStateChange(playerid, newstate, oldstate)
 {
+	// RACE RELATED
+	if(RACE_pInfo[playerid][RACE_isPlayerInRace])
+	{
+		if(oldstate == PLAYER_STATE_DRIVER)
+		{
+            PutPlayerInVehicle(playerid, RACE_pInfo[playerid][RACE_playerVehicle], 0);
+		}
+	}
+	
+	#if defined RACE_OnPlayerStateChange
+        RACE_OnPlayerStateChange(playerid, newstate, oldstate);
+    #endif
 	return 1;
 }
 
@@ -220,6 +272,62 @@ public OnPlayerLeaveCheckpoint(playerid)
 
 public OnPlayerEnterRaceCheckpoint(playerid)
 {
+	if(RACE_pInfo[playerid][RACE_isPlayerInRace])
+	{
+	    if(IsPlayerInAnyVehicle(playerid))
+	    {			
+			RACE_pInfo[playerid][RACE_playerCheckpointsPassed]++;
+		    RACE_checkpoints[RACE_pInfo[playerid][RACE_playerCheckpointsPassed]]++;
+			RACE_pInfo[playerid][RACE_playerPosition] = RACE_checkpoints[RACE_pInfo[playerid][RACE_playerCheckpointsPassed]];
+
+			if(RACE_pInfo[playerid][RACE_playerCheckpointsPassed] == RACE_rInfo[RACE_runningID][0][raceMaxCheckpoints])
+			{
+				RACE_playersLeft--;
+
+				DisablePlayerRaceCheckpoint(playerid);
+				DisablePlayerCheckpoint(playerid);
+
+				RACE_playerFinishedTheRace(playerid);
+
+				PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
+			}
+			else
+			{
+				new
+					i = RACE_pInfo[playerid][RACE_playerCheckpointsPassed],
+					runID = RACE_runningID
+				;
+
+                DisablePlayerCheckpoint(playerid);
+				DisablePlayerRaceCheckpoint(playerid);
+
+				if(RACE_rInfo[runID][0][raceMaxCheckpoints] - 1 == i)
+				{
+					SetPlayerRaceCheckpoint(playerid, 1, RACE_rInfo[runID][i][raceCheckpointPositionX], RACE_rInfo[runID][i][raceCheckpointPositionY], RACE_rInfo[runID][i][raceCheckpointPositionZ], RACE_rInfo[runID][i + 1][raceCheckpointPositionX], RACE_rInfo[runID][i + 1][raceCheckpointPositionY], RACE_rInfo[runID][i + 1][raceCheckpointPositionZ], 7.0);
+				}
+				else
+				{
+					SetPlayerRaceCheckpoint(playerid, 0, RACE_rInfo[runID][i][raceCheckpointPositionX], RACE_rInfo[runID][i][raceCheckpointPositionY], RACE_rInfo[runID][i][raceCheckpointPositionZ], RACE_rInfo[runID][i + 1][raceCheckpointPositionX], RACE_rInfo[runID][i + 1][raceCheckpointPositionY], RACE_rInfo[runID][i + 1][raceCheckpointPositionZ], 7.0);
+
+					SetPlayerCheckpoint(playerid, RACE_rInfo[runID][i + 1][raceCheckpointPositionX], RACE_rInfo[runID][i + 1][raceCheckpointPositionY], RACE_rInfo[runID][i + 1][raceCheckpointPositionZ], 0.0);
+				}
+
+                RACE_globalString[0] = '\0';
+				format(RACE_globalString, sizeof(RACE_globalString), "~g~Position:~w~ %d/%d", RACE_pInfo[playerid][RACE_playerPosition], RACE_playersInEvent);
+				TextDrawSetString(RACE_pInfo[playerid][RACE_textdrawPosition], RACE_globalString);
+
+				format(RACE_globalString, sizeof(RACE_globalString), "~g~Checkpoint:~w~ %d/%d", i, RACE_rInfo[runID][0][raceMaxCheckpoints]);
+				TextDrawSetString(RACE_pInfo[playerid][RACE_textdrawCheckpoint], RACE_globalString);
+
+				PlayerPlaySound(playerid, 1138,0.0,0.0,0.0);
+			}
+
+	  		if(RACE_playersLeft == 0)
+			{
+				RACE_finishEvent(0);
+			}
+		}
+	}
 	return 1;
 }
 

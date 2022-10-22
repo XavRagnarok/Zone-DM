@@ -1,5 +1,20 @@
 // all commands are here
 
+CMD:admins(playerid, params[])
+{
+	new count = 0, string[256];
+	SCM(playerid, COLOR_CYAN,"Current online admins:");
+	foreach(new i : Player)
+	{
+
+		format(string, sizeof(string),"{00FF00}%s(%d)   {00FF00}Admin",ReturnName(i), i);
+		SendClientMessage(playerid, COLOR_CYAN, string);
+		count++;
+	}
+	if(!count) SendClientMessage(playerid, COLOR_RED,"No admins are online right now!");
+	return 1;
+}
+
 CMD:dice(playerid, params[])
 {
 	new string[128];
