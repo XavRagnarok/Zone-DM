@@ -287,3 +287,35 @@ CMD:kick(playerid, params[])
 	KickEx(playerb);
 	return 1;
 }
+
+CMD:goto(playerid, params[])
+{
+	if(PlayerInfo[playerid][pAdmin] < 1)
+	{
+		return SCM(playerid, COLOR_RED, "You don't have permissions to use this command");
+	}
+
+	if(aduty[playerid] == 0)
+	{
+		return SCM(playerid, COLOR_RED,"You are not on admin duty");
+	}
+
+	new playerb, Float:x, Float:y, Float:z;
+	if(sscanf(params, "u", playerb))
+	{
+	    return SCM(playerid, COLOR_RED, "Usage: /goto [id/name]");
+	}
+
+    if(playerb == INVALID_PLAYER_ID)
+	{
+		return SCM(playerid, COLOR_RED, "Player is not connected");
+	}
+
+	GetPlayerPos(playerb, Float:x, Float:y, Float:z);
+	SetPlayerPos(playerid, x, y, z);
+
+	SCMex(playerid, COLOR_CYAN, "You've just teleported to %s", ReturnName(playerb));
+	SCMex(playerb, COLOR_RED, "An Admin teleported to you");
+
+	return 1;
+}
