@@ -159,6 +159,12 @@ CMD:lvpd(playerid, params[])
 	return 1;
 }
 
+CMD:lsap(playerid, params[])
+{
+	SetPlayerPos(playerid, 1986.7233,-2324.0649,13.5469);
+	return 1;
+}
+
 //=============================Animations======================
 
 CMD:handsup(playerid, params[])
