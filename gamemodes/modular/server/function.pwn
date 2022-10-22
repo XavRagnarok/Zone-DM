@@ -161,3 +161,8 @@ GetWeaponID(weaponname[]) {
 	}
 	return -1;
 }
+
+stock minrand(min, max) //By Alex "Y_Less" Cole for use in /veh
+{
+	return random(max - min) + min;
+}

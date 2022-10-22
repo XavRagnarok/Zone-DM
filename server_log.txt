@@ -1381,3 +1381,55 @@ v0.3.7-R2, (C)2005-2015 SA-MP Team
 [21:39:53] [join] Ragnarok has joined the server (0:192.168.0.102)
 [21:40:35] RCON (In-Game): Player #0 (Ragnarok) has logged in.
 [21:40:59] sscanf warning (`ui`): "Format specifier does not match parameter count 3: i."
+[21:45:57] [part] Ragnarok has left the server (0:1)
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[22:00:07] 
+[22:00:07] Server Plugins
+[22:00:07] --------------
+[22:00:07]  Loading plugin: mysql
+[22:00:07]  >> plugin.mysql: R39-6 successfully loaded.
+[22:00:07]   Loaded.
+[22:00:07]  Loading plugin: sscanf
+[22:00:07] 
+[22:00:07]  ===============================
+[22:00:07] 
+[22:00:07]       sscanf plugin loaded.     
+[22:00:07] 
+[22:00:07]          Version: 2.13.1
+[22:00:07] 
+[22:00:07]    (c) 2022 Alex "Y_Less" Cole  
+[22:00:07] 
+[22:00:07]  ===============================
+[22:00:07] 
+[22:00:07]   Loaded.
+[22:00:07]  Loading plugin: streamer
+[22:00:07] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[22:00:07]   Loaded.
+[22:00:07]  Loaded 3 plugins.
+
+[22:00:07] 
+[22:00:07] Filterscripts
+[22:00:07] ---------------
+[22:00:07]   Loaded 0 filterscripts.
+
+[22:00:07] [DATABASE]: Connection established to MySQL
+[22:00:07] 
+-------------------------------------
+[22:00:07] This is the sick script we are making
+[22:00:07] ---------------------------------------
+
+[22:00:07] Number of vehicle models: 0
+[22:00:23] [connection] 192.168.0.102:53353 requests connection cookie.
+[22:00:24] [connection] incoming connection: 192.168.0.102:53353 id: 0
+[22:00:24] [join] Ragnarok has joined the server (0:192.168.0.102)

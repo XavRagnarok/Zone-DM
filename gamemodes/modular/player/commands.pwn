@@ -1,5 +1,14 @@
 // all commands are here
 
+CMD:dice(playerid, params[])
+{
+	new string[128];
+
+	format(string, sizeof(string), "* %s rolls a dice and it lands on {FFC500}%d.", ReturnName(playerid), minrand(1, 7));
+	SendClientMessageToAll(COLOR_CYAN, string);
+	return 1;
+}
+
 CMD:jetpack(playerid, params[])
 {
     SetPlayerSpecialAction(playerid,SPECIAL_ACTION_USEJETPACK);
