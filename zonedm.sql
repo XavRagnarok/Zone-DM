@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 23, 2022 at 03:50 PM
+-- Generation Time: Oct 23, 2022 at 04:44 PM
 -- Server version: 10.4.24-MariaDB
 -- PHP Version: 8.1.6
 
@@ -35,6 +35,7 @@ CREATE TABLE `accounts` (
   `Skin` int(11) NOT NULL DEFAULT 3,
   `Score` int(32) NOT NULL DEFAULT 500,
   `Cash` int(11) NOT NULL,
+  `PMS` int(11) NOT NULL,
   `register_ip` varchar(60) CHARACTER SET latin1 DEFAULT NULL,
   `register_date` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -43,9 +44,9 @@ CREATE TABLE `accounts` (
 -- Dumping data for table `accounts`
 --
 
-INSERT INTO `accounts` (`acc_dbid`, `acc_name`, `acc_pass`, `Admin`, `Skin`, `Score`, `Cash`, `register_ip`, `register_date`) VALUES
-(1, 'Ragnarok', '7c222fb2927d828af22f592134e8932480637c0d', 2, 294, 0, 0, '192.168.0.102', 0),
-(2, 'Ragnaroktest', '7c222fb2927d828af22f592134e8932480637c0d', 0, 3, 500, 0, '192.168.0.102', 0);
+INSERT INTO `accounts` (`acc_dbid`, `acc_name`, `acc_pass`, `Admin`, `Skin`, `Score`, `Cash`, `PMS`, `register_ip`, `register_date`) VALUES
+(1, 'Ragnarok', '7c222fb2927d828af22f592134e8932480637c0d', 2, 294, 0, 0, 0, '192.168.0.102', 0),
+(2, 'Ragnaroktest', '7c222fb2927d828af22f592134e8932480637c0d', 0, 3, 500, 0, 0, '192.168.0.102', 0);
 
 --
 -- Indexes for dumped tables
