@@ -27,8 +27,7 @@
 
 //////////////////////////////////////////////////////////////
 
-new pms[MAX_PLAYERS],
-pPM[MAX_PLAYERS],
+new pPM[MAX_PLAYERS],
 aduty[MAX_PLAYERS];
 
 // =====================REGISTER/LOGGING STUFF===================
@@ -94,6 +93,7 @@ enum P_ACCOUNT_DATA
     pAdmin,
     pCash,
     pScore,
+    PMS
 }
 new PlayerInfo[MAX_PLAYERS][P_ACCOUNT_DATA];
 

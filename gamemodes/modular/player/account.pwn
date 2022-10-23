@@ -43,6 +43,7 @@ function:ResetPlayer(playerid)
     PlayerInfo[playerid][pAdmin] = 0;
     PlayerInfo[playerid][pCash] = 0;
     PlayerInfo[playerid][pScore] = 0;
+    PlayerInfo[playerid][PMS] = 0;
 
     return 1;
 }
@@ -111,6 +112,7 @@ function:Query_LoadAccount(playerid)
     PlayerInfo[playerid][pCash] = cache_get_field_content_int(0, "Cash", ourConnection);
 	PlayerInfo[playerid][pScore] = cache_get_field_content_int(0, "Score", ourConnection);
 	PlayerInfo[playerid][pSkin] = cache_get_field_content_int(0, "Skin", ourConnection);
+	PlayerInfo[playerid][PMS] = cache_get_field_content_int(0, "PMS", ourConnection);
 
 	GivePlayerMoney(playerid, PlayerInfo[playerid][pCash]);
 	SetPlayerScore(playerid, PlayerInfo[playerid][pScore]);
