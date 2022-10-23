@@ -70,8 +70,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             	if(listitem == 1)
             	{
             		new string[128];
-					SOSDM(playerid);
-					format(string, sizeof(string), "%s(%d) has joined the Sawn off Shotgun Deathmatch", GetName(playerid), playerid);
+					SPASDM(playerid);
+					format(string, sizeof(string), "%s(%d) has joined the combat Shotgun Deathmatch", GetName(playerid), playerid);
 	    			SCMall(COLOR_BLUE, string);
 	        	}
             	if(listitem == 2)
@@ -114,12 +114,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
         	}
     	}
 
-    	case DIALOG_CONFIRMSOSDM:
+    	case DIALOG_CONFIRMSPASDM:
     	{
         	if(response == 1)
         	{
             	new string[128];
-				SOSDM(playerid);
+				SPASDM(playerid);
 				format(string, sizeof(string), "%s(%d) has joined the Sawn off Shotgun Deathmatch", GetName(playerid), playerid);
 	    		SCMall(COLOR_BLUE, string);
         	}
