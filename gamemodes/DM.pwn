@@ -62,6 +62,9 @@
 // =========== functions ===========
 #include "./modular/server/function.pwn"
 
+// =========== dynamic pickups =====
+#include "./modular/server/dynamic-pickups.pwn"
+
 
 ////////////////////////////////////////////////
 

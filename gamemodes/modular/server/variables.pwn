@@ -53,7 +53,7 @@ new Ammo[MAX_PLAYERS][MAX_SLOTS];
 
 new ddmpickup;
 new sdmpickup;
-new sosdmpickup;
+new spasdmpickup;
 
 //////////////////////////////////////////////////////////
 

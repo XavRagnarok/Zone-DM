@@ -22,12 +22,12 @@ CMD:sdm(playerid, params[])
 	return 1;
 }
 
-CMD:sosdm(playerid, params[])
+CMD:spasdm(playerid, params[])
 {
 	new string[128];
 	if(dm[playerid] == 3 || dm[playerid] == 2 || dm[playerid] == 1) return GameTextForPlayer(playerid, "~g~You are already in a deathmatch", 4500,3);
 	SOSDM(playerid);
-	format(string, sizeof(string), "%s(%d) has joined the Sawn Off Shotgun Deathmatch", GetName(playerid), playerid);
+	format(string, sizeof(string), "%s(%d) has joined the Combat Shotgun Deathmatch", GetName(playerid), playerid);
 	SCMall(COLOR_BLUE, string);
 	return 1;
 }
@@ -64,7 +64,7 @@ CMD:dm(playerid, params[])
 	format(string,sizeof(string),
 	"Maps\tPlayers\n\
 	{fccf03}Deagle (/ddm)\t{5bc906}%d\n\
-	{fc9803}Sawn-Off Shotgun (/sosdm)\t{5bc906}%d\n\
+	{fc9803}Combat Shotgun (/spasdm)\t{5bc906}%d\n\
 	{c606c9}Sniper (/sdm)\t{5bc906}%d",ddm,sos,sdm);
 	ShowPlayerDialog(playerid, DIALOG_DM, DIALOG_STYLE_TABLIST_HEADERS, "Deathmatch",string, "Select","Cancel");
 
