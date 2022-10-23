@@ -661,7 +661,7 @@ public RACE_countDown()
 
 						TogglePlayerControllable(i, true);
 
-						DisableRemoteVehicleCollisions(i, true);
+						DisableRemoteVehicleCollisions(i, false);
 
 			            RACE_pInfo[i][RACE_playerTimeTookToFinish] = GetTickCount();
 
