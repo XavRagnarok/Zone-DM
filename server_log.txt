@@ -2197,3 +2197,135 @@ v0.3.7-R2, (C)2005-2015 SA-MP Team
 
 *** Streamer Plugin v2.9.5 by Incognito unloaded ***
 
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[19:53:47] 
+[19:53:47] Server Plugins
+[19:53:47] --------------
+[19:53:47]  Loading plugin: mysql
+[19:53:47]  >> plugin.mysql: R39-6 successfully loaded.
+[19:53:47]   Loaded.
+[19:53:47]  Loading plugin: sscanf
+[19:53:47] 
+[19:53:47]  ===============================
+[19:53:47] 
+[19:53:47]       sscanf plugin loaded.     
+[19:53:47] 
+[19:53:47]          Version: 2.13.1
+[19:53:47] 
+[19:53:47]    (c) 2022 Alex "Y_Less" Cole  
+[19:53:47] 
+[19:53:47]  ===============================
+[19:53:47] 
+[19:53:47]   Loaded.
+[19:53:47]  Loading plugin: streamer
+[19:53:47] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[19:53:47]   Loaded.
+[19:53:47]  Loaded 3 plugins.
+
+[19:53:47] 
+[19:53:47] Filterscripts
+[19:53:47] ---------------
+[19:53:47]   Loaded 0 filterscripts.
+
+[19:53:47] [DATABASE]: Connection established to MySQL
+[19:53:47]  ___________________________________________________________
+
+[19:53:47]   » Raf Racing System loaded. (Loaded 1 Races)
+[19:53:47]  ___________________________________________________________
+
+
+
+[19:53:47] 
+-------------------------------------
+[19:53:47] This is the sick script we are making
+[19:53:47] ---------------------------------------
+
+[19:53:47] Number of vehicle models: 0
+[19:54:10] [connection] 192.168.0.102:56216 requests connection cookie.
+[19:54:11] [connection] incoming connection: 192.168.0.102:56216 id: 0
+[19:54:11] [join] Ragnarok has joined the server (0:192.168.0.102)
+[19:54:25] [part] Ragnarok has left the server (0:1)
+[19:54:27] --- Server Shutting Down.
+[19:54:27] plugin.mysql: Unloading plugin...
+[19:54:27] plugin.mysql: Plugin unloaded.
+[19:54:27] 
+[19:54:27]  ===============================
+[19:54:27] 
+[19:54:27]      sscanf plugin unloaded.    
+[19:54:27] 
+[19:54:27]  ===============================
+[19:54:27] 
+[19:54:27] 
+
+*** Streamer Plugin v2.9.5 by Incognito unloaded ***
+
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[19:56:54] 
+[19:56:54] Server Plugins
+[19:56:54] --------------
+[19:56:54]  Loading plugin: mysql
+[19:56:54]  >> plugin.mysql: R39-6 successfully loaded.
+[19:56:54]   Loaded.
+[19:56:54]  Loading plugin: sscanf
+[19:56:54] 
+[19:56:54]  ===============================
+[19:56:54] 
+[19:56:54]       sscanf plugin loaded.     
+[19:56:54] 
+[19:56:54]          Version: 2.13.1
+[19:56:54] 
+[19:56:54]    (c) 2022 Alex "Y_Less" Cole  
+[19:56:54] 
+[19:56:54]  ===============================
+[19:56:54] 
+[19:56:54]   Loaded.
+[19:56:54]  Loading plugin: streamer
+[19:56:54] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[19:56:54]   Loaded.
+[19:56:54]  Loaded 3 plugins.
+
+[19:56:54] 
+[19:56:54] Filterscripts
+[19:56:54] ---------------
+[19:56:54]   Loaded 0 filterscripts.
+
+[19:56:54] [DATABASE]: Connection established to MySQL
+[19:56:54]  ___________________________________________________________
+
+[19:56:54]   » Raf Racing System loaded. (Loaded 1 Races)
+[19:56:54]  ___________________________________________________________
+
+
+
+[19:56:54] 
+-------------------------------------
+[19:56:54] This is the sick script we are making
+[19:56:54] ---------------------------------------
+
+[19:56:54] Number of vehicle models: 0
+[19:57:08] [connection] 192.168.0.102:50610 requests connection cookie.
+[19:57:09] [connection] incoming connection: 192.168.0.102:50610 id: 0
+[19:57:09] [join] Ragnarok has joined the server (0:192.168.0.102)
+[19:57:46] [part] Ragnarok has left the server (0:1)

@@ -59,6 +59,9 @@ public OnPlayerDisconnect(playerid, reason)
 	}
 	SendClientMessageToAll(0xFFFFFFFF, line);
 	}
+
+	SavePlayerData(playerid);
+
 	{
 		new insert[128];
 
