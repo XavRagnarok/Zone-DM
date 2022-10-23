@@ -2329,3 +2329,17 @@ v0.3.7-R2, (C)2005-2015 SA-MP Team
 [19:57:09] [connection] incoming connection: 192.168.0.102:50610 id: 0
 [19:57:09] [join] Ragnarok has joined the server (0:192.168.0.102)
 [19:57:46] [part] Ragnarok has left the server (0:1)
+[20:01:45] --- Server Shutting Down.
+[20:01:45] plugin.mysql: Unloading plugin...
+[20:01:45] plugin.mysql: Plugin unloaded.
+[20:01:45] 
+[20:01:45]  ===============================
+[20:01:45] 
+[20:01:45]      sscanf plugin unloaded.    
+[20:01:45] 
+[20:01:45]  ===============================
+[20:01:45] 
+[20:01:45] 
+
+*** Streamer Plugin v2.9.5 by Incognito unloaded ***
+

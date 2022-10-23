@@ -16,12 +16,12 @@ CMD:pms(playerid,params[])
     if(PlayerInfo[playerid][PMS] == 0)
     {
         PlayerInfo[playerid][PMS] = 1;
-        SCM(playerid, COLOR_CYAN, "Your PMS is set to ON");
+        SCM(playerid, COLOR_CYAN, "Your PMS is set to {00FF00}ON");
     }
     else if(PlayerInfo[playerid][PMS] == 1)
     {
         PlayerInfo[playerid][PMS] = 0;
-        SCM(playerid, COLOR_CYAN, "Your PMS is set OFF");
+        SCM(playerid, COLOR_CYAN, "Your PMS is set [FF0000}OFF");
     }
     return 1;
 }
@@ -47,12 +47,12 @@ CMD:pm(playerid, params[])
 	
 	if(PlayerInfo[playerb][PMS] == 0)
 	{
-		return SCM(playerid, COLOR_RED, "Player has Disabled their pms");
+		return SCM(playerid, COLOR_CYAN, "Player has {FF0000}Disabled {1fe0ddFF}their pms");
 	}
 	
 	if(PlayerInfo[playerid][PMS] == 0)
 	{
- 		SCM(playerid,COLOR_RED, "You have disabled your pms");
+ 		SCM(playerid,COLOR_CYAN, "You have {FF0000}disabled {1fe0ddFF}your pms");
 		return SCM(playerid, COLOR_RED, "Type /pms to enable your pms");
 	}
 	
