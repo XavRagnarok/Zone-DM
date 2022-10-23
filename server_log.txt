@@ -2128,3 +2128,72 @@ v0.3.7-R2, (C)2005-2015 SA-MP Team
 
 *** Streamer Plugin v2.9.5 by Incognito unloaded ***
 
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[19:11:21] 
+[19:11:21] Server Plugins
+[19:11:21] --------------
+[19:11:21]  Loading plugin: mysql
+[19:11:23]  >> plugin.mysql: R39-6 successfully loaded.
+[19:11:23]   Loaded.
+[19:11:23]  Loading plugin: sscanf
+[19:11:23] 
+[19:11:23]  ===============================
+[19:11:23] 
+[19:11:23]       sscanf plugin loaded.     
+[19:11:23] 
+[19:11:23]          Version: 2.13.1
+[19:11:23] 
+[19:11:23]    (c) 2022 Alex "Y_Less" Cole  
+[19:11:23] 
+[19:11:23]  ===============================
+[19:11:23] 
+[19:11:23]   Loaded.
+[19:11:23]  Loading plugin: streamer
+[19:11:23] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[19:11:23]   Loaded.
+[19:11:23]  Loaded 3 plugins.
+
+[19:11:23] 
+[19:11:23] Filterscripts
+[19:11:23] ---------------
+[19:11:23]   Loaded 0 filterscripts.
+
+[19:11:23] [DATABASE]: Connection established to MySQL
+[19:11:23]  ___________________________________________________________
+
+[19:11:23]   » Raf Racing System loaded. (Loaded 1 Races)
+[19:11:23]  ___________________________________________________________
+
+
+
+[19:11:23] 
+-------------------------------------
+[19:11:23] This is the sick script we are making
+[19:11:23] ---------------------------------------
+
+[19:11:23] Number of vehicle models: 0
+[19:11:58] --- Server Shutting Down.
+[19:11:58] plugin.mysql: Unloading plugin...
+[19:11:58] plugin.mysql: Plugin unloaded.
+[19:11:58] 
+[19:11:58]  ===============================
+[19:11:58] 
+[19:11:58]      sscanf plugin unloaded.    
+[19:11:58] 
+[19:11:58]  ===============================
+[19:11:58] 
+[19:11:58] 
+
+*** Streamer Plugin v2.9.5 by Incognito unloaded ***
+

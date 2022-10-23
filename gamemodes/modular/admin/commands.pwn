@@ -311,6 +311,11 @@ CMD:goto(playerid, params[])
 		return SCM(playerid, COLOR_RED, "Player is not connected");
 	}
 
+	if(playerb == playerid)
+	{
+		return SCM(playerid, COLOR_RED, "Nice try :)");
+	}
+
 	GetPlayerPos(playerb, Float:x, Float:y, Float:z);
 	SetPlayerPos(playerid, x, y, z);
 
@@ -341,6 +346,11 @@ CMD:get(playerid, params[])
     if(playerb == INVALID_PLAYER_ID)
 	{
 		return SCM(playerid, COLOR_RED, "Player is not connected");
+	}
+
+	if(playerb == playerid)
+	{
+		return SCM(playerid, COLOR_RED, "Nice try :)");
 	}
 
 	GetPlayerPos(playerid, Float:x, Float:y, Float:z);
