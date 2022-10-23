@@ -70,7 +70,7 @@ enum // dialog ids
 	DIALOG_DM,
 	DIALOG_CONFIRMDDM,
 	DIALOG_CONFIRMSDM,
-	DIALOG_CONFIRMSOSDM,
+	DIALOG_CONFIRMSPASDM,
 
 	// admin related
 	DIALOG_ADMINS,
@@ -130,7 +130,7 @@ new Float:SDMRandomSpawn[][12] =
 	
 };
 
-new Float:SOSRandomSpawn[][4] =
+new Float:SPASRandomSpawn[][4] =
 {
     {1412.6399,-1.7875,1000.9244,92.5395},
     {1413.1160,-44.3621,1000.9224,88.4661},

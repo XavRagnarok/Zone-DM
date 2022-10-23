@@ -123,7 +123,7 @@ public OnPlayerSpawn(playerid)
 	}
 	if(dm[playerid] == 3)
 	{
-		SOSDM(playerid);
+		SPASDM(playerid);
 	}
 	return 1;
 }
@@ -437,24 +437,5 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 	SetSpawnInfo(playerid, 0, modelid, 223.0138,-1872.2523,4.4400,1.4446,0,0,0,0,0,0);
 	SpawnPlayer(playerid);
 	}
-	return 1;
-}
-
-public OnPlayerPickUpDynamicPickup(playerid, pickupid)
-{
-	if(pickupid == ddmpickup)
-	{
-	    ShowPlayerDialog(playerid, 5, DIALOG_STYLE_MSGBOX, "Confirmation", "{ffffff}Are you sure you want to join {ff0000}Deagle Deathmatch ?", "Yes", "{ff0000}NO");
-
-	}
-	if(pickupid == sdmpickup)
-	{
-     	ShowPlayerDialog(playerid, 6, DIALOG_STYLE_MSGBOX, "Confirmation", "{ffffff}Are you sure you want to join {ff0000}Sniper Deathmatch ?", "Yes", "{ff0000}No");
-	}
-	if(pickupid == sosdmpickup)
-	{
-	    ShowPlayerDialog(playerid, 7, DIALOG_STYLE_MSGBOX, "Confirmation", "{ffffff}Are you sure you want to join {ff0000}Sawn Off Shotgun Deathmatch ?", "Yes", "{ff0000}No");
-	}
-
 	return 1;
 }

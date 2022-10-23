@@ -26,7 +26,7 @@ CMD:spasdm(playerid, params[])
 {
 	new string[128];
 	if(dm[playerid] == 3 || dm[playerid] == 2 || dm[playerid] == 1) return GameTextForPlayer(playerid, "~g~You are already in a deathmatch", 4500,3);
-	SOSDM(playerid);
+	SPASDM(playerid);
 	format(string, sizeof(string), "%s(%d) has joined the Combat Shotgun Deathmatch", GetName(playerid), playerid);
 	SCMall(COLOR_BLUE, string);
 	return 1;
@@ -42,7 +42,7 @@ CMD:leavedm(playerid, params[])
 CMD:dm(playerid, params[])
 {
     new string[500];
-    new ddm, sdm, sos;
+    new ddm, sdm, spas;
 	foreach(Player, i)
 	{
 		if(IsPlayerConnected(i))
@@ -57,7 +57,7 @@ CMD:dm(playerid, params[])
 			}
 			if(dm[i] == 3)
 			{
-				sos++;
+				spas++;
 			}
 		}
 	}
@@ -65,7 +65,7 @@ CMD:dm(playerid, params[])
 	"Maps\tPlayers\n\
 	{fccf03}Deagle (/ddm)\t{5bc906}%d\n\
 	{fc9803}Combat Shotgun (/spasdm)\t{5bc906}%d\n\
-	{c606c9}Sniper (/sdm)\t{5bc906}%d",ddm,sos,sdm);
+	{c606c9}Sniper (/sdm)\t{5bc906}%d",ddm,spas,sdm);
 	ShowPlayerDialog(playerid, DIALOG_DM, DIALOG_STYLE_TABLIST_HEADERS, "Deathmatch",string, "Select","Cancel");
 
 	return 1;
@@ -121,7 +121,7 @@ stock SDM(playerid)
 	return 1;
 }
 
-stock SOSDM(playerid)
+stock SPASDM(playerid)
 {
 	for(new i; i < 6; i++) //Just to avoid bugs
 	{
@@ -129,12 +129,12 @@ stock SOSDM(playerid)
 	}
 	Info[playerid] = CreatePlayer3DTextLabel(playerid, "Ping: 0\nFPS: 0", -1, 0.0, 0.0, 0.35, 30.0, playerid, INVALID_VEHICLE_ID, 0);
 
-	new rand = random(sizeof(SOSRandomSpawn));
+	new rand = random(sizeof(SPASRandomSpawn));
 	dm[playerid] = 3;
 	SetPlayerHealth(playerid, 100);
 	SetPlayerArmour(playerid, 100);
-	SetPlayerPos(playerid, SOSRandomSpawn[rand][0], SOSRandomSpawn[rand][1],SOSRandomSpawn[rand][2]);
-	SetPlayerFacingAngle(playerid, SOSRandomSpawn[rand][3]);
+	SetPlayerPos(playerid, SPASRandomSpawn[rand][0], SPASRandomSpawn[rand][1],SPASRandomSpawn[rand][2]);
+	SetPlayerFacingAngle(playerid, SPASRandomSpawn[rand][3]);
 	SetCameraBehindPlayer(playerid);
 	PlayerPlaySound(playerid, 1085, 0.0, 0.0, 0.0);
 	SetPlayerInterior(playerid, 1);
