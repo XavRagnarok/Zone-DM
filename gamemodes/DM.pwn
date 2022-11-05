@@ -39,6 +39,11 @@
 #include <k_functions>
 #include <string>
 #include <streamer>
+#include <weapon-config>
+#include <SKY>
+
+
+
 
 // ============================== modular scripts =============================
 

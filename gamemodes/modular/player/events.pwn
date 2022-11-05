@@ -195,9 +195,9 @@ public OnPlayerDeath(playerid, killerid, reason)
 	return 1;
 }
 
-public OnPlayerTakeDamage(playerid, issuerid, Float: amount, weaponid, bodypart)
+public OnPlayerDamage(&playerid, &Float:amount, &issuerid, &weapon, &bodypart)
 {
-    if(issuerid != INVALID_PLAYER_ID && dm[issuerid] == 2 && weaponid == 34 && bodypart == 9)
+    if(issuerid != INVALID_PLAYER_ID && dm[issuerid] == 2 && weapon == 34 && bodypart == 9)
     {
         SetPlayerHealth(playerid, 0);
         PlayerPlaySound(issuerid, 17802, 0.0, 0.0, 0.0);

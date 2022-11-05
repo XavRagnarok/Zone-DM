@@ -32,6 +32,11 @@ public OnGameModeInit()
     
     CreateDynamic3DTextLabel("Press ~k~~VEHICLE_ENTER_EXIT~", -1, 233.6071,-1883.0021,4.4685, 5.0, -1, -1, 1, -1, -1, -1, 5.0);
  	///////////////////////////
+
+    SetVehiclePassengerDamage(true);
+    SetDisableSyncBugs(true);
+
+    
     //////////////////////////
 
     // RACE RELATED
