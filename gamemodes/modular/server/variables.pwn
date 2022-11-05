@@ -18,7 +18,7 @@
 
 // race related
 
-#define MAX_RACES 			1
+#define MAX_RACES 			2
 #define MAX_CHECKS 			40
 
 #define DIALOG_UNUSED 		0
