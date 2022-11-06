@@ -22,15 +22,15 @@ public OnGameModeInit()
     // DM related
  	ddmpickup = CreateDynamicPickup(1318, 2, 385.8448,-2087.5015,7.8359, -1, -1, -1, 100.0, -1, 0);
  	
- 	CreateDynamic3DTextLabel("Press ~k~~VEHICLE_ENTER_EXIT~", -1, 238.7231,-1882.8654,4.4767, 5.0, -1, -1, 1, -1, -1, -1, 5.0);
+ 	Create3DTextLabel("Deagle DM", COLOR_BLUE, 385.8448,-2087.5015,7.8359, 20, 0, 0);
  	
  	sdmpickup = CreateDynamicPickup(1318, 2, 383.2977,-2087.4326,7.8359, -1, -1, -1, 100.0, -1, 0);
  	
-    CreateDynamic3DTextLabel("Press ~k~~VEHICLE_ENTER_EXIT~", -1, 236.1373,-1882.9423,4.4698, 5.0, -1, -1, 1, -1, -1, -1, 5.0);
+    Create3DTextLabel("Sniper DM", COLOR_RED, 383.2977,-2087.4326,7.8359, 20, 0, 0);
     
 	spasdmpickup = CreateDynamicPickup(1318, 2, 388.5406,-2087.7051,7.8359, -1, -1, -1, 100.0, -1, 0);
     
-    CreateDynamic3DTextLabel("Press ~k~~VEHICLE_ENTER_EXIT~", -1, 233.6071,-1883.0021,4.4685, 5.0, -1, -1, 1, -1, -1, -1, 5.0);
+    Create3DTextLabel("Combat Shotgun DM", COLOR_CYAN, 388.5406,-2087.7051,7.8359, 20, 0, 0);
  	///////////////////////////
 
     SetVehiclePassengerDamage(true);
