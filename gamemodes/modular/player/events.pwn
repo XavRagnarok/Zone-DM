@@ -27,8 +27,6 @@ public OnPlayerConnect(playerid)
 	}
     SetPlayerCamera(playerid);
 	ResetPlayer(playerid);
-	dm[playerid] = 0;
-	Streak[playerid] = 0;
 
 	new existcheck[248];
 
@@ -63,39 +61,12 @@ public OnPlayerDisconnect(playerid, reason)
 	SavePlayerData(playerid);
 
 	{
-		new insert[128];
-
-		PlayerInfo[playerid][pCash] = GetPlayerMoney(playerid);
-
-		mysql_format(ourConnection, insert, sizeof(insert), "UPDATE accounts SET Cash = %i WHERE acc_dbid = %i",PlayerInfo[playerid][pCash] , PlayerInfo[playerid][pDBID]);
-		mysql_tquery(ourConnection, insert);
-	}
-
-	{
 		dm[playerid] = 0;
 		Streak[playerid] = 0;
 		for(new i; i < 6; i++)
 		{
 	    	DeletePlayer3DTextLabel(playerid, Info[playerid]);
 		}
-	}
-	
-	{
-		new insert[130];
-
-		PlayerInfo[playerid][pScore] = GetPlayerScore(playerid);
-
-		mysql_format(ourConnection, insert, sizeof(insert), "UPDATE accounts SET Score = %i WHERE acc_dbid = %i",PlayerInfo[playerid][pScore] , PlayerInfo[playerid][pDBID]);
-		mysql_tquery(ourConnection, insert);
-	}
-
-	{
-		new insert[300];
-
-		PlayerInfo[playerid][pSkin] = GetPlayerSkin(playerid);
-
-		mysql_format(ourConnection, insert, sizeof(insert), "UPDATE accounts SET Skin = %i WHERE acc_dbid = %i", PlayerInfo[playerid][pSkin], PlayerInfo[playerid][pDBID]);
-		mysql_tquery(ourConnection, insert);
 	}
 
 	// RACE RELATED
