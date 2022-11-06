@@ -142,7 +142,7 @@ stock SPASDM(playerid)
 	SetPlayerInterior(playerid, 1);
 	SetPlayerVirtualWorld(playerid, 12);
 	ResetPlayerWeapons(playerid);
-	GivePlayerWeapon(playerid, 26, 999999);
+	GivePlayerWeapon(playerid, 27, 999999);
 	GameTextForPlayer(playerid,"~w~/leavedm ~g~to exit",5000,1);
 	return 1;
 }
