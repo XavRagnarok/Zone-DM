@@ -22,7 +22,6 @@ public OnGameModeInit()
     // DM related
     /*
  	ddmpickup = CreateDynamicPickup(1318, 2, 385.8448,-2087.5015,7.8359, -1, -1, -1, 100.0, -1, 0);
- 	*/
 
     actorddm = CreateActor(94, 385.8448,-2087.5015,7.8359, 359);
 
@@ -35,7 +34,10 @@ public OnGameModeInit()
 	spasdmpickup = CreateDynamicPickup(1318, 2, 388.5406,-2087.7051,7.8359, -1, -1, -1, 100.0, -1, 0);
     
     Create3DTextLabel("Combat Shotgun DM", COLOR_CYAN, 388.5406,-2087.7051,7.8359, 20, 0, 0);
+    */
  	///////////////////////////
+
+    CreateActorsForDM();
 
     SetVehiclePassengerDamage(true);
     SetDisableSyncBugs(true);

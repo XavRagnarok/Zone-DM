@@ -83,7 +83,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        	}
 	    	}
     	}
-
+    	/*
     	case DIALOG_CONFIRMDDM:
     	{
         	if(response == 1)
@@ -128,7 +128,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             	SCM(playerid, COLOR_RED, "You have Chosen Not to enter inside Combat Shotgun Deathmatch");
         	}
     	}
-
+		*/
+		
     	// RACE RELATED
 
     	case DIALOG_RACE:

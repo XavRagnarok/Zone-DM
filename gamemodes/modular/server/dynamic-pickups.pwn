@@ -2,6 +2,7 @@
 
 public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 {
+	/*
 	if(pickupid == ddmpickup)
 	{
 	    ShowPlayerDialog(playerid, 5, DIALOG_STYLE_MSGBOX, "Confirmation", "{ffffff}Are you sure you want to join {ff0000}Deagle Deathmatch ?", "Yes", "{ff0000}NO");
@@ -15,6 +16,6 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 	{
 	    ShowPlayerDialog(playerid, 7, DIALOG_STYLE_MSGBOX, "Confirmation", "{ffffff}Are you sure you want to join {ff0000}Combat Shotgun Deathmatch ?", "Yes", "{ff0000}No");
 	}
-
+	*/
 	return 1;
 }

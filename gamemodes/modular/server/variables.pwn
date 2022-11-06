@@ -30,6 +30,8 @@
 new pPM[MAX_PLAYERS],
 aduty[MAX_PLAYERS];
 
+new ddm, sdm, spas;
+
 // =====================REGISTER/LOGGING STUFF===================
 
 new joinskin = mS_INVALID_LISTID;
@@ -50,16 +52,20 @@ new Ammo[MAX_PLAYERS][MAX_SLOTS];
 ///////////////////////////////////////////////////////////
 
 //=========================Dynamic pickups================
-
+/*
 new ddmpickup;
 new sdmpickup;
 new spasdmpickup;
-
+*/
 //////////////////////////////////////////////////////////
 
 //========================Actors==========================
 
-new actorddm;
+new 
+	actorddm,
+	actorsdm,
+	actorspasdm
+;
 
 //================================Dialogs==================
 
