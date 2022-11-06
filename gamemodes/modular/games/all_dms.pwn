@@ -193,6 +193,7 @@ function:CreateActorsForDM()
 	{
         new textlabelddmstr[500];
         actorddm = CreateActor(94, 385.8448,-2087.5015,7.8359, 359);
+        SetActorInvulnerable(actorddm, 0);
         Create3DTextLabel("Deagle DM", COLOR_BLUE, 385.8448,-2087.5015,7.8359, 20, 0, 0);
         format(textlabelddmstr, sizeof(textlabelddmstr), "players: %d", ddm);
         Create3DTextLabel(textlabelddmstr, COLOR_WHITE, 385.8448,-2087.5015,7.6359, 20, 0, 0);
@@ -201,6 +202,7 @@ function:CreateActorsForDM()
     {
     	new textlabelsdmstr[500];
 	    actorsdm = CreateActor(94, 383.2977,-2087.5015,7.8359, 359);
+	    SetActorInvulnerable(actorsdm, 0);
 	    Create3DTextLabel("Sniper DM", COLOR_RED, 383.2977,-2087.5015,7.8359, 20, 0, 0);
 	    format(textlabelsdmstr, sizeof(textlabelsdmstr), "players: %d", sdm);
 	    Create3DTextLabel(textlabelsdmstr, COLOR_WHITE, 383.2977,-2087.5015,7.6359, 20, 0, 0);
@@ -209,6 +211,7 @@ function:CreateActorsForDM()
 	{
 		new textlabelspasdmstr[500];
 	    actorspasdm = CreateActor(94, 388.5406,-2087.5015,7.8359, 359);
+	    SetActorInvulnerable(actorspasdm, 0);
 		Create3DTextLabel("Combat Shotgun DM", COLOR_CYAN, 388.5406,-2087.5015,7.8359, 20, 0, 0);
 		format(textlabelspasdmstr, sizeof(textlabelspasdmstr), "players: %d", spas);
 	    Create3DTextLabel(textlabelspasdmstr, COLOR_WHITE, 388.5406,-2087.5015,7.6359, 20, 0, 0);

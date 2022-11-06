@@ -70,6 +70,9 @@
 // =========== dynamic pickups =====
 #include "./modular/server/dynamic-pickups.pwn"
 
+// =========== OnPlayerGiveDamageActor ===
+#include "./modular/server/actor.pwn"													
+
 
 ////////////////////////////////////////////////
 
