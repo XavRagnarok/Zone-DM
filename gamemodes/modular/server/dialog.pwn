@@ -125,7 +125,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
         	}
         	else if(response == 0)
         	{
-            	SCM(playerid, COLOR_RED, "You have Chosen Not to enter inside Sawn off Shotgun Deathmatch");
+            	SCM(playerid, COLOR_RED, "You have Chosen Not to enter inside Combat Shotgun Deathmatch");
         	}
     	}
 
