@@ -20,8 +20,12 @@ public OnGameModeInit()
  	SetGameModeText("friends zone");
  	// Dynamic pickups
     // DM related
+    /*
  	ddmpickup = CreateDynamicPickup(1318, 2, 385.8448,-2087.5015,7.8359, -1, -1, -1, 100.0, -1, 0);
- 	
+ 	*/
+
+    actorddm = CreateActor(94, 385.8448,-2087.5015,7.8359, 359);
+
  	Create3DTextLabel("Deagle DM", COLOR_BLUE, 385.8448,-2087.5015,7.8359, 20, 0, 0);
  	
  	sdmpickup = CreateDynamicPickup(1318, 2, 383.2977,-2087.4326,7.8359, -1, -1, -1, 100.0, -1, 0);
