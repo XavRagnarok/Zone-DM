@@ -90,6 +90,7 @@ stock DDM(playerid)
 	SetPlayerInterior(playerid, 1);
 	SetPlayerVirtualWorld(playerid, 10);
 	GivePlayerWeapon(playerid, 24, 999999);
+	SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
 	SetPlayerPos(playerid, DERandomSpawn[rand][0], DERandomSpawn[rand][1],DERandomSpawn[rand][2]);
 	SetPlayerFacingAngle(playerid, DERandomSpawn[rand][3]);
 	PlayerPlaySound(playerid, 1085, 0.0, 0.0, 0.0);
@@ -109,6 +110,7 @@ stock SDM(playerid)
 	dm[playerid] = 2;
 	SetPlayerArmour(playerid, 100);
 	SetPlayerHealth(playerid, 100);
+	SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
 	SetPlayerPos(playerid, SDMRandomSpawn[rand][0], SDMRandomSpawn[rand][1],SDMRandomSpawn[rand][2]);
 	SetPlayerFacingAngle(playerid, SDMRandomSpawn[rand][3]);
 	SetCameraBehindPlayer(playerid);
@@ -133,6 +135,7 @@ stock SPASDM(playerid)
 	dm[playerid] = 3;
 	SetPlayerHealth(playerid, 100);
 	SetPlayerArmour(playerid, 100);
+	SetPlayerSkin(playerid, PlayerInfo[playerid][pSkin]);
 	SetPlayerPos(playerid, SPASRandomSpawn[rand][0], SPASRandomSpawn[rand][1],SPASRandomSpawn[rand][2]);
 	SetPlayerFacingAngle(playerid, SPASRandomSpawn[rand][3]);
 	SetCameraBehindPlayer(playerid);
@@ -175,4 +178,13 @@ stock LeaveDM(playerid)
 	SetSpawnInfo(playerid, 0, PlayerInfo[playerid][pSkin], 384.3023,-2080.2852,7.8301,0.1614,0,0,0,0,0,0);
 	SpawnPlayer(playerid);
 	return 1;
+}
+
+function:IsPlayerInDm(playerid)
+{
+	if(dm[playerid] == 1 || dm[playerid] == 2 || dm[playerid] == 3)
+		return 1;
+
+	else
+		return 0;
 }
