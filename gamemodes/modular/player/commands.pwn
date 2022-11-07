@@ -60,7 +60,9 @@ CMD:skin(playerid, params[])
 
 	SetPlayerSkin(playerid, skinid);
 
-	skinid = PlayerInfo[playerid][pSkin];
+	PlayerInfo[playerid][pSkin] = skinid;
+
+
 
 	return 1;
 }
