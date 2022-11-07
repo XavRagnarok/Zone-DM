@@ -579,6 +579,7 @@ public RACE_finishEvent(reason)
 			DestroyVehicle(RACE_pInfo[i][RACE_playerVehicle]);
 			RACE_pInfo[i][RACE_playerVehicle] = -1;
 			
+			SetPlayerVirtualWorld(i, 0);
 			SpawnPlayer(i);
 			
 			RACE_pInfo[i][RACE_isPlayerInRace] = false;
@@ -843,6 +844,7 @@ public RACE_playerFinishedTheRace(playerid)
 	DestroyVehicle(RACE_pInfo[playerid][RACE_playerVehicle]);
 	RACE_pInfo[playerid][RACE_playerVehicle] = -1;
 	
+	SetPlayerVirtualWorld(playerid, 0);
 	SpawnPlayer(playerid);
 	
 	RACE_pInfo[playerid][RACE_isPlayerInRace] = false;
@@ -1015,7 +1017,8 @@ public RACE_playerExitEvent(playerid)
 	
 	DestroyVehicle(RACE_pInfo[playerid][RACE_playerVehicle]);
 	RACE_pInfo[playerid][RACE_playerVehicle] = -1;
-	
+
+	SetPlayerVirtualWorld(playerid, 0);
 	SpawnPlayer(playerid);
 	
 	RACE_pInfo[playerid][RACE_isPlayerInRace] = false;
