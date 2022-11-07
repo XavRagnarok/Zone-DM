@@ -49,13 +49,14 @@ public OnPlayerConnect(playerid)
 public OnPlayerDisconnect(playerid, reason)
 {
 	{
-	new line[124];
-	switch(reason) {
-    case 0: format(line, sizeof(line), "%s(%d) has left the server. (Lost Connection)", GetName(playerid), playerid);
-    case 1: format(line, sizeof(line), "%s(%d) has left the server. (Leaving)", GetName(playerid), playerid);
-    case 2: format(line, sizeof(line), "%s(%d) has left the server. (Kicked)", GetName(playerid), playerid);
-	}
-	SendClientMessageToAll(0xFFFFFFFF, line);
+		new line[124];
+		switch(reason) 
+		{
+		    case 0: format(line, sizeof(line), "%s(%d) has left the server. (Lost Connection)", GetName(playerid), playerid);
+		    case 1: format(line, sizeof(line), "%s(%d) has left the server. (Leaving)", GetName(playerid), playerid);
+		    case 2: format(line, sizeof(line), "%s(%d) has left the server. (Kicked)", GetName(playerid), playerid);
+		}
+		SendClientMessageToAll(0xFFFFFFFF, line);
 	}
 
 	SavePlayerData(playerid);

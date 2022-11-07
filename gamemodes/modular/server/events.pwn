@@ -65,6 +65,11 @@ public OnGameModeInit()
 
 public OnGameModeExit()
 {
+    foreach(new i : Player)
+    {
+        if(PlayerInfo[i][pLoggedin]) SavePlayerData(i);
+    }
+
     mysql_close(ourConnection);
     return 1;
 }
