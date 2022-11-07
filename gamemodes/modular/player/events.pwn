@@ -107,7 +107,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		new str[200];
 		format(str, sizeof(str), "~r~You killed~n~%s~n~~r~1 Score", GetName(playerid));
 		GameTextForPlayer(killerid, str, 4500, 3);
-		SetPlayerScore(killerid, GetPlayerScore(playerid) + 1);
+		SetPlayerScore(killerid, GetPlayerScore(killerid)+1);
 		PlayerPlaySound(killerid, 17802, 0.0, 0.0, 0.0);
 		Streak[killerid] = 0;
 
