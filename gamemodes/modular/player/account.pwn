@@ -130,13 +130,10 @@ function:SavePlayerData(playerid)
 	new query[256], pname[MAX_PLAYER_NAME];
 	
  	GetPlayerName(playerid, pname, sizeof(pname));
- 	PlayerInfo[playerid][pCash] = GetPlayerMoney(playerid);
- 	PlayerInfo[playerid][pScore] = GetPlayerScore(playerid);
- 	PlayerInfo[playerid][pSkin] = GetPlayerSkin(playerid);
 
 	mysql_format(ourConnection, query, sizeof(query), 
 		"UPDATE accounts SET Skin = %i, Score = %i, Cash = %i, PMS = %i WHERE acc_dbid = %i;",
-		PlayerInfo[playerid][pSkin], PlayerInfo[playerid][pScore], PlayerInfo[playerid][pCash], PlayerInfo[playerid][PMS], PlayerInfo[playerid][pDBID]);
+		GetPlayerSkin(playerid), GetPlayerScore(playerid), GetPlayerMoney(playerid), PlayerInfo[playerid][PMS], PlayerInfo[playerid][pDBID]);
 	mysql_query(ourConnection, query);
 
 	return 1;
