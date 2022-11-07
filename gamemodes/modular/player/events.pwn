@@ -102,6 +102,7 @@ public OnPlayerSpawn(playerid)
 
 public OnPlayerDeath(playerid, killerid, reason)
 {
+	SendDeathMessage(killerid, playerid, reason);
     if(dm[killerid] >= 1)
 	{
 		new str[200];
