@@ -105,12 +105,16 @@ public OnPlayerDeath(playerid, killerid, reason)
 	SendDeathMessage(killerid, playerid, reason);
     if(dm[killerid] >= 1)
 	{
-		new str[200];
-		format(str, sizeof(str), "~r~You killed~n~%s~n~~r~1 Score", GetName(playerid));
-		GameTextForPlayer(killerid, str, 4500, 3);
+		new str[200], gunname[32], streak[MAX_PLAYERS];
+		
+		GetWeaponName(reason, gunname, sizeof(gunname));
+		format(str, sizeof(str), "You Killed %s by using %s", GetName(playerid), gunname);
+		SendClientMessage(killerid, COLOR_RED, str);
 		SetPlayerScore(killerid, GetPlayerScore(killerid)+1);
 		PlayerPlaySound(killerid, 17802, 0.0, 0.0, 0.0);
-		Streak[killerid] = 0;
+		Streak[playerid] = 0;
+		streak[killerid] = 1;
+		Streak[killerid]++;
 
 		if(Streak[killerid] != 8)
 		{
