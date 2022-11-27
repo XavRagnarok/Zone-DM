@@ -42,6 +42,8 @@ public OnGameModeInit()
     SetVehiclePassengerDamage(true);
     SetDisableSyncBugs(true);
 
+    SetCbugAllowed(false);
+
     
     //////////////////////////
 
