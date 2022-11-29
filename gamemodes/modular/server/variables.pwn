@@ -37,6 +37,8 @@ new Text3D:textlabelstrddm,
 	Text3D:textlabelstrspasdm
 ;
 
+new Float:markx, Float:marky, Float:markz, Float:marka, markplaced, mark;
+
 // =====================REGISTER/LOGGING STUFF===================
 
 new joinskin = mS_INVALID_LISTID;

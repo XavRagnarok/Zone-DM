@@ -1,5 +1,48 @@
 // all commands are here
 
+CMD:mark(playerid, params[])
+{
+	new string[500];
+
+	GetPlayerPos(playerid, Float:markx, Float:marky, Float:markz);
+	GetPlayerFacingAngle(playerid, Float:marka);
+
+	format(string, sizeof(string), "You have Marked this location {FFFFFF}({00FF00}%f{FFFFFF}, {00FF00}%f{FFFFFF}, {00FF00}%f{FFFFFF}) (x, y, z)", Float:markx, Float:marky, Float:markz);
+	SendClientMessage(playerid, COLOR_CYAN, string);
+
+	SetPlayerMapIcon(playerid, mark, markx, marky, markz, 56, 0, MAPICON_LOCAL);
+	markplaced = true;
+	return 1;
+}
+
+CMD:gotomark(playerid, params[])
+{
+	if(!markplaced)
+	{
+		return SendClientMessage(playerid, COLOR_RED, "You have placed no mark. Place a mark using {00FF00}/mark {FF0000}cmd");
+	}
+
+	SetPlayerPos(playerid, markx, marky, markz);
+	SetPlayerFacingAngle(playerid, marka);
+
+	SendClientMessage(playerid, COLOR_CYAN, "Teleported to your last marked location");
+	return 1;
+}
+
+CMD:removemark(playerid, params[])
+{
+	if(!markplaced)
+	{
+		return SendClientMessage(playerid, COLOR_RED, "There's no mark placed to remove.");
+	}
+
+	markplaced = false;
+
+	RemovePlayerMapIcon(playerid, mark);
+	SendClientMessage(playerid, COLOR_CYAN, "You have removed your last placed mark");
+	return 1;
+}
+
 CMD:admins(playerid, params[])
 {
 	new count = 0, string[256];
@@ -221,7 +264,7 @@ CMD:lsap(playerid, params[])
 	{
 		return SendClientMessage(playerid, COLOR_RED, "Please return to lobby in order to use this command");
 	}
-	
+
 	SetPlayerPos(playerid, 1986.7233,-2324.0649,13.5469);
 	return 1;
 }

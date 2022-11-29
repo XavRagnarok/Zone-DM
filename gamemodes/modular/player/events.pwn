@@ -28,6 +28,8 @@ public OnPlayerConnect(playerid)
     SetPlayerCamera(playerid);
 	ResetPlayer(playerid);
 
+	markplaced = false;
+
 	new existcheck[248];
 
 	mysql_format(ourConnection, existcheck, sizeof(existcheck), "SELECT * FROM accounts WHERE acc_name = '%e'", ReturnName(playerid));
