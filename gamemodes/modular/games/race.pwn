@@ -1124,6 +1124,11 @@ public RACE_playerExitEvent(playerid)
 
 CMD:race(playerid)
 {
+	if(IsPlayerInLobby(playerid))
+	{
+		return SendClientMessage(playerid, COLOR_RED, "Please return to lobby in order to use this command");
+	}
+
 	if(!IsPlayerConnected(playerid)) return 0;
 	
 	if(RACE_isRaceStarted) return SendClientMessage(playerid, 0xFF0000FF, "ERROR {B0B0B0}»{FFFFFF} The race has already started.");
@@ -1156,6 +1161,11 @@ CMD:exitrace(playerid)
 
 CMD:startrace(playerid, params[])
 {
+	if(IsPlayerInLobby(playerid))
+	{
+		return SendClientMessage(playerid, COLOR_RED, "Please return to lobby in order to use this command");
+	}
+	
 	if(!IsPlayerConnected(playerid)) return 0;
 	
 	if(RACE_loadedRaces == 0) return SendClientMessage(playerid, 0xFF0000FF, "ERROR {B0B0B0}»{FFFFFF} No races found.");

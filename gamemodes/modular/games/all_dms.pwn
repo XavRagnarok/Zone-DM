@@ -156,14 +156,6 @@ stock SPASDM(playerid)
 	return 1;
 }
 
-CMD:tptotest(playerid, params[])
-{
-	SetPlayerInterior(playerid, 0);
-	SetPlayerVirtualWorld(playerid, 0);
-	SetPlayerPos(playerid, 384.3023,-2080.2852,7.8301);
-	return 1;
-}
-
 stock LeaveDM(playerid)
 {
     new str[100], textlabelddmstr[500], textlabelsdmstr[500], textlabelspasdmstr[500];
@@ -204,15 +196,6 @@ stock LeaveDM(playerid)
 	SetSpawnInfo(playerid, 0, PlayerInfo[playerid][pSkin], 384.3023,-2080.2852,7.8301,0.1614,0,0,0,0,0,0);
 	SpawnPlayer(playerid);
 	return 1;
-}
-
-function:IsPlayerInDm(playerid)
-{
-	if(dm[playerid] == 1 || dm[playerid] == 2 || dm[playerid] == 3)
-		return 1;
-
-	else
-		return 0;
 }
 
 function:CreateActorsForDM()

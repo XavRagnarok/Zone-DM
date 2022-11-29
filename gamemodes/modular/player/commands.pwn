@@ -6,7 +6,6 @@ CMD:admins(playerid, params[])
 	SCM(playerid, COLOR_CYAN,"Current online admins:");
 	foreach(new i : Player)
 	{
-
 		format(string, sizeof(string),"{00FF00}%s(%d)   {00FF00}Admin",ReturnName(i), i);
 		SendClientMessage(playerid, COLOR_CYAN, string);
 		count++;
@@ -19,7 +18,7 @@ CMD:dice(playerid, params[])
 {
 	new string[128];
 
-	if(IsPlayerInDm(playerid))
+	if(IsPlayerInLobby(playerid))
 	{
 		return SendClientMessage(playerid, COLOR_RED, "Please return to lobby in order to use this command");
 	}
@@ -30,13 +29,23 @@ CMD:dice(playerid, params[])
 }
 
 CMD:jetpack(playerid, params[])
-{	
+{
+	if(IsPlayerInLobby(playerid))
+	{
+		return SendClientMessage(playerid, COLOR_RED, "Please return to lobby in order to use this command");
+	}
+
     SetPlayerSpecialAction(playerid,SPECIAL_ACTION_USEJETPACK);
 	return 1;
 }
 
 CMD:kill(playerid, params[])
 {
+	if(IsPlayerInLobby(playerid))
+	{
+		return SendClientMessage(playerid, COLOR_RED, "Please return to lobby in order to use this command");
+	}
+
 	SetPlayerHealth(playerid, 0);
 	return 1;
 }
@@ -51,6 +60,11 @@ CMD:skin(playerid, params[])
 	if(skinid < 1 || skinid > 300)
 	{
 		return SCM(playerid, COLOR_RED, "Please choose a skin from 1 - 300");
+	}
+
+	if(IsPlayerInLobby(playerid))
+	{
+		return SendClientMessage(playerid, COLOR_RED, "Please return to lobby in order to use this command");
 	}
 
 	SetPlayerSkin(playerid, skinid);
@@ -83,6 +97,11 @@ CMD:w(playerid, params[])
 		return SCM(playerid, COLOR_RED, "[SERVER]: You have specified invalid ammo amount");
 	}
 
+	if(IsPlayerInLobby(playerid))
+	{
+		return SendClientMessage(playerid, COLOR_RED, "Please return to lobby in order to use this command");
+	}
+
 	GivePlayerWeapon(playerid, gun, ammo);
 
 	GetWeaponName(gun, gunname, sizeof(gunname));
@@ -105,6 +124,11 @@ CMD:arm(playerid, params[])
     {
         return SCM(playerid, COLOR_RED, "You have specified invalid amount");
     }
+
+    if(IsPlayerInLobby(playerid))
+	{
+		return SendClientMessage(playerid, COLOR_RED, "Please return to lobby in order to use this command");
+	}
 
     SetPlayerArmour(playerid, amount);
 
@@ -133,6 +157,11 @@ CMD:v(playerid, params[])
 		DestroyVehicle(GetPlayerVehicleID(playerid));
 	}
 
+	if(IsPlayerInLobby(playerid))
+	{
+		return SendClientMessage(playerid, COLOR_RED, "Please return to lobby in order to use this command");
+	}
+
  	vehicleid = AddStaticVehicleEx(modelid, x, y, z, a, 0, 0, 0, 0);
 
  	PutPlayerInVehicle(playerid, vehicleid, 0);
@@ -153,21 +182,32 @@ CMD:help(playerid, params[])
 
 CMD:ls(playerid, params[])
 {
+	if(IsPlayerInLobby(playerid))
+	{
+		return SendClientMessage(playerid, COLOR_RED, "Please return to lobby in order to use this command");
+	}
+
 	SetPlayerPos(playerid, 1519.6636, -1679.0535, 12.8015);
 	return 1;
 }
 
-CMD:lobby(playerid, params[])
+CMD:spawn(playerid, params[])
 {
+	if(IsPlayerInLobby(playerid))
+	{
+		return SendClientMessage(playerid, COLOR_RED, "Please return to lobby in order to use this command");
+	}
+
 	SetPlayerPos(playerid, 384.3023,-2080.2852,7.8301);
 	return 1;
 }
 
 CMD:lvpd(playerid, params[])
 {
-	if(IsPlayerInDm(playerid))
+
+	if(IsPlayerInLobby(playerid))
 	{
-		return SCM(playerid, COLOR_GREY, "You must use command /leavedm first");
+		return SendClientMessage(playerid, COLOR_RED, "Please return to lobby in order to use this command");
 	}
 
 	SetPlayerInterior(playerid, 3);
@@ -177,6 +217,11 @@ CMD:lvpd(playerid, params[])
 
 CMD:lsap(playerid, params[])
 {
+	if(IsPlayerInLobby(playerid))
+	{
+		return SendClientMessage(playerid, COLOR_RED, "Please return to lobby in order to use this command");
+	}
+	
 	SetPlayerPos(playerid, 1986.7233,-2324.0649,13.5469);
 	return 1;
 }
