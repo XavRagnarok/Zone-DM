@@ -32,7 +32,7 @@ CMD:spasdm(playerid, params[])
 	return 1;
 }
 
-CMD:leavedm(playerid, params[])
+CMD:lobby(playerid, params[])
 {
 	if(dm[playerid] == 0) return GameTextForPlayer(playerid,"~g~You are not in deathmatch", 4500, 3);
 	LeaveDM(playerid);
@@ -93,7 +93,7 @@ stock DDM(playerid)
 	SetPlayerPos(playerid, DERandomSpawn[rand][0], DERandomSpawn[rand][1],DERandomSpawn[rand][2]);
 	SetPlayerFacingAngle(playerid, DERandomSpawn[rand][3]);
 	PlayerPlaySound(playerid, 1085, 0.0, 0.0, 0.0);
-	GameTextForPlayer(playerid,"~w~/leavedm ~g~to exit",5000,1);
+	GameTextForPlayer(playerid,"~w~/lobby ~g~to exit",5000,1);
 
 	format(textlabelddmstr, sizeof(textlabelddmstr), "players: %d", ddm);
 	Update3DTextLabelText(textlabelstrddm, COLOR_WHITE, textlabelddmstr);
@@ -121,7 +121,7 @@ stock SDM(playerid)
 	SetPlayerVirtualWorld(playerid, 11);
 	ResetPlayerWeapons(playerid);
 	GivePlayerWeapon(playerid, 34, 999999);
-	GameTextForPlayer(playerid,"~w~/leavedm ~g~to exit",5000,1);
+	GameTextForPlayer(playerid,"~w~/lobby ~g~to exit",5000,1);
 
 	format(textlabelsdmstr, sizeof(textlabelsdmstr), "players: %d", sdm);
 	Update3DTextLabelText(textlabelstrsdm, COLOR_WHITE, textlabelsdmstr);
@@ -149,7 +149,7 @@ stock SPASDM(playerid)
 	SetPlayerVirtualWorld(playerid, 12);
 	ResetPlayerWeapons(playerid);
 	GivePlayerWeapon(playerid, 27, 999999);
-	GameTextForPlayer(playerid,"~w~/leavedm ~g~to exit",5000,1);
+	GameTextForPlayer(playerid,"~w~/lobby ~g~to exit",5000,1);
 
 	format(textlabelspasdmstr, sizeof(textlabelspasdmstr), "players: %d", spas);
 	Update3DTextLabelText(textlabelstrspasdm, COLOR_WHITE, textlabelspasdmstr);
