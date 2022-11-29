@@ -30,23 +30,13 @@ CMD:dice(playerid, params[])
 }
 
 CMD:jetpack(playerid, params[])
-{
-	if(IsPlayerInDm(playerid))
-	{
-		return SCM(playerid, COLOR_GREY, "You must use command /leavedm first");
-	}
-	
+{	
     SetPlayerSpecialAction(playerid,SPECIAL_ACTION_USEJETPACK);
 	return 1;
 }
 
 CMD:kill(playerid, params[])
 {
-	if(IsPlayerInDm(playerid))
-	{
-		return SCM(playerid, COLOR_GREY, "You must use command /leavedm first");
-	}
-
 	SetPlayerHealth(playerid, 0);
 	return 1;
 }
@@ -93,11 +83,6 @@ CMD:w(playerid, params[])
 		return SCM(playerid, COLOR_RED, "[SERVER]: You have specified invalid ammo amount");
 	}
 
-	if(IsPlayerInDm(playerid))
-	{
-		return SCM(playerid, COLOR_GREY, "You must use command /leavedm first");
-	}
-
 	GivePlayerWeapon(playerid, gun, ammo);
 
 	GetWeaponName(gun, gunname, sizeof(gunname));
@@ -121,12 +106,6 @@ CMD:arm(playerid, params[])
         return SCM(playerid, COLOR_RED, "You have specified invalid amount");
     }
 
-
-    if(IsPlayerInDm(playerid))
-	{
-		return SCM(playerid, COLOR_GREY, "You must use command /leavedm first");
-	}
-
     SetPlayerArmour(playerid, amount);
 
     SCM(playerid, COLOR_CYAN, "You have been given an armour");
@@ -147,11 +126,6 @@ CMD:v(playerid, params[])
 	if((modelid = GetVehicleModelByName(model)) == 0)
 	{
 	    return SendClientMessage(playerid, COLOR_RED, "Invalid vehicle model.");
-	}
-
-	if(IsPlayerInDm(playerid))
-	{
-		return SCM(playerid, COLOR_GREY, "You must use command /leavedm first");
 	}
 
 	if(IsPlayerInAnyVehicle(playerid) == 1)
@@ -179,22 +153,12 @@ CMD:help(playerid, params[])
 
 CMD:ls(playerid, params[])
 {
-	if(IsPlayerInDm(playerid))
-	{
-		return SCM(playerid, COLOR_GREY, "You must use command /leavedm first");
-	}
-
 	SetPlayerPos(playerid, 1519.6636, -1679.0535, 12.8015);
 	return 1;
 }
 
 CMD:lobby(playerid, params[])
 {
-	if(IsPlayerInDm(playerid))
-	{
-		return SCM(playerid, COLOR_GREY, "You must use command /leavedm first");
-	}
-
 	SetPlayerPos(playerid, 384.3023,-2080.2852,7.8301);
 	return 1;
 }
@@ -213,11 +177,6 @@ CMD:lvpd(playerid, params[])
 
 CMD:lsap(playerid, params[])
 {
-	if(IsPlayerInDm(playerid))
-	{
-		return SCM(playerid, COLOR_GREY, "You must use command /leavedm first");
-	}
-
 	SetPlayerPos(playerid, 1986.7233,-2324.0649,13.5469);
 	return 1;
 }
