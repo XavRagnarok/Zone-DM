@@ -19,6 +19,11 @@ CMD:dice(playerid, params[])
 {
 	new string[128];
 
+	if(IsPlayerInDm(playerid))
+	{
+		return SendClientMessage(playerid, COLOR_RED, "Please return to lobby in order to use this command");
+	}
+
 	format(string, sizeof(string), "* %s rolls a dice and it lands on {FFC500}%d.", ReturnName(playerid), minrand(1, 7));
 	SendClientMessageToAll(COLOR_CYAN, string);
 	return 1;

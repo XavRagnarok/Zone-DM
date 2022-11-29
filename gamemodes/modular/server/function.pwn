@@ -166,3 +166,14 @@ stock minrand(min, max) //By Alex "Y_Less" Cole for use in /veh
 {
 	return random(max - min) + min;
 }
+
+function:IsPlayerInLobby(playerid)
+{
+	if(dm[playerid] == 1 || dm[playerid] == 2 || dm[playerid] == 3 || RACE_pInfo[playerid][RACE_isPlayerInRace] == true)
+	{
+		return true;
+	}
+
+	else
+		return false;
+}
