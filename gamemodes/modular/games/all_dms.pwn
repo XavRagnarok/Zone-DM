@@ -80,7 +80,7 @@ stock DDM(playerid)
 	}
 	Info[playerid] = CreatePlayer3DTextLabel(playerid, "Ping: 0\nFPS: 0", -1, 0.0, 0.0, 0.35, 30.0, playerid, INVALID_VEHICLE_ID, 0);
 
-	new rand = random(sizeof(DERandomSpawn));
+	new rand = random(sizeof(DERandomSpawn)), textlabelddmstr[500];
 	dm[playerid] = 1;
 	SetPlayerArmour(playerid, 100);
 	SetPlayerHealth(playerid, 100);
@@ -94,6 +94,9 @@ stock DDM(playerid)
 	SetPlayerFacingAngle(playerid, DERandomSpawn[rand][3]);
 	PlayerPlaySound(playerid, 1085, 0.0, 0.0, 0.0);
 	GameTextForPlayer(playerid,"~w~/leavedm ~g~to exit",5000,1);
+
+	format(textlabelddmstr, sizeof(textlabelddmstr), "players: %d", ddm);
+	Update3DTextLabelText(textlabelstrddm, COLOR_WHITE, textlabelddmstr);
 	return 1;
 }
 
@@ -105,7 +108,7 @@ stock SDM(playerid)
 	}
 	Info[playerid] = CreatePlayer3DTextLabel(playerid, "Ping: 0\nFPS: 0", -1, 0.0, 0.0, 0.35, 30.0, playerid, INVALID_VEHICLE_ID, 0);
 
-	new rand = random(sizeof(SDMRandomSpawn));
+	new rand = random(sizeof(SDMRandomSpawn)), textlabelsdmstr[500];
 	dm[playerid] = 2;
 	SetPlayerArmour(playerid, 100);
 	SetPlayerHealth(playerid, 100);
@@ -119,6 +122,9 @@ stock SDM(playerid)
 	ResetPlayerWeapons(playerid);
 	GivePlayerWeapon(playerid, 34, 999999);
 	GameTextForPlayer(playerid,"~w~/leavedm ~g~to exit",5000,1);
+
+	format(textlabelsdmstr, sizeof(textlabelsdmstr), "players: %d", sdm);
+	Update3DTextLabelText(textlabelstrsdm, COLOR_WHITE, textlabelsdmstr);
 	return 1;
 }
 
@@ -130,7 +136,7 @@ stock SPASDM(playerid)
 	}
 	Info[playerid] = CreatePlayer3DTextLabel(playerid, "Ping: 0\nFPS: 0", -1, 0.0, 0.0, 0.35, 30.0, playerid, INVALID_VEHICLE_ID, 0);
 
-	new rand = random(sizeof(SPASRandomSpawn));
+	new rand = random(sizeof(SPASRandomSpawn)), textlabelspasdmstr[500];
 	dm[playerid] = 3;
 	SetPlayerHealth(playerid, 100);
 	SetPlayerArmour(playerid, 100);
@@ -144,12 +150,23 @@ stock SPASDM(playerid)
 	ResetPlayerWeapons(playerid);
 	GivePlayerWeapon(playerid, 27, 999999);
 	GameTextForPlayer(playerid,"~w~/leavedm ~g~to exit",5000,1);
+
+	format(textlabelspasdmstr, sizeof(textlabelspasdmstr), "players: %d", spas);
+	Update3DTextLabelText(textlabelstrspasdm, COLOR_WHITE, textlabelspasdmstr);
+	return 1;
+}
+
+CMD:tptotest(playerid, params[])
+{
+	SetPlayerInterior(playerid, 0);
+	SetPlayerVirtualWorld(playerid, 0);
+	SetPlayerPos(playerid, 384.3023,-2080.2852,7.8301);
 	return 1;
 }
 
 stock LeaveDM(playerid)
 {
-    new str[100];
+    new str[100], textlabelddmstr[500], textlabelsdmstr[500], textlabelspasdmstr[500];
 	format(str,sizeof(str),"{d6311c}%s(%d) has left the deathmatch",GetName(playerid), playerid);
 	foreach(Player, i)
 	{
@@ -174,6 +191,16 @@ stock LeaveDM(playerid)
 	SetPlayerInterior(playerid, 0);
 	SetPlayerVirtualWorld(playerid, 0);
 	ResetPlayerWeapons(playerid);
+
+	format(textlabelddmstr, sizeof(textlabelddmstr), "players: %d", ddm);
+	Update3DTextLabelText(textlabelstrddm, COLOR_WHITE, textlabelddmstr);
+
+	format(textlabelsdmstr, sizeof(textlabelsdmstr), "players: %d", sdm);
+	Update3DTextLabelText(textlabelstrsdm, COLOR_WHITE, textlabelsdmstr);
+
+	format(textlabelspasdmstr, sizeof(textlabelspasdmstr), "players: %d", spas);
+	Update3DTextLabelText(textlabelstrspasdm, COLOR_WHITE, textlabelspasdmstr);
+
 	SetSpawnInfo(playerid, 0, PlayerInfo[playerid][pSkin], 384.3023,-2080.2852,7.8301,0.1614,0,0,0,0,0,0);
 	SpawnPlayer(playerid);
 	return 1;
@@ -196,7 +223,7 @@ function:CreateActorsForDM()
         SetActorInvulnerable(actorddm, 0);
         Create3DTextLabel("Deagle DM", COLOR_BLUE, 385.8448,-2087.5015,7.8359, 20, 0, 0);
         format(textlabelddmstr, sizeof(textlabelddmstr), "players: %d", ddm);
-        Create3DTextLabel(textlabelddmstr, COLOR_WHITE, 385.8448,-2087.5015,7.6359, 20, 0, 0);
+        textlabelstrddm = Create3DTextLabel(textlabelddmstr, COLOR_WHITE, 385.8448,-2087.5015,7.6359, 20, 0, 0);
     }
 
     {
@@ -205,7 +232,7 @@ function:CreateActorsForDM()
 	    SetActorInvulnerable(actorsdm, 0);
 	    Create3DTextLabel("Sniper DM", COLOR_RED, 383.2977,-2087.5015,7.8359, 20, 0, 0);
 	    format(textlabelsdmstr, sizeof(textlabelsdmstr), "players: %d", sdm);
-	    Create3DTextLabel(textlabelsdmstr, COLOR_WHITE, 383.2977,-2087.5015,7.6359, 20, 0, 0);
+	    textlabelstrsdm = Create3DTextLabel(textlabelsdmstr, COLOR_WHITE, 383.2977,-2087.5015,7.6359, 20, 0, 0);
 	}
 
 	{
@@ -214,6 +241,6 @@ function:CreateActorsForDM()
 	    SetActorInvulnerable(actorspasdm, 0);
 		Create3DTextLabel("Combat Shotgun DM", COLOR_CYAN, 388.5406,-2087.5015,7.8359, 20, 0, 0);
 		format(textlabelspasdmstr, sizeof(textlabelspasdmstr), "players: %d", spas);
-	    Create3DTextLabel(textlabelspasdmstr, COLOR_WHITE, 388.5406,-2087.5015,7.6359, 20, 0, 0);
+	    textlabelstrspasdm = Create3DTextLabel(textlabelspasdmstr, COLOR_WHITE, 388.5406,-2087.5015,7.6359, 20, 0, 0);
 	}
 }

@@ -32,6 +32,11 @@ aduty[MAX_PLAYERS];
 
 new ddm, sdm, spas;
 
+new Text3D:textlabelstrddm,
+	Text3D:textlabelstrsdm,
+	Text3D:textlabelstrspasdm
+;
+
 // =====================REGISTER/LOGGING STUFF===================
 
 new joinskin = mS_INVALID_LISTID;
