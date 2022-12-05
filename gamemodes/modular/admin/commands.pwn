@@ -2,7 +2,7 @@
 
 CMD:setadmin(playerid, params[])
 {
-	if(PlayerInfo[playerid][pAdmin] >= 2 || IsPlayerAdmin(playerid))
+	if(PlayerInfo[playerid][pAdmin] >= 4 || IsPlayerAdmin(playerid))
 	{
 		new playerb, adminlvl, insert[128];
 
@@ -24,13 +24,13 @@ CMD:setadmin(playerid, params[])
 			}
 		}
 
-  		if(adminlvl < 1 || adminlvl > 2)
+  		if(adminlvl < 1 || adminlvl > 5)
    		{
    			return SCM(playerid, COLOR_RED, "[SERVER]: Invalid Admin Level");
    		}
 
-		SCMex(playerid, COLOR_CYAN, "You've just made %s admin level (%i)", ReturnName(playerb), adminlvl);
-		SCMex(playerb, COLOR_CYAN, "You've just been made admin level (%i) by an Admin", adminlvl, ReturnName(playerid));
+		SCMex(playerid, COLOR_CYAN, "You've just made %s a %s", ReturnName(playerb), StaffRank(adminlvl));
+		SCMex(playerb, COLOR_CYAN, "You've just been made %s", StaffRank(adminlvl));
 
 		PlayerInfo[playerb][pAdmin] = adminlvl;
 

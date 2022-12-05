@@ -42,24 +42,7 @@ CMD:lobby(playerid, params[])
 CMD:dm(playerid, params[])
 {
     new string[500];
-	foreach(Player, i)
-	{
-		if(IsPlayerConnected(i))
-		{
-	        if(dm[i] == 1)
-         	{
-				ddm++;
-			}
-			if(dm[i] == 2)
-			{
-				sdm++;
-			}
-			if(dm[i] == 3)
-			{
-				spas++;
-			}
-		}
-	}
+
 	format(string,sizeof(string),
 	"Maps\tPlayers\n\
 	{fccf03}Deagle (/ddm)\t{5bc906}%d\n\
@@ -67,6 +50,14 @@ CMD:dm(playerid, params[])
 	{c606c9}Sniper (/sdm)\t{5bc906}%d",ddm,spas,sdm);
 	ShowPlayerDialog(playerid, DIALOG_DM, DIALOG_STYLE_TABLIST_HEADERS, "Deathmatch",string, "Select","Cancel");
 
+	return 1;
+}
+
+CMD:tptotest(playerid, params[])
+{
+	SetPlayerVirtualWorld(playerid, 0);
+	SetPlayerInterior(playerid, 0);
+	SetPlayerPos(playerid, 384.3023,-2080.2852,7.8301);
 	return 1;
 }
 
@@ -79,6 +70,21 @@ stock DDM(playerid)
 	    DeletePlayer3DTextLabel(playerid, Info[playerid]);
 	}
 	Info[playerid] = CreatePlayer3DTextLabel(playerid, "Ping: 0\nFPS: 0", -1, 0.0, 0.0, 0.35, 30.0, playerid, INVALID_VEHICLE_ID, 0);
+
+	new pddm;
+
+	foreach(Player, i)
+	{
+		if(IsPlayerConnected(i))
+		{
+	        if(dm[i] == 1)
+         	{
+				pddm++;
+			}
+		}
+	}
+
+	ddm = pddm;
 
 	new rand = random(sizeof(DERandomSpawn)), textlabelddmstr[500];
 	dm[playerid] = 1;
@@ -108,6 +114,21 @@ stock SDM(playerid)
 	}
 	Info[playerid] = CreatePlayer3DTextLabel(playerid, "Ping: 0\nFPS: 0", -1, 0.0, 0.0, 0.35, 30.0, playerid, INVALID_VEHICLE_ID, 0);
 
+	new psdm;
+
+	foreach(Player, i)
+	{
+		if(IsPlayerConnected(i))
+		{
+	        if(dm[i] == 2)
+         	{
+				psdm++;
+			}
+		}
+	}
+
+	sdm = psdm;
+
 	new rand = random(sizeof(SDMRandomSpawn)), textlabelsdmstr[500];
 	dm[playerid] = 2;
 	SetPlayerArmour(playerid, 100);
@@ -135,6 +156,21 @@ stock SPASDM(playerid)
 	    DeletePlayer3DTextLabel(playerid, Info[playerid]);
 	}
 	Info[playerid] = CreatePlayer3DTextLabel(playerid, "Ping: 0\nFPS: 0", -1, 0.0, 0.0, 0.35, 30.0, playerid, INVALID_VEHICLE_ID, 0);
+
+	new pspas;
+
+	foreach(Player, i)
+	{
+		if(IsPlayerConnected(i))
+		{
+	        if(dm[i] == 3)
+         	{
+				pspas++;
+			}
+		}
+	}
+
+	spas = pspas;
 
 	new rand = random(sizeof(SPASRandomSpawn)), textlabelspasdmstr[500];
 	dm[playerid] = 3;

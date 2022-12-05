@@ -1,5 +1,5 @@
 // This is very dope script we are making for Ragnarok because he wants test his coding skills at newbie level
-// Server name is Zones DM :)
+// Server name is Zone DM :)
 													/*
 													$$$$$$$$\  $$$$$$\  $$\   $$\ $$$$$$$$\ 
 													\____$$  |$$  __$$\ $$$\  $$ |$$  _____|

@@ -49,7 +49,7 @@ CMD:admins(playerid, params[])
 	SCM(playerid, COLOR_CYAN,"Current online admins:");
 	foreach(new i : Player)
 	{
-		format(string, sizeof(string),"{00FF00}%s(%d)   {00FF00}Admin",ReturnName(i), i);
+		format(string, sizeof(string),"{00FF00}%s(%d)   %s",ReturnName(i), i, StaffRank(PlayerInfo[playerid][pAdmin]));
 		SendClientMessage(playerid, COLOR_CYAN, string);
 		count++;
 	}

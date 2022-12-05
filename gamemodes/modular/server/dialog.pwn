@@ -63,6 +63,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             	if(listitem == 0)
             	{
             		new string[128];
+            		if(dm[playerid] == 3 || dm[playerid] == 2 || dm[playerid] == 1) return GameTextForPlayer(playerid, "~g~You are already in a deathmatch", 4500,3);
 					DDM(playerid);
 					format(string, sizeof(string), "%s(%d) has joined the Deagle Deathmatch", GetName(playerid), playerid);
 	    			SCMall(COLOR_BLUE, string);
@@ -70,6 +71,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             	if(listitem == 1)
             	{
             		new string[128];
+            		if(dm[playerid] == 3 || dm[playerid] == 2 || dm[playerid] == 1) return GameTextForPlayer(playerid, "~g~You are already in a deathmatch", 4500,3);
 					SPASDM(playerid);
 					format(string, sizeof(string), "%s(%d) has joined the combat Shotgun Deathmatch", GetName(playerid), playerid);
 	    			SCMall(COLOR_BLUE, string);
@@ -77,6 +79,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
             	if(listitem == 2)
             	{
             		new string[128];
+            		if(dm[playerid] == 3 || dm[playerid] == 2 || dm[playerid] == 1) return GameTextForPlayer(playerid, "~g~You are already in a deathmatch", 4500,3);
 					SDM(playerid);
 					format(string, sizeof(string), "%s(%d) has joined the Sniper Deathmatch", GetName(playerid), playerid);
 	    			SCMall(COLOR_BLUE, string);
