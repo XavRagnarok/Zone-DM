@@ -330,7 +330,7 @@ RACE_loadRaceFromFile(race)
 			{
 			    firstline = true;
 
-	            if(!sscanf(line, "p<|>s[24]iiiiiis[24]ffff", rName, rVehicleID, rMaxCheckpoints, rInterior, rDistance, rRecord, rRecordPlaced, rRecordHolder, rSpawnPositionX, rSpawnPositionY, rSpawnPositionZ, rSpawnPositionA))
+	            if(!sscanf(line, "p<|>s[32]iiiiiis[24]ffff", rName, rVehicleID, rMaxCheckpoints, rInterior, rDistance, rRecord, rRecordPlaced, rRecordHolder, rSpawnPositionX, rSpawnPositionY, rSpawnPositionZ, rSpawnPositionA))
 	            {
 					format(RACE_rInfo[race][0][raceName], 24, "%s", rName);
 					RACE_rInfo[race][0][raceVehicleID] = rVehicleID;
