@@ -360,3 +360,36 @@ CMD:get(playerid, params[])
 	SCMex(playerb, COLOR_RED, "An Admin teleported you to him");
 	return 1;
 }
+
+CMD:slap(playerid, params[])
+{
+	if(PlayerInfo[playerid][pAdmin] < 1)
+	{
+		return SCM(playerid, COLOR_RED, "You don't have permissions to use this command");
+	}
+
+	if(aduty[playerid] == 0)
+	{
+		return SCM(playerid, COLOR_RED,"You are not on admin duty");
+	}
+
+	new playerb, Float:x, Float:y, Float:z;
+	if(sscanf(params, "u", playerb))
+	{
+	    return SCM(playerid, COLOR_RED, "Usage: /get [id/name]");
+	}
+
+    if(playerb == INVALID_PLAYER_ID)
+	{
+		return SCM(playerid, COLOR_RED, "Player is not connected");
+	}
+
+	GetPlayerPos(playerb, Float:x, Float:y, Float:z);
+	SetPlayerPos(playerb, x, y, z + 5);
+
+	PlayerPlaySound(playerb, 1190, 0.0,0.0,0.0);
+
+	SCMex(playerid, COLOR_CYAN, "You've just slapped %s", ReturnName(playerb));
+	SCMex(playerb, COLOR_RED, "An Admin slapped you");
+	return 1;
+}
