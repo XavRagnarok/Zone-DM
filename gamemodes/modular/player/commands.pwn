@@ -1,5 +1,11 @@
 // all commands are here
 
+CMD:savecar(playerid, params[])
+{
+
+	return 1;
+}
+
 CMD:playsound(playerid, params[])
 {
 	new soundid;
@@ -22,54 +28,6 @@ CMD:countdown(playerid, params[])
 	SendClientMessage(playerid, COLOR_CYAN, "Countdown Starting!!");
 	activecount = 1;
 	return 1;
-}
-
-forward count5(playerid);
-public count5(playerid)
-{
-	SetTimer("count4", 1000, false);
-	PlayerPlaySound(playerid, 1056, 0.0, 0.0, 0.0);
-	return SendClientMessage(playerid, COLOR_YELLOW, "5");
-}
-
-forward count4(playerid);
-public count4(playerid)
-{
-	SetTimer("count3", 1000, false);
-	PlayerPlaySound(playerid, 1056, 0.0, 0.0, 0.0);
-	return SendClientMessage(playerid, COLOR_YELLOW, "4");
-}
-
-forward count3(playerid);
-public count3(playerid)
-{
-	SetTimer("count2", 1000, false);
-	PlayerPlaySound(playerid, 1056, 0.0, 0.0, 0.0);
-	return SendClientMessage(playerid, COLOR_YELLOW, "3");
-}
-
-forward count2(playerid);
-public count2(playerid)
-{
-	SetTimer("count1", 1000, false);
-	PlayerPlaySound(playerid, 1056, 0.0, 0.0, 0.0);
-	return SendClientMessage(playerid, COLOR_YELLOW, "2");
-}
-
-forward count1(playerid);
-public count1(playerid)
-{
-	SetTimer("countend", 1000, false);
-	PlayerPlaySound(playerid, 1056, 0.0, 0.0, 0.0);
-	return SendClientMessage(playerid, COLOR_YELLOW, "1");
-}
-
-forward countend(playerid);
-public countend(playerid)
-{
-	activecount = 0;
-	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
-	return SendClientMessage(playerid, COL_GREEN, "Start!!");
 }
 
 CMD:mark(playerid, params[])
