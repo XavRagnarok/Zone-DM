@@ -91,6 +91,9 @@ enum // dialog ids
 	DIALOG_CONFIRMSDM,
 	DIALOG_CONFIRMSPASDM,
 
+	// vehicle save related
+	DIALOG_VEHICLE_SAVE_SLOTS,
+
 	// admin related
 	DIALOG_ADMINS,
 
@@ -327,3 +330,12 @@ new
 ;
 
 //////////////////////////////////////////////////////////////////
+
+// Vehicle Save  Related
+new 
+	slot1,
+	slot2,
+	slot3,
+	slot4,
+	slot5
+;

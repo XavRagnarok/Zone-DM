@@ -2,7 +2,13 @@
 
 CMD:savecar(playerid, params[])
 {
-
+	if(IsPlayerInAnyVehicle(playerid) == 0)
+	{
+		PlayerPlaySound(playerid, 1055, 0.0, 0.0, 0.0);
+		return SendClientMessage(playerid, COLOR_RED, "You're not inside any vehicle");
+	}
+	
+	ShowPlayerDialog(playerid, DIALOG_VEHICLE_SAVE_SLOTS, DIALOG_STYLE_LIST, "Save Your Vehicle by Clicking any Slot", slot1"\n"slot2"\n"slot3"\n"slot4"\n"slot5, "Select", "Close");
 	return 1;
 }
 

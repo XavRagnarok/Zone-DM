@@ -147,6 +147,34 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
         	RACE_OnDialogResponse(playerid, dialogid, response, listitem, inputtext);
     	#endif
 
+ 		// Vehicle save related
+
+        case DIALOG_VEHICLE_SLOTS:
+        {
+        	if(response)
+        	{
+        		if(listitem == 0)
+        		{
+        			
+        		}
+        		if(listitem == 1)
+        		{
+        			
+        		}
+        		if(listitem == 2)
+        		{
+        			
+        		}
+        		if(listitem == 3)
+        		{
+        			
+        		}
+        		if(listitem == 4)
+        		{
+        			
+        		}
+        	}
+        }
  	}
 	return 1;
 }
