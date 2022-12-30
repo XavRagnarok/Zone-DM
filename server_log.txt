@@ -725,3 +725,49 @@ v0.3.7-R2, (C)2005-2015 SA-MP Team
 [23:40:13] ---------------------------------------
 
 [23:40:13] Number of vehicle models: 0
+[23:49:14] RCON (In-Game): Player [Ragnaro] sent command: gmx
+[23:49:26] [DATABASE]: Connection established to MySQL
+[23:49:26]  ___________________________________________________________
+
+[23:49:26]   » Raf Racing System loaded. (Loaded 2 Races)
+[23:49:26]  ___________________________________________________________
+
+
+
+[23:49:26] 
+-------------------------------------
+[23:49:26] This is the sick script we are making
+[23:49:26] ---------------------------------------
+
+[23:49:26] Number of vehicle models: 0
+[23:52:09] RCON (In-Game): Player [Ragnaro] sent command: gmx
+[23:52:21] [DATABASE]: Connection established to MySQL
+[23:52:21]  ___________________________________________________________
+
+[23:52:21]   » Raf Racing System loaded. (Loaded 2 Races)
+[23:52:21]  ___________________________________________________________
+
+
+
+[23:52:21] 
+-------------------------------------
+[23:52:21] This is the sick script we are making
+[23:52:21] ---------------------------------------
+
+[23:52:21] Number of vehicle models: 0
+[23:54:23] RCON (In-Game): Player [Ragnaro] sent command: gmx
+[23:54:35] [DATABASE]: Connection established to MySQL
+[23:54:35]  ___________________________________________________________
+
+[23:54:35]   » Raf Racing System loaded. (Loaded 2 Races)
+[23:54:35]  ___________________________________________________________
+
+
+
+[23:54:35] 
+-------------------------------------
+[23:54:35] This is the sick script we are making
+[23:54:35] ---------------------------------------
+
+[23:54:35] Number of vehicle models: 0
+[23:55:45] [part] Ragnaro has left the server (0:1)

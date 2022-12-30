@@ -376,7 +376,7 @@ CMD:slap(playerid, params[])
 	new playerb, Float:x, Float:y, Float:z;
 	if(sscanf(params, "u", playerb))
 	{
-	    return SCM(playerid, COLOR_RED, "Usage: /get [id/name]");
+	    return SCM(playerid, COLOR_RED, "Usage: /slap [id/name]");
 	}
 
     if(playerb == INVALID_PLAYER_ID)
