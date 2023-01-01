@@ -149,7 +149,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
  		// Vehicle save related
 
-        case DIALOG_VEHICLE_SLOTS:
+        case DIALOG_VEHICLE_SAVE_SLOTS:
         {
         	if(response)
         	{
