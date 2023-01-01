@@ -155,23 +155,23 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
         	{
         		if(listitem == 0)
         		{
-        			
+        			ShowPlayerDialog(playerid, DIALOG_VEHICLE_SAVE_SLOT_INPUT1, DIALOG_STYLE_INPUT, "Slot 1", "{ffffff}Please enter the name of your Slot in the space\ngiven down below.", "Enter", "Close");
         		}
         		if(listitem == 1)
         		{
-        			
+        			ShowPlayerDialog(playerid, DIALOG_VEHICLE_SAVE_SLOT_INPUT2, DIALOG_STYLE_INPUT, "Slot 2", "{ffffff}Please enter the name of your Slot in the space\ngiven down below.", "Enter", "Close");
         		}
         		if(listitem == 2)
         		{
-        			
+        			ShowPlayerDialog(playerid, DIALOG_VEHICLE_SAVE_SLOT_INPUT3, DIALOG_STYLE_INPUT, "Slot 3", "{ffffff}Please enter the name of your Slot in the space\ngiven down below.", "Enter", "Close");
         		}
         		if(listitem == 3)
         		{
-        			
+        			ShowPlayerDialog(playerid, DIALOG_VEHICLE_SAVE_SLOT_INPUT4, DIALOG_STYLE_INPUT, "Slot 4", "{ffffff}Please enter the name of your Slot in the space\ngiven down below.", "Enter", "Close");
         		}
         		if(listitem == 4)
         		{
-        			
+        			ShowPlayerDialog(playerid, DIALOG_VEHICLE_SAVE_SLOT_INPUT5, DIALOG_STYLE_INPUT, "Slot 5", "{ffffff}Please enter the name of your Slot in the space\ngiven down below.", "Enter", "Close");
         		}
         	}
         }
