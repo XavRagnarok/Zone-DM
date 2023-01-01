@@ -224,7 +224,7 @@ CMD:v(playerid, params[])
 	GetPlayerFacingAngle(playerid, Float:a);
 
 	if(sscanf(params, "s[20]", model))
-	    return SCM(playerid, COLOR_RED, "Usage: /v [vehicle id 400-611]");
+	    return SCM(playerid, COLOR_RED, "Usage: /v [vehicle id or vehicle name]");
 
 	if((modelid = GetVehicleModelByName(model)) == 0)
 	{
