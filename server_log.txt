@@ -771,3 +771,447 @@ v0.3.7-R2, (C)2005-2015 SA-MP Team
 
 [23:54:35] Number of vehicle models: 0
 [23:55:45] [part] Ragnaro has left the server (0:1)
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[20:24:12] 
+[20:24:12] Server Plugins
+[20:24:12] --------------
+[20:24:12]  Loading plugin: mysql
+[20:24:13]  >> plugin.mysql: R39-6 successfully loaded.
+[20:24:13]   Loaded.
+[20:24:13]  Loading plugin: sscanf
+[20:24:13] 
+[20:24:13]  ===============================
+[20:24:13] 
+[20:24:13]       sscanf plugin loaded.     
+[20:24:13] 
+[20:24:13]          Version: 2.13.1
+[20:24:13] 
+[20:24:13]    (c) 2022 Alex "Y_Less" Cole  
+[20:24:13] 
+[20:24:13]  ===============================
+[20:24:13] 
+[20:24:13]   Loaded.
+[20:24:13]  Loading plugin: streamer
+[20:24:14] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[20:24:14]   Loaded.
+[20:24:14]  Loading plugin: SKY
+[20:24:14] 
+[20:24:14]  ===============================
+[20:24:14]    
+[20:24:14]    < SKY - 2.3.0 >
+[20:24:14]    
+[20:24:14]    (c) 2008 - Present | YSF Maintainers
+[20:24:14]    (c) 2015 | Oscar "Slice" Broman
+[20:24:14]    
+[20:24:14]    Server Version: 0.3.7 R2
+[20:24:14]    Operating System: Windows
+[20:24:14]    Built on: Sep 27 2021 at 23:19:52
+[20:24:14]    
+[20:24:14]  ===============================
+[20:24:14] 
+[20:24:14]   Loaded.
+[20:24:14]  Loaded 4 plugins.
+
+[20:24:14] 
+[20:24:14] Filterscripts
+[20:24:14] ---------------
+[20:24:14]   Loaded 0 filterscripts.
+
+[20:24:14] [DATABASE]: Connection established to MySQL
+[20:24:14]  ___________________________________________________________
+
+[20:24:14]   » Raf Racing System loaded. (Loaded 2 Races)
+[20:24:14]  ___________________________________________________________
+
+
+
+[20:24:14] 
+-------------------------------------
+[20:24:14] This is the sick script we are making
+[20:24:14] ---------------------------------------
+
+[20:24:14] Number of vehicle models: 0
+[20:25:33] [connection] 192.168.0.102:50546 requests connection cookie.
+[20:25:34] [connection] incoming connection: 192.168.0.102:50546 id: 0
+[20:25:34] [join] Ragnarok has joined the server (0:192.168.0.102)
+[21:30:31] RCON (In-Game): Player #0 (Ragnarok) has logged in.
+[21:30:35] RCON (In-Game): Player [Ragnarok] sent command: gmx
+[21:30:47] [DATABASE]: Connection established to MySQL
+[21:30:48]  ___________________________________________________________
+
+[21:30:48]   » Raf Racing System loaded. (Loaded 2 Races)
+[21:30:48]  ___________________________________________________________
+
+
+
+[21:30:48] 
+-------------------------------------
+[21:30:48] This is the sick script we are making
+[21:30:48] ---------------------------------------
+
+[21:30:48] Number of vehicle models: 0
+[21:35:08] RCON (In-Game): Player [Ragnarok] sent command: gmx
+[21:35:20] [DATABASE]: Connection established to MySQL
+[21:35:20]  ___________________________________________________________
+
+[21:35:20]   » Raf Racing System loaded. (Loaded 2 Races)
+[21:35:20]  ___________________________________________________________
+
+
+
+[21:35:20] 
+-------------------------------------
+[21:35:20] This is the sick script we are making
+[21:35:20] ---------------------------------------
+
+[21:35:20] Number of vehicle models: 0
+[22:05:11] RCON (In-Game): Player [Ragnarok] sent command: gmx
+[22:05:23] [DATABASE]: Connection established to MySQL
+[22:05:23]  ___________________________________________________________
+
+[22:05:23]   » Raf Racing System loaded. (Loaded 2 Races)
+[22:05:23]  ___________________________________________________________
+
+
+
+[22:05:23] 
+-------------------------------------
+[22:05:23] This is the sick script we are making
+[22:05:23] ---------------------------------------
+
+[22:05:23] Number of vehicle models: 0
+[22:10:31] RCON (In-Game): Player [Ragnarok] sent command: gmx
+[22:10:43] [DATABASE]: Connection established to MySQL
+[22:10:43]  ___________________________________________________________
+
+[22:10:43]   » Raf Racing System loaded. (Loaded 2 Races)
+[22:10:43]  ___________________________________________________________
+
+
+
+[22:10:43] 
+-------------------------------------
+[22:10:43] This is the sick script we are making
+[22:10:43] ---------------------------------------
+
+[22:10:43] Number of vehicle models: 0
+[22:25:00] [part] Ragnarok has left the server (0:1)
+[22:25:06] --- Server Shutting Down.
+[22:25:06] plugin.mysql: Unloading plugin...
+[22:25:06] plugin.mysql: Plugin unloaded.
+[22:25:06] 
+[22:25:06]  ===============================
+[22:25:06] 
+[22:25:06]      sscanf plugin unloaded.    
+[22:25:06] 
+[22:25:06]  ===============================
+[22:25:06] 
+[22:25:06] 
+
+*** Streamer Plugin v2.9.5 by Incognito unloaded ***
+
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[01:00:55] 
+[01:00:55] Server Plugins
+[01:00:55] --------------
+[01:00:55]  Loading plugin: mysql
+[01:00:55]  >> plugin.mysql: R39-6 successfully loaded.
+[01:00:55]   Loaded.
+[01:00:55]  Loading plugin: sscanf
+[01:00:55] 
+[01:00:55]  ===============================
+[01:00:55] 
+[01:00:55]       sscanf plugin loaded.     
+[01:00:55] 
+[01:00:55]          Version: 2.13.1
+[01:00:55] 
+[01:00:55]    (c) 2022 Alex "Y_Less" Cole  
+[01:00:55] 
+[01:00:55]  ===============================
+[01:00:55] 
+[01:00:55]   Loaded.
+[01:00:55]  Loading plugin: streamer
+[01:00:55] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[01:00:55]   Loaded.
+[01:00:55]  Loading plugin: SKY
+[01:00:55] 
+[01:00:55]  ===============================
+[01:00:55]    
+[01:00:55]    < SKY - 2.3.0 >
+[01:00:55]    
+[01:00:55]    (c) 2008 - Present | YSF Maintainers
+[01:00:55]    (c) 2015 | Oscar "Slice" Broman
+[01:00:55]    
+[01:00:55]    Server Version: 0.3.7 R2
+[01:00:55]    Operating System: Windows
+[01:00:55]    Built on: Sep 27 2021 at 23:19:52
+[01:00:55]    
+[01:00:55]  ===============================
+[01:00:55] 
+[01:00:55]   Loaded.
+[01:00:55]  Loaded 4 plugins.
+
+[01:00:55] 
+[01:00:55] Filterscripts
+[01:00:55] ---------------
+[01:00:55]   Loaded 0 filterscripts.
+
+[01:00:55] [DATABASE]: Connection established to MySQL
+[01:00:55]  ___________________________________________________________
+
+[01:00:55]   » Raf Racing System loaded. (Loaded 2 Races)
+[01:00:55]  ___________________________________________________________
+
+
+
+[01:00:55] 
+-------------------------------------
+[01:00:55] This is the sick script we are making
+[01:00:55] ---------------------------------------
+
+[01:00:55] Number of vehicle models: 0
+[01:01:25] [connection] 192.168.0.102:60085 requests connection cookie.
+[01:01:26] [connection] incoming connection: 192.168.0.102:60085 id: 0
+[01:01:26] [join] Ragnarok has joined the server (0:192.168.0.102)
+[01:45:43] [part] Ragnarok has left the server (0:1)
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[18:42:30] 
+[18:42:30] Server Plugins
+[18:42:30] --------------
+[18:42:30]  Loading plugin: mysql
+[18:42:30]  >> plugin.mysql: R39-6 successfully loaded.
+[18:42:30]   Loaded.
+[18:42:30]  Loading plugin: sscanf
+[18:42:30] 
+[18:42:30]  ===============================
+[18:42:30] 
+[18:42:30]       sscanf plugin loaded.     
+[18:42:30] 
+[18:42:30]          Version: 2.13.1
+[18:42:30] 
+[18:42:30]    (c) 2022 Alex "Y_Less" Cole  
+[18:42:30] 
+[18:42:30]  ===============================
+[18:42:30] 
+[18:42:30]   Loaded.
+[18:42:30]  Loading plugin: streamer
+[18:42:30] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[18:42:30]   Loaded.
+[18:42:30]  Loading plugin: SKY
+[18:42:31] 
+[18:42:31]  ===============================
+[18:42:31]    
+[18:42:31]    < SKY - 2.3.0 >
+[18:42:31]    
+[18:42:31]    (c) 2008 - Present | YSF Maintainers
+[18:42:31]    (c) 2015 | Oscar "Slice" Broman
+[18:42:31]    
+[18:42:31]    Server Version: 0.3.7 R2
+[18:42:31]    Operating System: Windows
+[18:42:31]    Built on: Sep 27 2021 at 23:19:52
+[18:42:31]    
+[18:42:31]  ===============================
+[18:42:31] 
+[18:42:31]   Loaded.
+[18:42:31]  Loaded 4 plugins.
+
+[18:42:31] I couldn't load any gamemode scripts. Please verify your server.cfg
+[18:42:31] It needs a gamemode0 line at the very least.
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3.7-R2, (C)2005-2015 SA-MP Team
+
+[19:04:21] 
+[19:04:21] Server Plugins
+[19:04:21] --------------
+[19:04:21]  Loading plugin: mysql
+[19:04:21]  >> plugin.mysql: R39-6 successfully loaded.
+[19:04:21]   Loaded.
+[19:04:21]  Loading plugin: sscanf
+[19:04:21] 
+[19:04:21]  ===============================
+[19:04:21] 
+[19:04:21]       sscanf plugin loaded.     
+[19:04:21] 
+[19:04:21]          Version: 2.13.1
+[19:04:21] 
+[19:04:21]    (c) 2022 Alex "Y_Less" Cole  
+[19:04:21] 
+[19:04:21]  ===============================
+[19:04:21] 
+[19:04:21]   Loaded.
+[19:04:21]  Loading plugin: streamer
+[19:04:21] 
+
+*** Streamer Plugin v2.9.5 by Incognito loaded ***
+
+[19:04:21]   Loaded.
+[19:04:21]  Loading plugin: SKY
+[19:04:21] 
+[19:04:21]  ===============================
+[19:04:21]    
+[19:04:21]    < SKY - 2.3.0 >
+[19:04:21]    
+[19:04:21]    (c) 2008 - Present | YSF Maintainers
+[19:04:21]    (c) 2015 | Oscar "Slice" Broman
+[19:04:21]    
+[19:04:21]    Server Version: 0.3.7 R2
+[19:04:21]    Operating System: Windows
+[19:04:21]    Built on: Sep 27 2021 at 23:19:52
+[19:04:21]    
+[19:04:21]  ===============================
+[19:04:21] 
+[19:04:21]   Loaded.
+[19:04:21]  Loaded 4 plugins.
+
+[19:04:21] 
+[19:04:21] Filterscripts
+[19:04:21] ---------------
+[19:04:21]   Loaded 0 filterscripts.
+
+[19:04:21] [DATABASE]: Connection established to MySQL
+[19:04:21]  ___________________________________________________________
+
+[19:04:21]   » Raf Racing System loaded. (Loaded 2 Races)
+[19:04:21]  ___________________________________________________________
+
+
+
+[19:04:21] 
+-------------------------------------
+[19:04:21] This is the sick script we are making
+[19:04:21] ---------------------------------------
+
+[19:04:21] Number of vehicle models: 0
+[19:07:41] [connection] 192.168.0.102:52724 requests connection cookie.
+[19:07:42] [connection] incoming connection: 192.168.0.102:52724 id: 0
+[19:07:42] [join] Ragnarok has joined the server (0:192.168.0.102)
+[19:09:52] RCON (In-Game): Player #0 (Ragnarok) has logged in.
+[19:09:53] RCON (In-Game): Player [Ragnarok] sent command: gmx
+[19:10:05] [DATABASE]: Connection established to MySQL
+[19:10:05]  ___________________________________________________________
+
+[19:10:05]   » Raf Racing System loaded. (Loaded 2 Races)
+[19:10:05]  ___________________________________________________________
+
+
+
+[19:10:05] 
+-------------------------------------
+[19:10:05] This is the sick script we are making
+[19:10:05] ---------------------------------------
+
+[19:10:05] Number of vehicle models: 0
+[19:13:28] RCON (In-Game): Player [Ragnarok] sent command: gmx
+[19:13:40] [DATABASE]: Connection established to MySQL
+[19:13:40]  ___________________________________________________________
+
+[19:13:40]   » Raf Racing System loaded. (Loaded 2 Races)
+[19:13:40]  ___________________________________________________________
+
+
+
+[19:13:40] 
+-------------------------------------
+[19:13:40] This is the sick script we are making
+[19:13:40] ---------------------------------------
+
+[19:13:40] Number of vehicle models: 0
+[19:16:54] RCON (In-Game): Player [Ragnarok] sent command: gmx
+[19:17:06] [DATABASE]: Connection established to MySQL
+[19:17:06]  ___________________________________________________________
+
+[19:17:06]   » Raf Racing System loaded. (Loaded 2 Races)
+[19:17:06]  ___________________________________________________________
+
+
+
+[19:17:06] 
+-------------------------------------
+[19:17:06] This is the sick script we are making
+[19:17:06] ---------------------------------------
+
+[19:17:06] Number of vehicle models: 0
+[19:21:45] RCON (In-Game): Player [Ragnarok] sent command: gmx
+[19:21:57] [DATABASE]: Connection established to MySQL
+[19:21:57]  ___________________________________________________________
+
+[19:21:57]   » Raf Racing System loaded. (Loaded 2 Races)
+[19:21:57]  ___________________________________________________________
+
+
+
+[19:21:57] 
+-------------------------------------
+[19:21:57] This is the sick script we are making
+[19:21:57] ---------------------------------------
+
+[19:21:57] Number of vehicle models: 0
+[19:23:31] RCON (In-Game): Player [Ragnarok] sent command: gmx
+[19:23:43] [DATABASE]: Connection established to MySQL
+[19:23:43]  ___________________________________________________________
+
+[19:23:43]   » Raf Racing System loaded. (Loaded 2 Races)
+[19:23:43]  ___________________________________________________________
+
+
+
+[19:23:43] 
+-------------------------------------
+[19:23:43] This is the sick script we are making
+[19:23:43] ---------------------------------------
+
+[19:23:43] Number of vehicle models: 0
+[19:25:14] RCON (In-Game): Player [Ragnarok] sent command: gmx
+[19:25:26] [DATABASE]: Connection established to MySQL
+[19:25:26]  ___________________________________________________________
+
+[19:25:26]   » Raf Racing System loaded. (Loaded 2 Races)
+[19:25:26]  ___________________________________________________________
+
+
+
+[19:25:26] 
+-------------------------------------
+[19:25:26] This is the sick script we are making
+[19:25:26] ---------------------------------------
+
+[19:25:26] Number of vehicle models: 0

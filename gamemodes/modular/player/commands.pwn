@@ -8,7 +8,35 @@ CMD:savecar(playerid, params[])
 		return SendClientMessage(playerid, COLOR_RED, "You're not inside any vehicle");
 	}
 	
-	ShowPlayerDialog(playerid, DIALOG_VEHICLE_SAVE_SLOTS, DIALOG_STYLE_LIST, "Save Your Vehicle by Clicking any Slot", slot1"\n"slot2"\n"slot3"\n"slot4"\n"slot5, "Select", "Close");
+	new string[128], slot1string[32], slot2string[32], slot3string[32], slot4string[32], slot5string[32];
+
+	if(VehicleInfo[playerid][Slotname1] == 0)
+	{
+		slot1string = "Slot 1";
+	}
+
+	if(VehicleInfo[playerid][Slotname2] == 0)
+	{
+		slot2string = "Slot 2";
+	}
+
+	if(VehicleInfo[playerid][Slotname3] == 0)
+	{
+		slot3string = "Slot 3";
+	}
+
+	if(VehicleInfo[playerid][Slotname4] == 0)
+	{
+		slot4string = "Slot 4";
+	}
+
+	if(VehicleInfo[playerid][Slotname5] == 0)
+	{
+		slot5string = "Slot 5";
+	}
+
+	format(string, sizeof(string), "%s\n%s\n%s\n%s\n%s", slot1string, slot2string, slot3string, slot4string, slot5string);
+	ShowPlayerDialog(playerid, DIALOG_VEHICLE_SAVE_SLOTS, DIALOG_STYLE_LIST, "Save Your Vehicle by Clicking any Slot", string, "Select", "Close");
 	return 1;
 }
 

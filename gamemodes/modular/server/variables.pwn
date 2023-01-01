@@ -16,6 +16,8 @@
 
 #define SCRIPT_VERSION "Ragnarok's script adventure"
 
+#define MAX_VEHICLE_SAVE_SLOTS 5
+
 // race related
 
 #define MAX_RACES 			2
@@ -332,10 +334,13 @@ new
 //////////////////////////////////////////////////////////////////
 
 // Vehicle Save  Related
-new 
-	slot1,
-	slot2,
-	slot3,
-	slot4,
-	slot5
-;
+
+enum P_VEHICLE_SAVE_DATA
+{
+    Slotname1,
+    Slotname2,
+    Slotname3,
+    Slotname4,
+    Slotname5
+};
+new VehicleInfo[MAX_PLAYERS][P_VEHICLE_SAVE_DATA];
