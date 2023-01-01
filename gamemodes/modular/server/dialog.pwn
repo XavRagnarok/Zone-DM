@@ -175,6 +175,45 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
         		}
         	}
         }
+
+        case DIALOG_VEHICLE_SAVE_SLOT_INPUT1:
+        {	
+        	if(strlen(inputtext) <=3 || strlen(inputtext) > 32)
+        	{
+        		return SendClientMessage(playerid, COLOR_RED, "Your text must be greater than 3 and less than 32");
+        	}
+        }
+        case DIALOG_VEHICLE_SAVE_SLOT_INPUT2:
+        {
+        	if(strlen(inputtext) <=3 || strlen(inputtext) > 32)
+        	{
+        		return SendClientMessage(playerid, COLOR_RED, "Your text must be greater than 3 and less than 32");
+        	}
+        }
+        case DIALOG_VEHICLE_SAVE_SLOT_INPUT3:
+        {
+        	if(strlen(inputtext) <=3 || strlen(inputtext) > 32)
+        	{
+        		return SendClientMessage(playerid, COLOR_RED, "Your text must be greater than 3 and less than 32");
+        	}
+        }
+        case DIALOG_VEHICLE_SAVE_SLOT_INPUT4:
+        {
+        	if(strlen(inputtext) <=3 || strlen(inputtext) > 32)
+        	{
+        		return SendClientMessage(playerid, COLOR_RED, "Your text must be greater than 3 and less than 32");
+        	}if(response)
+        	{
+
+        	}
+        }
+        case DIALOG_VEHICLE_SAVE_SLOT_INPUT5:
+        {
+        	if(strlen(inputtext) <=3 || strlen(inputtext) > 32)
+        	{
+        		return SendClientMessage(playerid, COLOR_RED, "Your text must be greater than 3 and less than 32");
+        	}
+        }
  	}
 	return 1;
 }
